@@ -314,18 +314,27 @@ function vDistance(){
 
 /* admin: roles */
 var PERMS=MENU.filter(function(m){return !m[3]});
+var STAFF_DOMAIN="staff.example.com";
+function uname(e){e=String(e||"");return e.slice(-STAFF_DOMAIN.length-1)==="@"+STAFF_DOMAIN?e.slice(0,-STAFF_DOMAIN.length-1):e}
+function genPw(){var c="abcdefghjkmnpqrstuvwxyz23456789",a=new Uint32Array(10),o="";crypto.getRandomValues(a);for(var i=0;i<10;i++)o+=c[a[i]%c.length];return o}
+function siteUrl(){return location.origin+location.pathname}
+function staffFn(body){return sb.functions.invoke("staff-admin",{body:body}).then(function(r){var d=r.data;if(r.error&&!d&&r.error.context&&r.error.context.json)return r.error.context.json().then(function(j){throw new Error(j.error)},function(){throw new Error(r.error.message)});if(r.error)throw new Error((d&&d.error)||r.error.message);if(d&&d.error)throw new Error(d.error);return d})}
+function staffErr(e){var m=e&&e.message;return m==="taken"?"اسم المستخدم مستخدم من قبل، اختر اسماً آخر.":m==="bad_username"?"اسم المستخدم: حروف إنجليزية وأرقام فقط، من 3 إلى 30.":m==="short_password"?"كلمة المرور 8 أحرف على الأقل.":m==="not_allowed"?"هذه العملية للمدير فقط.":"تعذّر الحفظ: "+m}
 function vPerm(){
   if(!ui.acc){ui.acc="loading";sb.rpc("list_accounts").then(function(r){if(r.error){ui.acc=[];ui.msg="تعذّر تحميل الحسابات: "+r.error.message;ui.msgOk=false}else ui.acc=r.data.map(function(a){return{id:a.user_id,e:a.email,n:a.name||"",r:a.role||"",p:a.perms||[],o:JSON.stringify([a.name||"",a.role||"",a.perms||[]])}});render()});}
   if(ui.acc==="loading")return '<div class="panel"><p class="hint" style="margin:0">جارٍ التحميل…</p></div>';
   var dr=ui.acc,dirty=dr.some(function(a){return JSON.stringify([a.n,a.r,a.p])!==a.o});
-  var rows=dr.map(function(s,i){var self=s.id===myUid;return '<tr><td class="s"><input data-aname="'+i+'" value="'+esc(s.n)+'" placeholder="الاسم" style="min-width:120px"><br><span class="num" style="color:var(--muted);font-size:12px" dir="ltr">'+esc(s.e)+'</span>'+(self?'<br><span style="color:var(--muted);font-size:12px">هذا حسابك، مدير بكل الصلاحيات</span>':'')+'</td>'+
+  var rows=dr.map(function(s,i){var self=s.id===myUid;return '<tr><td class="s"><input data-aname="'+i+'" value="'+esc(s.n)+'" placeholder="الاسم" style="min-width:120px"><br><span class="num" style="color:var(--muted);font-size:12px" dir="ltr">'+esc(uname(s.e))+'</span>'+(self||!s.r?'':' <button class="btn" style="padding:2px 8px;font-size:12px" data-newpw="'+i+'"'+(ui.busy?" disabled":"")+'>كلمة مرور جديدة</button>')+(self?'<br><span style="color:var(--muted);font-size:12px">هذا حسابك، مدير بكل الصلاحيات</span>':'')+'</td>'+
     '<td><select data-arole="'+i+'"'+(self?" disabled":"")+'><option value=""'+(!s.r?" selected":"")+'>بدون دخول</option><option value="staff"'+(s.r==="staff"?" selected":"")+'>موظف</option><option value="admin"'+(s.r==="admin"?" selected":"")+'>مدير</option></select></td>'+
     PERMS.map(function(m){return '<td><input type="checkbox" data-perm="'+i+'|'+m[0]+'"'+((s.p||[]).indexOf(m[0])>=0||s.r==="admin"?" checked":"")+(s.r!=="staff"?" disabled":"")+' aria-label="'+esc(m[1])+'"></td>'}).join("")+'</tr>'}).join("");
   return '<section class="panel"><h2>أنواع الصلاحيات</h2><ul class="cols" style="margin-top:8px"><li><b>المدير</b> <span>كل الأقسام، ورفع البيانات، وإدارة الحسابات.</span></li><li><b>الموظف</b> <span>يرى فقط الأقسام التي تحددها له هنا.</span></li><li><b>المندوب</b> <span>يدخل برقم الإقامة والـ ID من رابط المناديب.</span></li></ul></section>'+
-    '<section class="panel"><h2>الحسابات</h2><p class="hint">الموظف يفتح الموقع ويختار «موظف» ثم «إنشاء حساب»، وبعدها يظهر هنا. اختر له «موظف» وحدّد أقسامه ثم اضغط «حفظ الصلاحيات».</p>'+
-    '<div class="tbl" style="box-shadow:none"><table><thead><tr><th>الحساب</th><th>الدور</th>'+PERMS.map(function(m){return '<th>'+m[1]+'</th>'}).join("")+'</tr></thead><tbody>'+(rows||'<tr><td class="empty" colspan="'+(PERMS.length+2)+'">لا توجد حسابات بعد.</td></tr>')+'</tbody></table></div>'+(dr.length<2?'<p class="hint" style="margin-top:10px">لا يوجد موظفون بعد. عندما ينشئ موظف حسابه سيظهر هنا في سطر جديد، وتقدر تختار له الأقسام.</p>':'')+
+    '<section class="panel"><h2>الحسابات</h2><p class="hint">حدّد أقسام كل موظف ثم اضغط «حفظ الصلاحيات». اختيار «بدون دخول» يوقف حسابه.</p>'+
+    '<div class="tbl" style="box-shadow:none"><table><thead><tr><th>الحساب</th><th>الدور</th>'+PERMS.map(function(m){return '<th>'+m[1]+'</th>'}).join("")+'</tr></thead><tbody>'+(rows||'<tr><td class="empty" colspan="'+(PERMS.length+2)+'">لا توجد حسابات بعد.</td></tr>')+'</tbody></table></div>'+(dr.length<2?'<p class="hint" style="margin-top:10px">لا يوجد موظفون بعد. أضف أول موظف من النموذج بالأسفل.</p>':'')+
     '<p class="'+(ui.msgOk?"ok":"err")+'" style="margin-top:10px">'+esc(ui.msg)+'</p>'+
-    '<div class="row"><button class="btn pri" id="saveStaff"'+(dirty&&!ui.busy?"":" disabled")+'>حفظ الصلاحيات</button></div></section>';
+    '<div class="row"><button class="btn pri" id="saveStaff"'+(dirty&&!ui.busy?"":" disabled")+'>حفظ الصلاحيات</button></div></section>'+
+    (ui.cred?'<section class="panel" style="border-inline-start:4px solid var(--gold)"><h2>أرسل هذه البيانات للموظف</h2><p class="hint">انسخها الآن، كلمة المرور لا تظهر مرة أخرى.</p><pre id="credTxt" style="white-space:pre-wrap;background:var(--sunk);padding:12px;border-radius:6px;font:15px/1.8 var(--f-body)">'+esc(ui.cred)+'</pre><div class="row"><button class="btn pri" id="copyCred">نسخ</button><button class="btn" id="hideCred">تم</button></div></section>':'')+
+    '<section class="panel"><h2>إضافة موظف</h2><p class="hint">اكتب اسم الموظف واسم مستخدم بالإنجليزي. كلمة المرور تُولَّد تلقائياً ويمكنك تغييرها. بعد الإضافة تظهر لك البيانات لترسلها له.</p>'+
+    '<form id="addStaff" class="row" autocomplete="off"><label>اسم الموظف<input id="sn" required></label><label>اسم المستخدم<input id="su" required dir="ltr" autocapitalize="none" pattern="[A-Za-z0-9._\\-]{3,30}" title="حروف إنجليزية وأرقام، من 3 إلى 30"></label><label>كلمة المرور<input id="sp" required dir="ltr" minlength="8" value="'+esc(ui.genpw||(ui.genpw=genPw()))+'"></label><button class="btn pri" type="submit"'+(ui.busy?" disabled":"")+'>إضافة موظف</button></form></section>';
 }
 
 /* courier */
@@ -336,12 +345,12 @@ function vCourier(){
   if(!me&&!staff){
     var who=ui0.who;
     if(RIDER_ONLY)who="courier";var su=ui0.signup;
-    var demo=who==="staff"?'<p class="hint" style="margin-top:12px">'+(su?'عندك حساب؟ <a href="#" data-su="0">تسجيل الدخول</a>':'موظف جديد؟ <a href="#" data-su="1">إنشاء حساب</a>')+'</p>':"";
+    var demo=su?'<p class="hint" style="margin-top:12px"><a href="#" data-su="0">رجوع لتسجيل الدخول</a></p>':"";
     var form=who==="courier"?
       '<form id="loginF" autocomplete="off"><label>رقم الإقامة<input id="iq" inputmode="numeric" maxlength="10" required></label><label>رقم الـ ID<input id="cid" inputmode="numeric" required></label><p class="err">'+esc(ui.msg)+'</p><button class="btn pri" type="submit">دخول</button></form>':
-      '<form id="staffF">'+(su?'<label>الاسم<input id="ln" required></label>':'')+'<label>البريد الإلكتروني<input id="lu" type="email" dir="ltr" autocomplete="username" required></label><label>كلمة المرور<input id="lp" type="password" dir="ltr" minlength="8" autocomplete="'+(su?"new-password":"current-password")+'" required></label><p class="'+(ui.msgOk?"ok":"err")+'">'+esc(ui.msg)+'</p><button class="btn pri" type="submit"'+(ui.busy?" disabled":"")+'>'+(su?"إنشاء حساب":"دخول")+'</button></form>';
+      '<form id="staffF">'+(su?'<label>الاسم<input id="ln" required></label>':'')+'<label>'+(su?'البريد الإلكتروني':'اسم المستخدم')+'<input id="lu" type="'+(su?'email':'text')+'" dir="ltr" autocomplete="username" autocapitalize="none" required></label><label>كلمة المرور<input id="lp" type="password" dir="ltr" minlength="8" autocomplete="'+(su?"new-password":"current-password")+'" required></label><p class="'+(ui.msgOk?"ok":"err")+'">'+esc(ui.msg)+'</p><button class="btn pri" type="submit"'+(ui.busy?" disabled":"")+'>'+(su?"إنشاء حساب":"دخول")+'</button></form>';
     return '<div class="login"><section class="panel">'+(RIDER_ONLY?'':'<div class="seg" role="group" style="margin-bottom:14px"><button data-who="courier" aria-pressed="'+(who==="courier")+'">مندوب توصيل</button><button data-who="staff" aria-pressed="'+(who==="staff")+'">موظف / مدير</button></div>')+
-      '<h2>'+(who==="courier"?"دخول المندوب":"دخول الموظف")+'</h2><p class="hint">'+(who==="courier"?"أدخل رقم الإقامة ورقم الـ ID الخاص بك في هنقرستيشن.":(su?"أنشئ حسابك، ثم يمنحك المدير الصلاحيات.":"أدخل بريدك الإلكتروني وكلمة المرور."))+'</p>'+form+demo+'</section></div>';
+      '<h2>'+(who==="courier"?"دخول المندوب":"دخول الموظف")+'</h2><p class="hint">'+(who==="courier"?"أدخل رقم الإقامة ورقم الـ ID الخاص بك في هنقرستيشن.":(su?"أنشئ حسابك، ثم يمنحك المدير الصلاحيات.":"أدخل اسم المستخدم وكلمة المرور التي أرسلها لك المدير. المدير يدخل ببريده."))+'</p>'+form+demo+'</section></div>';
   }
   if(!me)return '<div class="panel"><p class="hint" style="margin:0">هذه الشاشة للمناديب.</p></div>';
   var id=me,ds=days(),mine=ds.filter(function(d){return data.days[d][id]}),ld=lastDay(),cs=ui0.cs;
@@ -611,6 +620,10 @@ root.addEventListener("click",function(e){
     work(ch.reduce(function(p,a){return p.then(function(){
       var q=a.r?sb.from("staff").upsert({user_id:a.id,name:a.n||a.e,role:a.r,perms:a.r==="staff"?a.p:[]},{onConflict:"user_id"}):sb.from("staff").delete().eq("user_id",a.id);
       return q.then(function(r){if(r.error)throw r.error})})},Promise.resolve()).then(function(){ui.acc=null}),"تم حفظ الصلاحيات.");return}
+  if(t.dataset.newpw!=null){var ac=ui.acc[+t.dataset.newpw],npw=genPw();ui.busy=true;render();
+    staffFn({action:"password",user_id:ac.id,password:npw}).then(function(){ui.busy=false;ui.cred="الرابط: "+siteUrl()+"\nاسم المستخدم: "+uname(ac.e)+"\nكلمة المرور: "+npw;ui.msg="";render()}).catch(function(e){ui.busy=false;ui.msgOk=false;ui.msg=staffErr(e);render()});return}
+  if(t.id==="copyCred"){try{navigator.clipboard.writeText(ui.cred);t.textContent="تم النسخ"}catch(e){}return}
+  if(t.id==="hideCred"){ui.cred=null;render();return}
   if(t.id==="cancelUp"){ui.upload=null;ui.msg="";render();return}
   if(t.id==="askReset"){ui.confirmReset=true;render();return}
   if(t.id==="noReset"){ui.confirmReset=false;render();return}
@@ -645,7 +658,11 @@ root.addEventListener("change",function(e){
 });
 
 root.addEventListener("submit",function(e){
-  var id=e.target.id;if(id!=="loginF"&&id!=="staffF"&&id!=="addRider")return;e.preventDefault();
+  var id=e.target.id;if(id!=="loginF"&&id!=="staffF"&&id!=="addRider"&&id!=="addStaff")return;e.preventDefault();
+  if(id==="addStaff"){var sn=document.getElementById("sn").value.trim(),su=document.getElementById("su").value.trim().toLowerCase(),sp=document.getElementById("sp").value;
+    ui.busy=true;ui.msg="";render();
+    staffFn({action:"create",name:sn,username:su,password:sp,perms:["overall","daily"]}).then(function(){ui.busy=false;ui.genpw=null;ui.acc=null;ui.msgOk=true;ui.msg="أُضيف الموظف بقسمي النظرة العامة والأداء اليومي. عدّل أقسامه من الجدول إن أردت.";
+      ui.cred="الرابط: "+siteUrl()+"\nاسم المستخدم: "+su+"\nكلمة المرور: "+sp;render()}).catch(function(e){ui.busy=false;ui.msgOk=false;ui.msg=staffErr(e);render()});return}
   if(id==="loginF"){
     var iq=digits(document.getElementById("iq").value).trim(),cid=digits(document.getElementById("cid").value).trim();
     ui.busy=true;ui.msg="";
@@ -655,11 +672,11 @@ root.addEventListener("submit",function(e){
       me=cid;portalToData(r.data);ss("hs_portal",JSON.stringify(r.data));ui.msg="";ui0.cs="home";ui.cday=null;render()});
   }
   if(id==="staffF"){
-    var em=document.getElementById("lu").value.trim(),pw=document.getElementById("lp").value,nmEl=document.getElementById("ln"),nm=nmEl&&nmEl.value.trim();
+    var em=document.getElementById("lu").value.trim().toLowerCase();if(em.indexOf("@")<0)em=em+"@"+STAFF_DOMAIN;var _x=0,pw=document.getElementById("lp").value,nmEl=document.getElementById("ln"),nm=nmEl&&nmEl.value.trim();
     ui.busy=true;ui.msg="";render();
     var p=ui0.signup?sb.auth.signUp({email:em,password:pw,options:{data:{name:nm},emailRedirectTo:location.origin+location.pathname}}):sb.auth.signInWithPassword({email:em,password:pw});
     p.then(function(r){
-      if(r.error){ui.busy=false;ui.msgOk=false;ui.msg=/invalid login/i.test(r.error.message)?"البريد أو كلمة المرور غير صحيحة.":/not confirmed/i.test(r.error.message)?"فعّل حسابك من الرسالة التي وصلت بريدك أولاً.":/registered/i.test(r.error.message)?"هذا البريد مسجّل من قبل. اختر تسجيل الدخول.":r.error.message;render();return}
+      if(r.error){ui.busy=false;ui.msgOk=false;ui.msg=/invalid login/i.test(r.error.message)?"اسم المستخدم أو كلمة المرور غير صحيحة.":/not confirmed/i.test(r.error.message)?"فعّل حسابك من الرسالة التي وصلت بريدك أولاً.":/registered/i.test(r.error.message)?"هذا البريد مسجّل من قبل. اختر تسجيل الدخول.":r.error.message;render();return}
       if(!r.data.session){ui.busy=false;ui.msgOk=true;ui0.signup=false;ui.msg="تم إنشاء الحساب. افتح الرسالة التي وصلت بريدك لتفعيله، ثم سجّل الدخول.";render();return}
       return enterStaff(r.data.user,nm).then(function(){ui.busy=false;if(isAdmin||staff)ui.msg="";render()});
     }).catch(function(err){ui.busy=false;ui.msgOk=false;ui.msg="تعذّر الدخول: "+(err.message||err);render()});
