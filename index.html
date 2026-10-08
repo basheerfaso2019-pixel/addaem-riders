@@ -675,7 +675,7 @@ root.addEventListener("submit",function(e){
     sb.rpc("rider_portal",{p_id:cid,p_iqama:iq}).then(function(r){ui.busy=false;
       if(r.error){ui.msg="تعذّر الاتصال، حاول مرة أخرى.";render();return}
       if(r.data.error){ui.msg=riderErr(r.data.error);render();return}
-      me=cid;portalToData(r.data);ss("hs_portal",JSON.stringify(r.data));ui.msg="";ui0.cs="home";ui.cday=null;render()});
+      me=cid;portalToData(r.data);ui.msg="";ui0.cs="home";ui.cday=null;render()});
   }
   if(id==="staffF"){
     var em=document.getElementById("lu").value.trim().toLowerCase();if(em.indexOf("@")<0)em=em+"@"+STAFF_DOMAIN;var _x=0,pw=document.getElementById("lp").value,nmEl=document.getElementById("ln"),nm=nmEl&&nmEl.value.trim();
@@ -697,7 +697,7 @@ sb.from("settings").select("value").eq("key","company").maybeSingle().then(funct
   if(RIDER_ONLY)return null;
   return sb.auth.getSession().then(function(r){var s=r.data&&r.data.session;return s?enterStaff(s.user):null});
 }).then(function(){
-  if(!isAdmin&&!staff){var p=ss("hs_portal");if(p){try{var res=JSON.parse(p);me=res.rider&&res.rider.id;if(me)portalToData(res)}catch(e){}}}
+  ss("hs_portal",null);
 }).catch(function(e){ui.msg="تعذّر الاتصال بقاعدة البيانات.";ui.msgOk=false}).then(function(){booting=false;render()});
 })();
 </script>
