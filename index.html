@@ -338,6 +338,7 @@ function vPerm(){
 }
 
 /* courier */
+function sumDE(list,id){var t=0;list.forEach(function(d){t+=+data.days[d][id][DE]||0});return t}
 function curMonth(){return (lastDay()||YEST).slice(0,7)}
 function cRec(d){return data.days[d]&&data.days[d][me]}
 function tile(cs,label,val,sub){return '<button class="kpi tile" data-cs="'+cs+'"><span class="l">'+label+'</span><span class="v">'+val+'</span><span class="s">'+(sub||"")+'</span></button>'}
@@ -363,7 +364,7 @@ function vCourier(){
       tile("all","إجمالي الطلبات",N(all.cp,0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
       tile("quality","جودة التوصيل",last?'<span style="font-size:24px">'+segPill(last)+'</span>':"—",qk?"تصنيف "+monLabel(qk):"لم تُرفع بعد")+
-      tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+'</div>'+
+      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+'</div>'+
       '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
@@ -375,13 +376,18 @@ function vCourier(){
     else{var rk=v.rk,arr={length:v.cn};
       res+='<div class="hero"><span class="hero-num num">'+fmt(v[CP],0)+'</span><span>طلب مكتمل في '+dl(d)+'</span></div>'+
       '<div class="kpis" style="margin-top:12px">'+(rk?kpi("ترتيبك في اليوم",'<span class="num">'+rk+'</span> <span style="font-size:14px;color:var(--muted)">من <span class="num">'+arr.length+'</span></span>',v.av!=null?'متوسط المناديب <span class="num">'+fmt(v.av,1)+'</span> طلب':""):"")+
-      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DI]!=null?kpi("المسافة",N(v[DI],1)+' <span style="font-size:14px">كم</span>',""):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
+      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DI]!=null?kpi("المسافة",N(v[DI],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(v[DE],0),"Declined Deliveries"):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
     var hist=mine.slice(-14).reverse().map(function(x){var y=data.days[x][id];return '<tr class="click" data-cday="'+x+'"><td>'+dl(x)+'</td><td>'+N(y[CP],0)+'</td><td>'+P(y[AR])+'</td><td>'+N(y[AC])+'</td></tr>'}).join("");
     return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
   }
   if(cs==="all"){var a=agg(mine.map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
     return sampleNote()+head+'<section class="panel"><h2>إجمالي الطلبات حتى أمس</h2><div class="hero"><span class="hero-num num">'+fmt(a.cp,0)+'</span><span>طلب مكتمل</span></div><p class="hint">'+(mine.length?'من <span class="num">'+mine[0]+'</span> إلى <span class="num">'+mine[mine.length-1]+'</span>':'')+'</p>'+
-      '<div class="kpis">'+kpi("أيام العمل",N(a.days,0),"")+kpi("متوسط يومي",N(a.days?a.cp/a.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(a.ar),"")+kpi("ساعات العمل",N(a.ac,1),"")+kpi("عدم الحضور",N(a.ns,0),"")+'</div></section>';}
+      '<div class="kpis">'+kpi("أيام العمل",N(a.days,0),"")+kpi("متوسط يومي",N(a.days?a.cp/a.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(a.ar),"")+kpi("ساعات العمل",N(a.ac,1),"")+kpi("عدم الحضور",N(a.ns,0),"")+kpi("الطلبات المرفوضة",N(sumDE(mine,id),0),"Declined Deliveries")+'</div></section>';}
+  if(cs==="declined"){var dd2=mine.filter(function(d){return data.days[d][id][DE]!=null}),tot=sumDE(mine,id);
+    var rowsD=dd2.slice().reverse().map(function(d){var y=data.days[d][id];return '<tr class="click" data-cday="'+d+'" data-cs="day"><td>'+dl(d)+'</td><td>'+N(y[DE],0)+'</td><td>'+N(y[NT],0)+'</td><td>'+N(y[CP],0)+'</td></tr>'}).join("");
+    return head+'<section class="panel"><h2>الطلبات المرفوضة</h2><div class="hero"><span class="hero-num num">'+fmt(tot,0)+'</span><span>طلب مرفوض حتى <span class="num">'+(ld||"—")+'</span></span></div>'+
+      '<p class="hint">الطلبات التي وصلتك ورفضتها (Declined Deliveries). كثرة الرفض تخفض نسبة القبول.</p>'+
+      (rowsD?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المرفوضة</th><th>المُبلّغة</th><th>المكتملة</th></tr></thead><tbody>'+rowsD+'</tbody></table></div>':'<p class="hint">لا توجد بيانات رفض مسجلة لك بعد.</p>')+'</section>';}
   if(cs==="wallet"){var w2=data.couriers[id]&&data.couriers[id].w;
     return sampleNote()+head+'<section class="panel"><h2>المحفظة</h2>'+(w2?'<div class="hero"><span class="hero-num">'+money(w2.b)+'</span></div><p class="hint">آخر تحديث <span class="num">'+esc(w2.d)+'</span>.</p><div class="kpis">'+kpi("رصيد المحفظة",money(w2.b),"")+(w2.c!=null?kpi("النقد المحصّل",money(w2.c),""):"")+'</div>':'<p class="hint">لم تُرفع بيانات المحفظة بعد.</p>')+'</section>';}
   if(cs==="quality"){var qq=(data.couriers[id]&&data.couriers[id].q)||{},qms=Object.keys(qq).sort().reverse(),qm=ui0.qm&&qq[ui0.qm]?ui0.qm:qms[0],q=qm&&qq[qm];
@@ -609,7 +615,7 @@ root.addEventListener("click",function(e){
   if(t.dataset.tab){view=t.dataset.tab;ui.msg="";ui.acc=null;ss("hs_view",view);render();window.scrollTo(0,0);return}
   if(t.dataset.open!=null){if(canSee("riders")){view="riders";ui.sel=t.dataset.open;render();window.scrollTo(0,0)}return}
   if(t.dataset.sel!=null){ui.sel=t.dataset.sel||null;render();return}
-  if(t.dataset.cday){ui.cday=t.dataset.cday;render();return}
+  if(t.dataset.cday){ui.cday=t.dataset.cday;if(t.dataset.cs)ui0.cs=t.dataset.cs;render();window.scrollTo(0,0);return}
   if(t.dataset.cs){ui0.cs=t.dataset.cs;render();window.scrollTo(0,0);return}
   if(t.dataset.who){ui0.who=t.dataset.who;ui.msg="";render();return}
   if(t.dataset.dmode){ui0.dmode=t.dataset.dmode;render();return}
