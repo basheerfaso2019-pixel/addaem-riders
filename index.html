@@ -416,7 +416,7 @@ function vData(){
   var all=courierIds(),noIq=all.filter(function(id){return !(data.couriers[id]&&data.couriers[id].h)});
   var ups=ui.upload||[],prev="";
   if(ups.length){prev='<div class="panel" style="background:var(--sunk);box-shadow:none;margin-top:12px"><h2>معاينة الملفات</h2><div class="tbl" style="box-shadow:none;margin-block:8px 12px"><table><thead><tr><th>الملف</th><th>النوع</th><th>الصفوف</th><th>التاريخ</th><th>ملاحظات</th></tr></thead><tbody>'+
-    ups.map(function(u){var dt=u.type==="quality"?(u.month||"—"):u.from?(u.from===u.to?u.from:u.from+" ← "+u.to):"—";var notes=[];if(u.skippedToday)notes.push('استُبعد '+u.skippedToday+' صف من اليوم الحالي');if(u.bad)notes.push(u.bad+' صف بدون ID أو تاريخ');if(u.multiDay)notes.push('الملف يغطي أكثر من يوم، صدّره ليوم واحد');
+    ups.map(function(u){var dt=u.type==="quality"?(u.month||"—"):u.from?(u.from===u.to?u.from:u.from+" ← "+u.to):"—";var notes=[];if(u.skippedToday)notes.push('استُبعد '+u.skippedToday+' صف من اليوم الحالي');if(u.bad)notes.push(u.bad+' صف بدون ID أو تاريخ');if(u.multiDay)notes.push('الملف يغطي أكثر من يوم ولن يُحفظ. صدّره ليوم واحد');
       return '<tr><td class="s">'+esc(u.file)+'</td><td>'+FTYPES[u.type]+'</td><td>'+N(u.rows,0)+'</td><td class="num">'+esc(dt)+'</td><td class="s" style="white-space:normal;color:'+(u.multiDay?"var(--bad)":"var(--muted)")+'">'+esc(notes.join("، ")||"—")+'</td></tr>'}).join("")+'</tbody></table></div>'+
     '<p class="hint">البيانات الجديدة تستبدل نفس الأيام والمناديب، وباقي البيانات تبقى.</p>'+
     '<div class="row"><button class="btn pri" id="applyUp"'+(ui.busy?" disabled":"")+'>اعتماد وحفظ</button><button class="btn" id="cancelUp">إلغاء</button></div></div>';}
@@ -637,7 +637,7 @@ root.addEventListener("click",function(e){
     work(Promise.all([sb.from("daily").delete().gte("day","1900-01-01"),sb.from("quality").delete().neq("month",""),sb.from("wallet").delete().neq("rider_id","")]).then(function(rs){rs.forEach(function(r){if(r.error)throw r.error})}),"تم حذف بيانات الأداء. أسماء المناديب وأرقام الإقامة باقية.");return}
   if(t.id==="saveName"){var nm=document.getElementById("cname").value.trim();if(!nm)return;
     work(sb.from("settings").upsert({key:"company",value:nm}).then(function(r){if(r.error)throw r.error}),"تم حفظ الاسم.");return}
-  if(t.id==="applyUp"){var up=ui.upload;if(!up||!up.length)return;ui.upload=null;work(applyUpload(up),"تم حفظ البيانات.");return}
+  if(t.id==="applyUp"){var up=ui.upload;if(!up||!up.length)return;var multi=up.filter(function(u){return u.type==="perf"&&u.multiDay});up=up.filter(function(u){return !(u.type==="perf"&&u.multiDay)});ui.upload=null;if(!up.length){ui.msgOk=false;ui.msg="لم يُحفظ شيء: تقرير الأداء يغطي أكثر من يوم. صدّره من هنقرستيشن ليوم واحد فقط ثم ارفعه مع اختيار نفس التاريخ.";render();return}work(applyUpload(up),multi.length?"تم حفظ باقي الملفات. تقرير الأداء لم يُحفظ لأنه يغطي أكثر من يوم، صدّره ليوم واحد.":"تم حفظ البيانات.");return}
   if(t.id==="saveRoster"){var ro=ui.roster;ui.roster=null;
     work(sb.rpc("set_riders",{p_rows:Object.keys(ro).map(function(id){return{id:id,name:ro[id].n||"",iqama:ro[id].iq}})}).then(function(r){if(r.error)throw r.error}),"تم حفظ أرقام الإقامة.");return}
 });
