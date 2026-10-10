@@ -351,7 +351,7 @@ var SMON="";
 function stmtMonths(id){var m={};days().forEach(function(d){if(data.days[d][id])m[d.slice(0,7)]=1});return Object.keys(m).sort().reverse()}
 function stmtMonSel(id,cur){var ms=stmtMonths(id);if(ms.length<2)return "";return '<label class="fcard noprint" style="max-width:220px;margin-bottom:10px"><span>الشهر</span><select id="stmtMon">'+ms.map(function(m){return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+m+'</option>'}).join("")+'</select></label>'}
 function stmtWa(id,st){var ph=data.couriers[id]&&data.couriers[id].ph;return ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):""}
-function stmtPanel(id){var st=stmtCalc(id);if(!st)return "";var wa=stmtWa(id,st),ph=data.couriers[id]&&data.couriers[id].ph;
+function stmtPanel(id){var sb0=stmtBlock(id);if(sb0)return stmtBlockedHtml(id,sb0);var st=stmtCalc(id);if(!st)return "";var wa=stmtWa(id,st),ph=data.couriers[id]&&data.couriers[id].ph;
   return '<section class="panel stmt">'+stmtHead(id,st.mon)+stmtTable(id,st)+
     '<div class="row noprint" style="margin-top:14px">'+(wa?waLinks(ph,stmtText(id,st)):'<span class="hint">لا يوجد رقم جوال مسجل لهذا المندوب.</span>')+
     '</div>'+
@@ -390,10 +390,14 @@ function stmtDoc(id,st){
     row("r3","جودة التوصيل "+seg,n0(st.orders)+' طلب',st.seg?n2(st.qr):'—',st.c)+
     '<tr class="tot"><td colspan="3">الإجمالي المستحق</td><td class="amt">'+n2(st.total)+'</td></tr></tbody></table>'+
     '<div class="foot"><span>تاريخ الإصدار: <span dir="ltr">'+today+'</span></span><span>'+esc(data.company||"")+'</span></div></div></body></html>'}
-function stmtDownload(id){var st=stmtCalc(id);if(!st)return;
+function stmtDownload(id){var st=!stmtBlock(id)&&stmtCalc(id);if(!st)return;
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([stmtDoc(id,st)],{type:"text/html"}));a.download="kashf-"+id+"-"+st.mon+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}
-function stmtPrint(id){var st=stmtCalc(id);if(!st)return;var f=document.createElement("iframe");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0";document.body.appendChild(f);
+function stmtPrint(id){var st=!stmtBlock(id)&&stmtCalc(id);if(!st)return;var f=document.createElement("iframe");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0";document.body.appendChild(f);
   f.onload=function(){setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print()}catch(e){window.print()}setTimeout(function(){f.remove()},2000)},400)};f.srcdoc=stmtDoc(id,st)}
+function normCat(v){var s=String(v||"").trim().replace(/[إآا]/g,"أ");return s==="أ"||s.toUpperCase()==="A"?"أ":s==="ب"||s.toUpperCase()==="B"?"ب":s==="خ"?"خ":s}
+function stmtBlock(id){var c=data.couriers[id]&&data.couriers[id].cat;if(c==="ب"||c==="خ")return "";
+  return c==="أ"?"لا يوجد كشف حساب للمناديب العاملين بالتارقت.":"لا يوجد كشف حساب لهذا المندوب لأن فئته غير محددة في شيت المناديب."}
+function stmtBlockedHtml(id,m){return '<section class="panel stmt"><h2>كشف حساب المندوب</h2><div class="note" style="margin:8px 0 0;padding:12px 14px;border-radius:8px;background:#fff6dc;border-inline-start:4px solid #f5b51f;color:#5a2a1d;font-weight:600">'+esc(m)+'</div></section>'}
 function stmtCalc(id){var ld=lastDay();if(!ld)return null;var ms=stmtMonths(id),mon=SMON&&ms.indexOf(SMON)>=0?SMON:ld.slice(0,7),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!ds.length)return null;
   var o=0,km=0;ds.forEach(function(d){var x=data.days[d][id];o+=+x[CP]||0;km+=+x[DP]||0});
   var qx=data.couriers[id]&&data.couriers[id].q,seg=qx&&qx[mon]&&String(qx[mon].s||"").trim().toUpperCase(),qr=seg&&QRATE[seg]!=null?QRATE[seg]:0;
@@ -437,7 +441,7 @@ function vCourier(){
       tile("all","إجمالي الطلبات",N(all.cp,0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
       tile("quality","جودة التوصيل",last?'<span style="font-size:24px">'+segPill(last)+'</span>':"—",qk?"تصنيف "+monLabel(qk):"لم تُرفع بعد")+
-      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+(function(){var st=stmtCalc(id);return st?tile("stmt","كشف الحساب",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
+      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+(function(){var st=!stmtBlock(id)&&stmtCalc(id);return st?tile("stmt","كشف الحساب",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
       '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
@@ -461,7 +465,7 @@ function vCourier(){
     return head+'<section class="panel"><h2>الطلبات المرفوضة</h2><div class="hero"><span class="hero-num num">'+fmt(tot,0)+'</span><span>طلب مرفوض حتى <span class="num">'+(ld||"—")+'</span></span></div>'+
       '<p class="hint">الطلبات التي وصلتك ورفضتها (Declined Deliveries). كثرة الرفض تخفض نسبة القبول.</p>'+
       (rowsD?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المرفوضة</th><th>المُبلّغة</th><th>المكتملة</th></tr></thead><tbody>'+rowsD+'</tbody></table></div>':'<p class="hint">لا توجد بيانات رفض مسجلة لك بعد.</p>')+'</section>';}
-  if(cs==="stmt"){var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
+  if(cs==="stmt"){var sb0=stmtBlock(id);if(sb0)return head+stmtBlockedHtml(id,sb0);var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
     var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
     return head+'<section class="panel stmt">'+stmtHead(id,st.mon)+stmtTable(id,st)+
       '<div class="row noprint" style="margin-top:14px">'+(wa?waLinks(ph,stmtText(id,st)):'<span class="hint">لا يوجد رقم جوال مسجل لك. اطلب من الإدارة إضافته.</span>')+
@@ -566,11 +570,11 @@ function parseRows(rows,fallbackDate){
   if(hi<0)throw new Error("cols");
   var h=rows[hi],I=idCol(h),out={type:type,days:{},people:{},quality:{},rows:0,bad:0,skippedToday:0,multiDay:false};
   var C={date:col(h,function(x){return (x.indexOf("date")>=0||x==="التاريخ")&&x.indexOf("update")<0}),ci:col(h,function(x){return x==="city name"||x==="city"||x==="المدينة"}),co:col(h,function(x){return x==="contract name"||x==="contract"||x==="العقد"}),
-    name:col(h,eq("name","rider name","الاسم","الأسم","اسم المندوب")),iq:col(h,function(x){return /iqama|residency|الإقامة|الاقامة|هوية/.test(x)}),ph:col(h,function(x){return /جوال|جـوال|phone|mobile|الهاتف/.test(x.replace(/ـ/g,""))})};
+    name:col(h,eq("name","rider name","الاسم","الأسم","اسم المندوب")),iq:col(h,function(x){return /iqama|residency|الإقامة|الاقامة|هوية/.test(x)}),ph:col(h,function(x){return /جوال|جـوال|phone|mobile|الهاتف/.test(x.replace(/ـ/g,""))}),cat:col(h,function(x){return /^(فئ|الفئ|category)/i.test(String(x).trim())})};
   function person(id){return out.people[id]||(out.people[id]={})}
   rows.slice(hi+1).forEach(function(r){if(!r.some(function(x){return String(x).trim()}))return;
     var id=digits(cell(r,I)).trim().replace(/\.0$/,"");if(!id){out.bad++;return}
-    var p=person(id);if(C.name>=0&&String(r[C.name]).trim())p.n=String(r[C.name]).trim();if(C.iq>=0&&String(r[C.iq]).trim())p.iq=digits(r[C.iq]).trim().replace(/\.0$/,"");if(C.ph>=0&&String(r[C.ph]).trim())p.ph=normPh(r[C.ph]);
+    var p=person(id);if(C.name>=0&&String(r[C.name]).trim())p.n=String(r[C.name]).trim();if(C.iq>=0&&String(r[C.iq]).trim())p.iq=digits(r[C.iq]).trim().replace(/\.0$/,"");if(C.ph>=0&&String(r[C.ph]).trim())p.ph=normPh(r[C.ph]);if(C.cat>=0&&String(r[C.cat]).trim())p.cat=normCat(r[C.cat]);
     if(type==="roster"){out.rows++;return}
     if(type==="quality"){var mi=col(h,eq("month","الشهر")),mon=mi>=0?normMonth(r[mi]):fallbackDate.slice(0,7);if(!mon){out.bad++;return}
       function g(n){var i=col(h,eq(n));return i<0?null:r[i]}
@@ -621,7 +625,7 @@ function loadStaffData(){
   function C(id){return d.couriers[id]||(d.couriers[id]={})}
   var jobs=[
     sb.from("settings").select("key,value").then(function(r){(r.data||[]).forEach(function(s){if(s.key==="company")d.company=s.value;if(s.key==="last_upload")LASTUP=s.value})}),
-    all("riders","id,name,vehicle,tga,phone","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
+    all("riders","id,name,vehicle,tga,phone,category","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.category)c.cat=r.category;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
     all("daily","*",["day","rider_id"]).then(function(rs){rs.forEach(function(r){(d.days[r.day]||(d.days[r.day]={}))[r.rider_id]=rowToRec(r)})}),
     sb.rpc("riders_with_login").then(function(r){(r.data||[]).forEach(function(id){C(typeof id==="string"?id:id.riders_with_login).h=true})})];
   if(canSee("quality"))jobs.push(all("quality","*",["month","rider_id"]).then(function(rs){rs.forEach(function(q){var c=C(q.rider_id);(c.q||(c.q={}))[q.month]=qToObj(q)})}));
@@ -634,7 +638,7 @@ var _all=all;all=function(t,c,o){return _all(t,c,typeof o==="string"?[o,o]:o)};
 function portalToData(res){
   me=res.rider&&res.rider.id||me;LAST=res.last_day||null;
   var d={company:res.company||data.company,couriers:{},days:{},staff:[]},c=d.couriers[me]={};
-  if(res.rider&&res.rider.name)c.n=res.rider.name;if(res.rider&&res.rider.phone)c.ph=res.rider.phone;
+  if(res.rider&&res.rider.name)c.n=res.rider.name;if(res.rider&&res.rider.phone)c.ph=res.rider.phone;if(res.rider&&res.rider.category)c.cat=res.rider.category;
   (res.days||[]).forEach(function(r){var x=rowToRec(r);x.rk=r.rnk;x.cn=r.cnt;x.av=r.avg_completed!=null?+r.avg_completed:null;(d.days[r.day]||(d.days[r.day]={}))[me]=x});
   (res.quality||[]).forEach(function(q){(c.q||(c.q={}))[q.month]=qToObj(q)});
   if(res.wallet)c.w={b:num(res.wallet.balance),c:null,d:res.wallet.as_of};
@@ -664,7 +668,7 @@ function applyUpload(list){
     Object.keys(p.people).forEach(function(id){var b=p.people[id];riders[id]=1;
       if(b.v||b.tga){var m=meta[id]||(meta[id]={id:id,vehicle:null,tga:null});if(b.v)m.vehicle=b.v;if(b.tga)m.tga=b.tga}
       if(b.w&&(!wal[id]||b.w.d>=wal[id].as_of))wal[id]={rider_id:id,balance:round2(b.w.b),as_of:b.w.d};
-      if(p.type==="roster"){var iq=/^\d{6,}$/.test(b.iq||"")?b.iq:"";ros.push({id:id,name:b.n||"",iqama:iq,phone:b.ph||""})}});
+      if(p.type==="roster"){var iq=/^\d{6,}$/.test(b.iq||"")?b.iq:"";ros.push({id:id,name:b.n||"",iqama:iq,phone:b.ph||"",category:b.cat||""})}});
     Object.keys(p.days).forEach(function(d){Object.keys(p.days[d]).forEach(function(id){var x=p.days[d][id];riders[id]=1;
       if(p.type==="dist")daily.dist.push({day:d,rider_id:id,distance_km:round2(x[DI]),payable_km:round2(x[DP]),completed_dist:x.softCP==null?null:x.softCP});
       else{var o={day:d,rider_id:id};PERF_COLS.forEach(function(k){var v=x[DBCOL[k]];o[k]=(k==="city"||k==="contract")?(v||null):(v==null?null:round2(v))});daily.perf.push(o)}})});
