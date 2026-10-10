@@ -121,6 +121,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
   .side button small,.side .navlink small{display:none}
 }
 
+@media print{.side,.top,.noprint,.who .row,.tiles{display:none!important}.panel{box-shadow:none;border:0}body{background:#fff}}
+
 .side .navlink{text-decoration:none;color:inherit}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -341,6 +343,27 @@ function vPerm(){
 function sumDE(list,id){var t=0;list.forEach(function(d){t+=+data.days[d][id][DE]||0});return t}
 function curMonth(){return (lastDay()||YEST).slice(0,7)}
 function cRec(d){return data.days[d]&&data.days[d][me]}
+var RATE_ORDER=8,RATE_KM=1.15,QRATE={A:2.75,B:2.25,C:1.75,D:1.25,E:0.75,F:0};
+function stmtCalc(id){var ld=lastDay();if(!ld)return null;var mon=ld.slice(0,7),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!ds.length)return null;
+  var o=0,km=0;ds.forEach(function(d){var x=data.days[d][id];o+=+x[CP]||0;km+=+x[DP]||0});
+  var qx=data.couriers[id]&&data.couriers[id].q,seg=qx&&qx[mon]&&String(qx[mon].s||"").trim().toUpperCase(),qr=seg&&QRATE[seg]!=null?QRATE[seg]:0;
+  var r2=function(v){return Math.round(v*100)/100},a=r2(o*RATE_ORDER),b=r2(km*RATE_KM),c=r2(o*qr);
+  return {mon:mon,from:ds[0],to:ds[ds.length-1],n:ds.length,orders:o,km:r2(km),seg:seg||"",qr:qr,a:a,b:b,c:c,total:r2(a+b+c)}}
+function f2(v){return fmt(v,2)}
+function stmtTable(id,st){
+  return '<p class="hint" style="margin:0 0 10px"><b>'+esc(cname(id))+'</b> · ID <span class="num">'+esc(id)+'</span><br>الفترة من <span class="num">'+st.from+'</span> إلى <span class="num">'+st.to+'</span> ('+N(st.n,0)+' يوم)</p>'+
+  '<div class="tbl" style="box-shadow:none"><table><thead><tr><th>البند</th><th>المبلغ</th></tr></thead><tbody>'+
+  sRow('الطلبات المكتملة',N(st.orders,0)+' طلب × '+f2(RATE_ORDER),st.a)+
+  sRow('المسافة المستحقة (Payable KM)',fmt(st.km,2)+' كم × '+f2(RATE_KM),st.b)+
+  sRow('جودة التوصيل '+(st.seg?segPill(st.seg):''),st.seg?N(st.orders,0)+' طلب × '+f2(st.qr):'التصنيف غير متوفر لهذا الشهر',st.c)+
+  '<tr><td style="text-align:right"><b>الإجمالي</b></td><td><b>'+money(st.total)+'</b></td></tr></tbody></table></div>'}
+function sRow(l,d,v){return '<tr><td style="text-align:right;white-space:normal">'+l+'<br><span class="hint" style="font-size:12px">'+d+'</span></td><td style="white-space:nowrap">'+money(v)+'</td></tr>'}
+function stmtText(id,st){return ["كشف حساب المندوب - "+(data.company||""),"الاسم: "+cname(id),"ID: "+id,"الفترة: "+st.from+" إلى "+st.to,"",
+  "الطلبات: "+st.orders+" × "+RATE_ORDER+" = "+st.a.toFixed(2)+" ريال","المسافة المستحقة: "+st.km.toFixed(2)+" كم × "+RATE_KM+" = "+st.b.toFixed(2)+" ريال",
+  "جودة التوصيل ("+(st.seg||"-")+"): "+st.orders+" × "+st.qr+" = "+st.c.toFixed(2)+" ريال","","الإجمالي: "+st.total.toFixed(2)+" ريال"].join("\n")}
+function stmtDownload(id){var st=stmtCalc(id);if(!st)return;var cssT=(document.querySelector("style")||{}).textContent||"";
+  var h='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كشف حساب '+esc(id)+'</title><style>'+cssT+'body{padding:16px;background:#fff}</style></head><body><section class="panel stmt"><h2>'+esc(data.company||"")+'</h2><h2>كشف حساب المندوب</h2>'+stmtTable(id,st)+'</section></body></html>';
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([h],{type:"text/html"}));a.download="kashf-"+id+"-"+st.to+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}
 function tile(cs,label,val,sub){return '<button class="kpi tile" data-cs="'+cs+'"><span class="l">'+label+'</span><span class="v">'+val+'</span><span class="s">'+(sub||"")+'</span></button>'}
 function vCourier(){
   if(!me&&!staff){
@@ -364,7 +387,7 @@ function vCourier(){
       tile("all","إجمالي الطلبات",N(all.cp,0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
       tile("quality","جودة التوصيل",last?'<span style="font-size:24px">'+segPill(last)+'</span>':"—",qk?"تصنيف "+monLabel(qk):"لم تُرفع بعد")+
-      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+'</div>'+
+      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+(function(){var st=stmtCalc(id);return st?tile("stmt","كشف الحساب",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
       '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
@@ -388,6 +411,12 @@ function vCourier(){
     return head+'<section class="panel"><h2>الطلبات المرفوضة</h2><div class="hero"><span class="hero-num num">'+fmt(tot,0)+'</span><span>طلب مرفوض حتى <span class="num">'+(ld||"—")+'</span></span></div>'+
       '<p class="hint">الطلبات التي وصلتك ورفضتها (Declined Deliveries). كثرة الرفض تخفض نسبة القبول.</p>'+
       (rowsD?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المرفوضة</th><th>المُبلّغة</th><th>المكتملة</th></tr></thead><tbody>'+rowsD+'</tbody></table></div>':'<p class="hint">لا توجد بيانات رفض مسجلة لك بعد.</p>')+'</section>';}
+  if(cs==="stmt"){var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
+    var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
+    return head+'<section class="panel stmt"><h2>كشف حساب المندوب</h2>'+stmtTable(id,st)+
+      '<div class="row noprint" style="margin-top:14px">'+(wa?'<a class="btn pri" style="text-decoration:none" href="'+wa+'" target="_blank" rel="noopener">إرسال على واتساب</a>':'<span class="hint">لا يوجد رقم جوال مسجل لك. اطلب من الإدارة إضافته.</span>')+
+      '<button class="btn" id="stmtHtml">تنزيل صفحة ويب</button><button class="btn" id="stmtPrint">طباعة / PDF</button></div>'+
+      (ph?'<p class="hint noprint">يُرسل إلى الرقم المسجل: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>';}
   if(cs==="wallet"){var w2=data.couriers[id]&&data.couriers[id].w;
     return sampleNote()+head+'<section class="panel"><h2>المحفظة</h2>'+(w2?'<div class="hero"><span class="hero-num">'+money(w2.b)+'</span></div><p class="hint">آخر تحديث <span class="num">'+esc(w2.d)+'</span>.</p><div class="kpis">'+kpi("رصيد المحفظة",money(w2.b),"")+(w2.c!=null?kpi("النقد المحصّل",money(w2.c),""):"")+'</div>':'<p class="hint">لم تُرفع بيانات المحفظة بعد.</p>')+'</section>';}
   if(cs==="quality"){var qq=(data.couriers[id]&&data.couriers[id].q)||{},qms=Object.keys(qq).sort().reverse(),qm=ui0.qm&&qq[ui0.qm]?ui0.qm:qms[0],q=qm&&qq[qm];
@@ -481,16 +510,17 @@ function detect(hdr){var hs=hdr.map(H);function any(w){return hs.some(function(h
   if(any("iqama")||any("الإقامة")||any("الاقامة")||any("هوية")||any("name")||any("الاسم"))return "roster";
   return null}
 function cell(r,i){return i<0?null:r[i]}
+function normPh(v){var s=digits(v).trim().replace(/\.0$/,"").replace(/\D/g,"");if(s.slice(0,3)==="966")s=s.slice(3);s=s.replace(/^0+/,"");return /^5\d{8}$/.test(s)?"966"+s:""}
 function parseRows(rows,fallbackDate){
   var hi=-1,type=null;for(var k=0;k<Math.min(rows.length,30);k++){type=detect(rows[k]);if(type){hi=k;break}}
   if(hi<0)throw new Error("cols");
   var h=rows[hi],I=idCol(h),out={type:type,days:{},people:{},quality:{},rows:0,bad:0,skippedToday:0,multiDay:false};
   var C={date:col(h,function(x){return (x.indexOf("date")>=0||x==="التاريخ")&&x.indexOf("update")<0}),ci:col(h,function(x){return x==="city name"||x==="city"||x==="المدينة"}),co:col(h,function(x){return x==="contract name"||x==="contract"||x==="العقد"}),
-    name:col(h,eq("name","rider name","الاسم","الأسم","اسم المندوب")),iq:col(h,function(x){return /iqama|residency|الإقامة|الاقامة|هوية/.test(x)})};
+    name:col(h,eq("name","rider name","الاسم","الأسم","اسم المندوب")),iq:col(h,function(x){return /iqama|residency|الإقامة|الاقامة|هوية/.test(x)}),ph:col(h,function(x){return /جوال|جـوال|phone|mobile|الهاتف/.test(x.replace(/ـ/g,""))})};
   function person(id){return out.people[id]||(out.people[id]={})}
   rows.slice(hi+1).forEach(function(r){if(!r.some(function(x){return String(x).trim()}))return;
     var id=digits(cell(r,I)).trim().replace(/\.0$/,"");if(!id){out.bad++;return}
-    var p=person(id);if(C.name>=0&&String(r[C.name]).trim())p.n=String(r[C.name]).trim();if(C.iq>=0&&String(r[C.iq]).trim())p.iq=digits(r[C.iq]).trim().replace(/\.0$/,"");
+    var p=person(id);if(C.name>=0&&String(r[C.name]).trim())p.n=String(r[C.name]).trim();if(C.iq>=0&&String(r[C.iq]).trim())p.iq=digits(r[C.iq]).trim().replace(/\.0$/,"");if(C.ph>=0&&String(r[C.ph]).trim())p.ph=normPh(r[C.ph]);
     if(type==="roster"){out.rows++;return}
     if(type==="quality"){var mi=col(h,eq("month","الشهر")),mon=mi>=0?normMonth(r[mi]):fallbackDate.slice(0,7);if(!mon){out.bad++;return}
       function g(n){var i=col(h,eq(n));return i<0?null:r[i]}
@@ -554,7 +584,7 @@ var _all=all;all=function(t,c,o){return _all(t,c,typeof o==="string"?[o,o]:o)};
 function portalToData(res){
   me=res.rider&&res.rider.id||me;LAST=res.last_day||null;
   var d={company:res.company||data.company,couriers:{},days:{},staff:[]},c=d.couriers[me]={};
-  if(res.rider&&res.rider.name)c.n=res.rider.name;
+  if(res.rider&&res.rider.name)c.n=res.rider.name;if(res.rider&&res.rider.phone)c.ph=res.rider.phone;
   (res.days||[]).forEach(function(r){var x=rowToRec(r);x.rk=r.rnk;x.cn=r.cnt;x.av=r.avg_completed!=null?+r.avg_completed:null;(d.days[r.day]||(d.days[r.day]={}))[me]=x});
   (res.quality||[]).forEach(function(q){(c.q||(c.q={}))[q.month]=qToObj(q)});
   if(res.wallet)c.w={b:num(res.wallet.balance),c:null,d:res.wallet.as_of};
@@ -584,7 +614,7 @@ function applyUpload(list){
     Object.keys(p.people).forEach(function(id){var b=p.people[id];riders[id]=1;
       if(b.v||b.tga){var m=meta[id]||(meta[id]={id:id,vehicle:null,tga:null});if(b.v)m.vehicle=b.v;if(b.tga)m.tga=b.tga}
       if(b.w&&(!wal[id]||b.w.d>=wal[id].as_of))wal[id]={rider_id:id,balance:round2(b.w.b),as_of:b.w.d};
-      if(p.type==="roster"){var iq=/^\d{6,}$/.test(b.iq||"")?b.iq:"";ros.push({id:id,name:b.n||"",iqama:iq})}});
+      if(p.type==="roster"){var iq=/^\d{6,}$/.test(b.iq||"")?b.iq:"";ros.push({id:id,name:b.n||"",iqama:iq,phone:b.ph||""})}});
     Object.keys(p.days).forEach(function(d){Object.keys(p.days[d]).forEach(function(id){var x=p.days[d][id];riders[id]=1;
       if(p.type==="dist")daily.dist.push({day:d,rider_id:id,distance_km:round2(x[DI]),payable_km:round2(x[DP]),completed_dist:x.softCP==null?null:x.softCP});
       else{var o={day:d,rider_id:id};PERF_COLS.forEach(function(k){var v=x[DBCOL[k]];o[k]=(k==="city"||k==="contract")?(v||null):(v==null?null:round2(v))});daily.perf.push(o)}})});
@@ -620,6 +650,8 @@ root.addEventListener("click",function(e){
   if(t.dataset.who){ui0.who=t.dataset.who;ui.msg="";render();return}
   if(t.dataset.dmode){ui0.dmode=t.dataset.dmode;render();return}
   if(t.dataset.qm){ui0.qm=t.dataset.qm;render();return}
+   if(t.id==="stmtHtml"){stmtDownload(me);return}
+  if(t.id==="stmtPrint"){window.print();return}
   if(t.id==="logout"){me=null;LAST=null;ss("hs_portal",null);ui.msg="";ui0.cs="home";data={company:data.company,couriers:{},days:{},staff:[]};render();return}
   if(t.id==="staffOut"){sb.auth.signOut().then(function(){location.reload()});return}
   if(t.id==="saveStaff"){var ch=ui.acc.filter(function(a){return JSON.stringify([a.n,a.r,a.p])!==a.o});
