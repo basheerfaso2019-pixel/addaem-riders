@@ -123,6 +123,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .stmthead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}.stmthead h2{margin:0}.stmttools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.stmttools select{font:inherit;padding:7px 10px;border:1px solid var(--line,#ddd);border-radius:6px;background:var(--card,#fff);color:inherit}
 
+.btn.wa{background:#25d366;border-color:#25d366;color:#fff}.btn.wa:hover{background:#1ebe5b}
+
 @media print{body.pst .panel:not(.stmt),body.pst #root>*>.tbl,body.pst .tbl:not(.stmt .tbl),body.pst .filters,body.pst .fhint,body.pst .bar,body.pst .coband{display:none!important}}
 @media print{.side,.top,.noprint,.who .row,.tiles{display:none!important}.panel{box-shadow:none;border:0}body{background:#fff}}
 
@@ -353,16 +355,18 @@ function stmtMonSel(id,cur){var ms=stmtMonths(id);if(ms.length<2)return "";retur
 function stmtWa(id,st){var ph=data.couriers[id]&&data.couriers[id].ph;return ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):""}
 function stmtPanel(id){var sb0=stmtBlock(id);if(sb0)return stmtBlockedHtml(id,sb0);var st=stmtCalc(id);if(!st)return "";var wa=stmtWa(id,st),ph=data.couriers[id]&&data.couriers[id].ph;
   return '<section class="panel stmt">'+stmtHead(id,st.mon)+stmtTable(id,st)+
-    '<div class="row noprint" style="margin-top:14px">'+(wa?waLinks(ph,stmtText(id,st)):'<span class="hint">لا يوجد رقم جوال مسجل لهذا المندوب.</span>')+
-    '</div>'+
     (ph?'<p class="hint noprint">يُرسل إلى: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>'}
-var IS_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+var WA_TAB="hs_whatsapp_web";var IS_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 function waLinks(ph,txt){var q="phone="+ph+"&text="+encodeURIComponent(txt),st=' style="text-decoration:none"';
   var app='<a class="btn pri"'+st+' href="whatsapp://send?'+q+'">'+(IS_MOBILE?'إرسال على واتساب':'إرسال عبر تطبيق واتساب')+'</a>';
   return IS_MOBILE?app:app+'<a class="btn"'+st+' href="https://web.whatsapp.com/send?'+q+'" target="waweb" rel="noopener">إرسال عبر واتساب ويب</a>'}
 function monTxt(m){var M=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];return M[+m.slice(5,7)-1]+" "+m.slice(0,4)}
+function stmtWaBtn(id){var ph=data.couriers[id]&&data.couriers[id].ph,st=stmtCalc(id);
+  if(!ph||!st)return '<span class="hint" style="font-size:12.5px">لا يوجد رقم جوال مسجل</span>';
+  var q="phone="+ph+"&text="+encodeURIComponent(stmtText(id,st));
+  return IS_MOBILE?'<a class="btn wa" style="text-decoration:none" href="whatsapp://send?'+q+'">واتساب</a>':'<button class="btn wa" data-waweb="'+esc("https://web.whatsapp.com/send?"+q)+'" title="+'+esc(ph)+'">واتساب ويب</button>'}
 function stmtHead(id,cur){var ms=stmtMonths(id);
-  return '<div class="stmthead"><h2>كشف حساب المندوب</h2><div class="stmttools noprint"><select id="stmtMon" aria-label="الشهر">'+ms.map(function(m){return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select>'+
+  return '<div class="stmthead"><h2>كشف حساب المندوب</h2><div class="stmttools noprint"><select id="stmtMon" aria-label="الشهر">'+ms.map(function(m){return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select>'+stmtWaBtn(id)+
     '<button class="btn pri" data-sp="'+esc(id)+'">تصدير PDF</button><button class="btn" data-sdl="'+esc(id)+'">صفحة ويب</button></div></div>'}
 function n2(v){return '<span dir="ltr">'+Number(v||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'}
 function n0(v){return '<span dir="ltr">'+Number(v||0).toLocaleString("en-US")+'</span>'}
@@ -468,8 +472,6 @@ function vCourier(){
   if(cs==="stmt"){var sb0=stmtBlock(id);if(sb0)return head+stmtBlockedHtml(id,sb0);var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
     var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
     return head+'<section class="panel stmt">'+stmtHead(id,st.mon)+stmtTable(id,st)+
-      '<div class="row noprint" style="margin-top:14px">'+(wa?waLinks(ph,stmtText(id,st)):'<span class="hint">لا يوجد رقم جوال مسجل لك. اطلب من الإدارة إضافته.</span>')+
-      '</div>'+
       (ph?'<p class="hint noprint">يُرسل إلى الرقم المسجل: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>';}
   if(cs==="wallet"){var w2=data.couriers[id]&&data.couriers[id].w;
     return sampleNote()+head+'<section class="panel"><h2>المحفظة</h2>'+(w2?'<div class="hero"><span class="hero-num">'+money(w2.b)+'</span></div><p class="hint">آخر تحديث <span class="num">'+esc(w2.d)+'</span>.</p><div class="kpis">'+kpi("رصيد المحفظة",money(w2.b),"")+(w2.c!=null?kpi("النقد المحصّل",money(w2.c),""):"")+'</div>':'<p class="hint">لم تُرفع بيانات المحفظة بعد.</p>')+'</section>';}
@@ -708,6 +710,7 @@ root.addEventListener("click",function(e){
    if(t.id==="stmtHtml"){stmtDownload(me);return}
   if(t.dataset.sdl){stmtDownload(t.dataset.sdl);return}
   if(t.dataset.sp){stmtPrint(t.dataset.sp);return}
+  if(t.dataset.waweb){var w=window.open(t.dataset.waweb,WA_TAB);if(w)w.focus();return}
   if(t.id==="stmtPrint"){document.body.classList.add("pst");window.print();setTimeout(function(){document.body.classList.remove("pst")},500);return}
   if(t.id==="logout"){me=null;LAST=null;ss("hs_portal",null);ui.msg="";ui0.cs="home";data={company:data.company,couriers:{},days:{},staff:[]};render();return}
   if(t.id==="staffOut"){sb.auth.signOut().then(function(){location.reload()});return}
