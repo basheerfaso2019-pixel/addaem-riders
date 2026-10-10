@@ -368,7 +368,8 @@ function vPerm(){
 }
 
 /* courier */
-function sumDE(list,id){var t=0;list.forEach(function(d){t+=+data.days[d][id][DE]||0});return t}
+var DE_FREE=2;function deX(v){return Math.max(0,(+v||0)-DE_FREE)}
+function sumDE(list,id){var t=0;list.forEach(function(d){t+=deX(data.days[d][id][DE])});return t}
 function curMonth(){return (lastDay()||YEST).slice(0,7)}
 function cRec(d){return data.days[d]&&data.days[d][me]}
 var RATE_ORDER=8,RATE_KM=1.15,QRATE={A:2.75,B:2.25,C:1.75,D:1.25,E:0.75,F:0};
@@ -444,7 +445,7 @@ function shCalc(mon){
     var lv=last&&data.days[last][id],q=c.q&&c.q[mon],dd=[];
     for(var i=1;i<=nd;i++){var d=mon+"-"+(i<10?"0":"")+i,r=data.days[d]&&data.days[d][id];dd.push(r&&r[CP]!=null?+r[CP]:0)}
     var ph=String(c.ph||"").replace(/^966/,""),e=x[id]||{};
-    return {no:cnt[cat],cat:cat,name:c.n||"",iq:SHIQ&&SHIQ!=="loading"?(SHIQ[id]||""):"",ph:ph,id:id,tga:0,h:lv&&lv[AC]!=null?+lv[AC]:0,de:lv&&lv[DE]!=null?+lv[DE]:0,
+    return {no:cnt[cat],cat:cat,name:c.n||"",iq:SHIQ&&SHIQ!=="loading"?(SHIQ[id]||""):"",ph:ph,id:id,tga:0,h:lv&&lv[AC]!=null?+lv[AC]:0,de:lv&&lv[DE]!=null?deX(lv[DE]):0,
       q:q&&q.s||"",w:c.w&&c.w.b!=null?c.w.b:null,dd:dd,tot:dd.reduce(function(a,b){return a+b},0),f:e.f==null?null:e.f,n:e.n||""}});
   return {mon:mon,last:last,nd:nd,rows:rows};
 }
@@ -535,7 +536,7 @@ function vCourier(){
   }
   if(!me)return '<div class="panel"><p class="hint" style="margin:0">هذه الشاشة للمناديب.</p></div>';
   var id=me,ds=days(),mine=ds.filter(function(d){return data.days[d][id]}),ld=lastDay(),cs=ui0.cs;
-  var head='<section class="panel"><div class="who"><div><div style="color:var(--muted);font-size:13px">مرحباً</div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row">'+(cs!=="stmt"?'<button class="btn pri" data-cs="stmt">تصدير ملخص الأداء</button>':"")+(cs!=="home"?'<button class="btn" data-cs="home">الرجوع للقائمة</button>':"")+'<button class="btn" id="logout">تسجيل خروج</button></div></div></section>';
+  var head='<section class="panel"><div class="who"><div><div style="color:var(--muted);font-size:13px">مرحباً</div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row">'+(cs!=="stmt"&&!stmtBlock(id)?'<button class="btn pri" data-cs="stmt">تصدير ملخص الأداء</button>':"")+(cs!=="home"?'<button class="btn" data-cs="home">الرجوع للقائمة</button>':"")+'<button class="btn" id="logout">تسجيل خروج</button></div></div></section>';
   if(cs==="home"){
     var lv=ld&&cRec(ld),all=agg(mine.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),w=data.couriers[id]&&data.couriers[id].w;
     var mon=curMonth(),km=0,last=null;mine.forEach(function(d){var x=data.days[d][id];if(d.slice(0,7)===mon)km+=+x[DI]||0});var qx=data.couriers[id]&&data.couriers[id].q,qk=qx&&Object.keys(qx).sort().pop();last=qk&&qx[qk].s;
@@ -556,7 +557,7 @@ function vCourier(){
     else{var rk=v.rk,arr={length:v.cn};
       res+='<div class="hero"><span class="hero-num num">'+fmt(v[CP],0)+'</span><span>طلب مكتمل في '+dl(d)+'</span></div>'+
       '<div class="kpis" style="margin-top:12px">'+(rk?kpi("ترتيبك في اليوم",'<span class="num">'+rk+'</span> <span style="font-size:14px;color:var(--muted)">من <span class="num">'+arr.length+'</span></span>',v.av!=null?'متوسط المناديب <span class="num">'+fmt(v.av,1)+'</span> طلب':""):"")+
-      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DI]!=null?kpi("المسافة",N(v[DI],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(v[DE],0),"Declined Deliveries"):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
+      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DI]!=null?kpi("المسافة",N(v[DI],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">'+fmt(v[DE],0)+'</span>'):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
     var hist=mine.slice(-14).reverse().map(function(x){var y=data.days[x][id];return '<tr class="click" data-cday="'+x+'"><td>'+dl(x)+'</td><td>'+N(y[CP],0)+'</td><td>'+P(y[AR])+'</td><td>'+N(y[AC])+'</td></tr>'}).join("");
     return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
   }
@@ -566,10 +567,10 @@ function vCourier(){
     return sampleNote()+head+'<section class="panel"><div class="stmthead"><h2>إجمالي الطلبات · '+monTxt(am)+'</h2><div class="stmttools"><select id="aMon" aria-label="الشهر">'+aml.map(function(m){return '<option value="'+m+'"'+(m===am?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select></div></div><div class="hero"><span class="hero-num num">'+fmt(a.cp,0)+'</span><span>طلب مكتمل في '+monTxt(am)+'</span></div><p class="hint">'+(amd.length?'من <span class="num">'+amd[0]+'</span> إلى <span class="num">'+amd[amd.length-1]+'</span>':'لا توجد أيام مسجلة لك في هذا الشهر.')+'</p>'+
       '<div class="kpis">'+kpi("أيام العمل",N(a.days,0),"")+kpi("متوسط يومي",N(a.days?a.cp/a.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(a.ar),"")+kpi("ساعات العمل",N(a.ac,1),"")+kpi("عدم الحضور",N(a.ns,0),"")+kpi("الطلبات المرفوضة",N(sumDE(amd,id),0),"Declined Deliveries")+'</div></section>'+(aml.length?'<section class="panel"><h2>إجمالي كل شهر</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>الشهر</th><th>الطلبات المكتملة</th></tr></thead><tbody>'+mrows+'</tbody></table></div></section>':"");}
   if(cs==="declined"){var dd2=mine.filter(function(d){return data.days[d][id][DE]!=null}),tot=sumDE(mine,id);
-    var rowsD=dd2.slice().reverse().map(function(d){var y=data.days[d][id];return '<tr class="click" data-cday="'+d+'" data-cs="day"><td>'+dl(d)+'</td><td>'+N(y[DE],0)+'</td><td>'+N(y[NT],0)+'</td><td>'+N(y[CP],0)+'</td></tr>'}).join("");
+    var rowsD=dd2.slice().reverse().map(function(d){var y=data.days[d][id];return '<tr class="click" data-cday="'+d+'" data-cs="day"><td>'+dl(d)+'</td><td>'+N(y[DE],0)+'</td><td>'+N(deX(y[DE]),0)+'</td><td>'+N(y[NT],0)+'</td><td>'+N(y[CP],0)+'</td></tr>'}).join("");
     return head+'<section class="panel"><h2>الطلبات المرفوضة</h2><div class="hero"><span class="hero-num num">'+fmt(tot,0)+'</span><span>طلب مرفوض حتى <span class="num">'+(ld||"—")+'</span></span></div>'+
-      '<p class="hint">الطلبات التي وصلتك ورفضتها (Declined Deliveries). كثرة الرفض تخفض نسبة القبول.</p>'+
-      (rowsD?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المرفوضة</th><th>المُبلّغة</th><th>المكتملة</th></tr></thead><tbody>'+rowsD+'</tbody></table></div>':'<p class="hint">لا توجد بيانات رفض مسجلة لك بعد.</p>')+'</section>';}
+      '<p class="hint">المسموح طلبان مرفوضان في اليوم، وما زاد عنهما يُسجَّل عليك هنا. كثرة الرفض تخفض نسبة القبول.</p>'+
+      (rowsD?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>رفضت</th><th>المسجلة</th><th>المُبلّغة</th><th>المكتملة</th></tr></thead><tbody>'+rowsD+'</tbody></table></div>':'<p class="hint">لا توجد بيانات رفض مسجلة لك بعد.</p>')+'</section>';}
   if(cs==="stmt"){var sb0=stmtBlock(id);if(sb0)return head+stmtBlockedHtml(id,sb0);var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
     var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
     return head+'<section class="panel stmt">'+stmtHead(id,st.mon)+stmtTable(id,st)+
