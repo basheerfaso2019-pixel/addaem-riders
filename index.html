@@ -247,12 +247,12 @@ function riderRows(f){var list=recs(f),g={};list.forEach(function(o){(g[o.id]||(
 function status(a,avg){if(a.ns&&!a.cp)return['p-off','لم يحضر'];if(!avg)return['p-mid','—'];var x=(a.cp/a.days)/avg;if(x>=1.15)return['p-good','أعلى من المتوسط'];if(x<.85)return['p-low','أقل من المتوسط'];return['p-mid','ضمن المتوسط']}
 function vRiders(){
   var f=F(),rows=riderRows(f).sort(function(a,b){return b.cp-a.cp}),all=agg(recs(f)),avg=all.riders&&all.days?all.cp/ (rows.reduce(function(s,a){return s+a.days},0)||1):0;
-  var body=rows.map(function(a){var s=status(a,avg);return '<tr class="click'+(ui.sel===a.id?" sel":"")+'" data-sel="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+'</td><td>'+esc(a.city||"—")+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.sh,0)+'</td><td>'+N(a.pl)+'</td><td>'+N(a.ac)+'</td><td>'+N(a.br)+'</td><td>'+P(a.ar)+'</td><td>'+P(a.cr)+'</td><td>'+N(a.ns,0)+'</td><td>'+N(a.nt,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+N(a.ad,0)+'</td><td>'+N(a.st,0)+'</td><td>'+N(a.di,1)+'</td><td><span class="pill '+s[0]+'">'+s[1]+'</span></td><td><button class="btn" style="padding:4px 10px;font-size:12.5px;white-space:nowrap" data-stmt="'+esc(a.id)+'">كشف الحساب</button></td></tr>'}).join("");
+  var body=rows.map(function(a){var s=status(a,avg);return '<tr class="click'+(ui.sel===a.id?" sel":"")+'" data-sel="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+'</td><td>'+esc(a.city||"—")+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.sh,0)+'</td><td>'+N(a.pl)+'</td><td>'+N(a.ac)+'</td><td>'+N(a.br)+'</td><td>'+P(a.ar)+'</td><td>'+P(a.cr)+'</td><td>'+N(a.ns,0)+'</td><td>'+N(a.nt,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+N(a.ad,0)+'</td><td>'+N(a.st,0)+'</td><td>'+N(a.di,1)+'</td><td><span class="pill '+s[0]+'">'+s[1]+'</span></td><td><button class="btn" style="padding:4px 10px;font-size:12.5px;white-space:nowrap" data-stmt="'+esc(a.id)+'">ملخص الأداء</button></td></tr>'}).join("");
   var det="";
   if(ui.sel){var id=ui.sel,ds=days().slice(-30),ser=ds.map(function(d){var v=data.days[d][id];return{d:d,v:v?+v[CP]||0:0}}),tot=agg(days().filter(function(d){return data.days[d][id]}).map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
-    det='<section class="panel"><div class="who"><div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row"><button class="btn pri" data-stmt="'+esc(id)+'">تصدير كشف الحساب</button><button class="btn" data-sel="">إغلاق</button></div></div>'+
+    det='<section class="panel"><div class="who"><div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row"><button class="btn pri" data-stmt="'+esc(id)+'">تصدير ملخص الأداء</button><button class="btn" data-sel="">إغلاق</button></div></div>'+
       '<div class="kpis" style="margin-block:12px">'+kpi("الطلبات المكتملة (كل الأيام)",N(tot.cp,0),'خلال <span class="num">'+tot.days+'</span> يوم')+kpi("متوسط يومي",N(tot.days?tot.cp/tot.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(tot.ar),"")+kpi("عدم الحضور",N(tot.ns,0),"")+'</div>'+bars(ser,{h:170,label:"الطلبات المكتملة يومياً"})+'</section>'+stmtPanel(id);}
-  return sampleNote()+filters()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المسافة كم<br>Distance</th><th>الحالة</th><th>كشف الحساب</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="18">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
+  return sampleNote()+filters()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المسافة كم<br>Distance</th><th>الحالة</th><th>ملخص الأداء</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="18">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
 }
 function vTop(){
   var f=F(),rows=riderRows(f).sort(function(a,b){return b.cp-a.cp}).slice(0,15),max=rows.length?rows[0].cp||1:1;
@@ -366,7 +366,7 @@ function stmtWaBtn(id){var ph=data.couriers[id]&&data.couriers[id].ph,st=stmtCal
   var q="phone="+ph+"&text="+encodeURIComponent(stmtText(id,st));
   return IS_MOBILE?'<a class="btn wa" style="text-decoration:none" href="whatsapp://send?'+q+'">واتساب</a>':'<button class="btn wa" data-waweb="'+esc("https://web.whatsapp.com/send?"+q)+'" title="+'+esc(ph)+'">واتساب ويب</button>'}
 function stmtHead(id,cur){var ms=stmtMonths(id);
-  return '<div class="stmthead"><h2>كشف حساب المندوب</h2><div class="stmttools noprint"><select id="stmtMon" aria-label="الشهر">'+ms.map(function(m){return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select>'+stmtWaBtn(id)+
+  return '<div class="stmthead"><h2>ملخص أداء المندوب</h2><div class="stmttools noprint"><select id="stmtMon" aria-label="الشهر">'+ms.map(function(m){return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select>'+stmtWaBtn(id)+
     '<button class="btn pri" data-sp="'+esc(id)+'">تصدير PDF</button><button class="btn" data-sdl="'+esc(id)+'">صفحة ويب</button></div></div>'}
 function n2(v){return '<span dir="ltr">'+Number(v||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'}
 function n0(v){return '<span dir="ltr">'+Number(v||0).toLocaleString("en-US")+'</span>'}
@@ -384,9 +384,9 @@ function stmtDoc(id,st){
     '.seg{display:inline-block;min-width:22px;text-align:center;padding:0 8px;border-radius:999px;color:#fff;font-weight:700;font-size:12.5px}'+
     '.foot{padding:8px 14px;font-size:11px;color:#6b7b84;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #e6edef}'+
     '@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none;border-radius:0}}@media(max-width:560px){.info{grid-template-columns:1fr 1fr}.info div:nth-child(3){border:0}th,td{padding:7px 8px}}';
-  return '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كشف حساب '+esc(cname(id))+' - '+monTxt(st.mon)+'</title>'+
+  return '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ملخص أداء '+esc(cname(id))+' - '+monTxt(st.mon)+'</title>'+
     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap"><style>'+css+'</style></head><body><div class="sheet">'+
-    '<div class="top"><div><h1>كشف حساب المندوب</h1><div class="co">'+esc(data.company||"")+'</div></div><span class="mon">'+monTxt(st.mon)+'</span></div><div class="band"></div>'+
+    '<div class="top"><div><h1>ملخص أداء المندوب</h1><div class="co">'+esc(data.company||"")+'</div></div><span class="mon">'+monTxt(st.mon)+'</span></div><div class="band"></div>'+
     '<div class="info"><div><span>المندوب</span><b>'+esc(cname(id))+'</b></div><div><span>رقم ID</span><b dir="ltr">'+esc(id)+'</b></div><div><span>الفترة</span><b dir="ltr">'+st.from.slice(5)+' → '+st.to.slice(5)+'</b> <small>('+st.n+' يوم)</small></div><div><span>تصنيف الجودة</span><b>'+seg+'</b></div></div>'+
     '<table><thead><tr><th>البند</th><th>الكمية</th><th>السعر</th><th>المبلغ (ر.س)</th></tr></thead><tbody>'+
     row("r1","الطلبات المكتملة",n0(st.orders)+' طلب',n2(RATE_ORDER),st.a)+
@@ -395,13 +395,13 @@ function stmtDoc(id,st){
     '<tr class="tot"><td colspan="3">الإجمالي المستحق</td><td class="amt">'+n2(st.total)+'</td></tr></tbody></table>'+
     '<div class="foot"><span>تاريخ الإصدار: <span dir="ltr">'+today+'</span></span><span>'+esc(data.company||"")+'</span></div></div></body></html>'}
 function stmtDownload(id){var st=!stmtBlock(id)&&stmtCalc(id);if(!st)return;
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([stmtDoc(id,st)],{type:"text/html"}));a.download="kashf-"+id+"-"+st.mon+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([stmtDoc(id,st)],{type:"text/html"}));a.download="performance-"+id+"-"+st.mon+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}
 function stmtPrint(id){var st=!stmtBlock(id)&&stmtCalc(id);if(!st)return;var f=document.createElement("iframe");f.style.cssText="position:fixed;right:0;bottom:0;width:0;height:0;border:0";document.body.appendChild(f);
   f.onload=function(){setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print()}catch(e){window.print()}setTimeout(function(){f.remove()},2000)},400)};f.srcdoc=stmtDoc(id,st)}
 function normCat(v){var s=String(v||"").trim().replace(/[إآا]/g,"أ");return s==="أ"||s.toUpperCase()==="A"?"أ":s==="ب"||s.toUpperCase()==="B"?"ب":s==="خ"?"خ":s}
 function stmtBlock(id){var c=data.couriers[id]&&data.couriers[id].cat;if(c==="ب"||c==="خ")return "";
-  return c==="أ"?"لا يوجد كشف حساب للمناديب العاملين بالتارقت.":"لا يوجد كشف حساب لهذا المندوب لأن فئته غير محددة في شيت المناديب."}
-function stmtBlockedHtml(id,m){return '<section class="panel stmt"><h2>كشف حساب المندوب</h2><div class="note" style="margin:8px 0 0;padding:12px 14px;border-radius:8px;background:#fdf3e1;border-inline-start:4px solid #e8a33d;color:#0d3b47;font-weight:600">'+esc(m)+'</div></section>'}
+  return c==="أ"?"لا يوجد ملخص أداء للمناديب العاملين بالتارقت.":"لا يوجد ملخص أداء لهذا المندوب لأن فئته غير محددة في شيت المناديب."}
+function stmtBlockedHtml(id,m){return '<section class="panel stmt"><h2>ملخص أداء المندوب</h2><div class="note" style="margin:8px 0 0;padding:12px 14px;border-radius:8px;background:#fdf3e1;border-inline-start:4px solid #e8a33d;color:#0d3b47;font-weight:600">'+esc(m)+'</div></section>'}
 function stmtCalc(id){var ld=lastDay();if(!ld)return null;var ms=stmtMonths(id),mon=SMON&&ms.indexOf(SMON)>=0?SMON:ld.slice(0,7),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!ds.length)return null;
   var o=0,km=0;ds.forEach(function(d){var x=data.days[d][id];o+=+x[CP]||0;km+=+x[DP]||0});
   var qx=data.couriers[id]&&data.couriers[id].q,seg=qx&&qx[mon]&&String(qx[mon].s||"").trim().toUpperCase(),qr=seg&&QRATE[seg]!=null?QRATE[seg]:0;
@@ -416,12 +416,12 @@ function stmtTable(id,st){
   sRow('جودة التوصيل '+(st.seg?segPill(st.seg):''),st.seg?N(st.orders,0)+' طلب × '+f2(st.qr):'التصنيف غير متوفر لهذا الشهر',st.c)+
   '<tr><td style="text-align:right"><b>الإجمالي</b></td><td><b>'+money(st.total)+'</b></td></tr></tbody></table></div>'}
 function sRow(l,d,v){return '<tr><td style="text-align:right;white-space:normal">'+l+'<br><span class="hint" style="font-size:12px">'+d+'</span></td><td style="white-space:nowrap">'+money(v)+'</td></tr>'}
-function stmtText(id,st){return ["كشف حساب المندوب - "+(data.company||""),"الاسم: "+cname(id),"ID: "+id,"الفترة: "+st.from+" إلى "+st.to,"",
+function stmtText(id,st){return ["ملخص أداء المندوب - "+(data.company||""),"الاسم: "+cname(id),"ID: "+id,"الفترة: "+st.from+" إلى "+st.to,"",
   "الطلبات: "+st.orders+" × "+RATE_ORDER+" = "+st.a.toFixed(2)+" ريال","المسافة المستحقة: "+st.km.toFixed(2)+" كم × "+RATE_KM+" = "+st.b.toFixed(2)+" ريال",
   "جودة التوصيل ("+(st.seg||"-")+"): "+st.orders+" × "+st.qr+" = "+st.c.toFixed(2)+" ريال","","الإجمالي: "+st.total.toFixed(2)+" ريال"].join("\n")}
 function stmtDownloadOld(id){var st=stmtCalc(id);if(!st)return;var cssT=(document.querySelector("style")||{}).textContent||"";
-  var h='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كشف حساب '+esc(id)+'</title><style>'+cssT+'body{padding:16px;background:#fff}</style></head><body><section class="panel stmt"><h2>'+esc(data.company||"")+'</h2><h2>كشف حساب المندوب</h2>'+stmtTable(id,st)+'</section></body></html>';
-  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([h],{type:"text/html"}));a.download="kashf-"+id+"-"+st.to+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}
+  var h='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ملخص أداء '+esc(id)+'</title><style>'+cssT+'body{padding:16px;background:#fff}</style></head><body><section class="panel stmt"><h2>'+esc(data.company||"")+'</h2><h2>ملخص أداء المندوب</h2>'+stmtTable(id,st)+'</section></body></html>';
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([h],{type:"text/html"}));a.download="performance-"+id+"-"+st.to+".html";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000)}
 function tile(cs,label,val,sub){return '<button class="kpi tile" data-cs="'+cs+'"><span class="l">'+label+'</span><span class="v">'+val+'</span><span class="s">'+(sub||"")+'</span></button>'}
 function vCourier(){
   if(!me&&!staff){
@@ -436,7 +436,7 @@ function vCourier(){
   }
   if(!me)return '<div class="panel"><p class="hint" style="margin:0">هذه الشاشة للمناديب.</p></div>';
   var id=me,ds=days(),mine=ds.filter(function(d){return data.days[d][id]}),ld=lastDay(),cs=ui0.cs;
-  var head='<section class="panel"><div class="who"><div><div style="color:var(--muted);font-size:13px">مرحباً</div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row">'+(cs!=="stmt"?'<button class="btn pri" data-cs="stmt">تصدير كشف الحساب</button>':"")+(cs!=="home"?'<button class="btn" data-cs="home">الرجوع للقائمة</button>':"")+'<button class="btn" id="logout">تسجيل خروج</button></div></div></section>';
+  var head='<section class="panel"><div class="who"><div><div style="color:var(--muted);font-size:13px">مرحباً</div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row">'+(cs!=="stmt"?'<button class="btn pri" data-cs="stmt">تصدير ملخص الأداء</button>':"")+(cs!=="home"?'<button class="btn" data-cs="home">الرجوع للقائمة</button>':"")+'<button class="btn" id="logout">تسجيل خروج</button></div></div></section>';
   if(cs==="home"){
     var lv=ld&&cRec(ld),all=agg(mine.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),w=data.couriers[id]&&data.couriers[id].w;
     var mon=curMonth(),km=0,last=null;mine.forEach(function(d){var x=data.days[d][id];if(d.slice(0,7)===mon)km+=+x[DI]||0});var qx=data.couriers[id]&&data.couriers[id].q,qk=qx&&Object.keys(qx).sort().pop();last=qk&&qx[qk].s;
@@ -445,7 +445,7 @@ function vCourier(){
       tile("all","إجمالي الطلبات",N(all.cp,0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
       tile("quality","جودة التوصيل",last?'<span style="font-size:24px">'+segPill(last)+'</span>':"—",qk?"تصنيف "+monLabel(qk):"لم تُرفع بعد")+
-      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+(function(){var st=!stmtBlock(id)&&stmtCalc(id);return st?tile("stmt","كشف الحساب",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
+      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+(function(){var st=!stmtBlock(id)&&stmtCalc(id);return st?tile("stmt","ملخص الأداء",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
       '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
