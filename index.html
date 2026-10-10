@@ -142,9 +142,19 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 .shtbl tfoot td{background:#ffc000;font-weight:700}
 .shtbl .shin{width:70px;border:1px solid #c9d3d6;border-radius:4px;padding:2px 4px;font:inherit;text-align:center;background:#fffef5;color:#000}
 .shtbl .shin.shnote{width:190px;text-align:right}
+
+body{padding-bottom:34px}
+.side{padding-bottom:40px}
+.ticker{position:fixed;left:0;right:0;bottom:0;height:32px;overflow:hidden;background:var(--head);color:var(--head-fg);border-top:2px solid var(--gold);z-index:50;font:600 14px/32px var(--f-body,system-ui)}
+.ticker span{position:absolute;left:0;top:0;white-space:nowrap;animation:tick 16s linear infinite}
+.ticker b{color:var(--gold)}
+@keyframes tick{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
+@media (prefers-reduced-motion:reduce){.ticker span{animation:none;position:static;display:block;text-align:center}}
+@media print{.ticker{display:none!important}body{padding-bottom:0}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head><body><div id="root"></div>
+<div class="ticker" role="note"><span>إعداد المهندس / <b>فاضل العميسي</b></span></div>
 <script>
 (function(){
 "use strict";
