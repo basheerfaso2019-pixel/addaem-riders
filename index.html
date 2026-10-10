@@ -351,9 +351,13 @@ function stmtMonSel(id,cur){var ms=stmtMonths(id);if(ms.length<2)return "";retur
 function stmtWa(id,st){var ph=data.couriers[id]&&data.couriers[id].ph;return ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):""}
 function stmtPanel(id){var st=stmtCalc(id);if(!st)return "";var wa=stmtWa(id,st),ph=data.couriers[id]&&data.couriers[id].ph;
   return '<section class="panel stmt"><h2>كشف حساب المندوب</h2>'+stmtMonSel(id,st.mon)+stmtTable(id,st)+
-    '<div class="row noprint" style="margin-top:14px">'+(wa?'<a class="btn pri" style="text-decoration:none" href="'+wa+'" target="_blank" rel="noopener">إرسال على واتساب</a>':'<span class="hint">لا يوجد رقم جوال مسجل لهذا المندوب.</span>')+
+    '<div class="row noprint" style="margin-top:14px">'+(wa?waLinks(ph,stmtText(id,st)):'<span class="hint">لا يوجد رقم جوال مسجل لهذا المندوب.</span>')+
     '<button class="btn" data-sdl="'+esc(id)+'">تنزيل صفحة ويب</button><button class="btn" id="stmtPrint">طباعة / PDF</button></div>'+
     (ph?'<p class="hint noprint">يُرسل إلى: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>'}
+var IS_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+function waLinks(ph,txt){var q="phone="+ph+"&text="+encodeURIComponent(txt),st=' style="text-decoration:none"';
+  var app='<a class="btn pri"'+st+' href="whatsapp://send?'+q+'">'+(IS_MOBILE?'إرسال على واتساب':'إرسال عبر تطبيق واتساب')+'</a>';
+  return IS_MOBILE?app:app+'<a class="btn"'+st+' href="https://web.whatsapp.com/send?'+q+'" target="waweb" rel="noopener">إرسال عبر واتساب ويب</a>'}
 function stmtCalc(id){var ld=lastDay();if(!ld)return null;var ms=stmtMonths(id),mon=SMON&&ms.indexOf(SMON)>=0?SMON:ld.slice(0,7),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!ds.length)return null;
   var o=0,km=0;ds.forEach(function(d){var x=data.days[d][id];o+=+x[CP]||0;km+=+x[DP]||0});
   var qx=data.couriers[id]&&data.couriers[id].q,seg=qx&&qx[mon]&&String(qx[mon].s||"").trim().toUpperCase(),qr=seg&&QRATE[seg]!=null?QRATE[seg]:0;
@@ -424,7 +428,7 @@ function vCourier(){
   if(cs==="stmt"){var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
     var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
     return head+'<section class="panel stmt"><h2>كشف حساب المندوب</h2>'+stmtMonSel(id,st.mon)+stmtTable(id,st)+
-      '<div class="row noprint" style="margin-top:14px">'+(wa?'<a class="btn pri" style="text-decoration:none" href="'+wa+'" target="_blank" rel="noopener">إرسال على واتساب</a>':'<span class="hint">لا يوجد رقم جوال مسجل لك. اطلب من الإدارة إضافته.</span>')+
+      '<div class="row noprint" style="margin-top:14px">'+(wa?waLinks(ph,stmtText(id,st)):'<span class="hint">لا يوجد رقم جوال مسجل لك. اطلب من الإدارة إضافته.</span>')+
       '<button class="btn" id="stmtHtml">تنزيل صفحة ويب</button><button class="btn" id="stmtPrint">طباعة / PDF</button></div>'+
       (ph?'<p class="hint noprint">يُرسل إلى الرقم المسجل: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>';}
   if(cs==="wallet"){var w2=data.couriers[id]&&data.couriers[id].w;
