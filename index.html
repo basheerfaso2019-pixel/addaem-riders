@@ -121,6 +121,7 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
   .side button small,.side .navlink small{display:none}
 }
 
+@media print{body.pst .panel:not(.stmt),body.pst #root>*>.tbl,body.pst .tbl:not(.stmt .tbl),body.pst .filters,body.pst .fhint,body.pst .bar,body.pst .coband{display:none!important}}
 @media print{.side,.top,.noprint,.who .row,.tiles{display:none!important}.panel{box-shadow:none;border:0}body{background:#fff}}
 
 .side .navlink{text-decoration:none;color:inherit}
@@ -246,7 +247,7 @@ function vRiders(){
   var det="";
   if(ui.sel){var id=ui.sel,ds=days().slice(-30),ser=ds.map(function(d){var v=data.days[d][id];return{d:d,v:v?+v[CP]||0:0}}),tot=agg(days().filter(function(d){return data.days[d][id]}).map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
     det='<section class="panel"><div class="who"><div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><button class="btn" data-sel="">إغلاق</button></div>'+
-      '<div class="kpis" style="margin-block:12px">'+kpi("الطلبات المكتملة (كل الأيام)",N(tot.cp,0),'خلال <span class="num">'+tot.days+'</span> يوم')+kpi("متوسط يومي",N(tot.days?tot.cp/tot.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(tot.ar),"")+kpi("عدم الحضور",N(tot.ns,0),"")+'</div>'+bars(ser,{h:170,label:"الطلبات المكتملة يومياً"})+'</section>';}
+      '<div class="kpis" style="margin-block:12px">'+kpi("الطلبات المكتملة (كل الأيام)",N(tot.cp,0),'خلال <span class="num">'+tot.days+'</span> يوم')+kpi("متوسط يومي",N(tot.days?tot.cp/tot.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(tot.ar),"")+kpi("عدم الحضور",N(tot.ns,0),"")+'</div>'+bars(ser,{h:170,label:"الطلبات المكتملة يومياً"})+'</section>'+stmtPanel(id);}
   return sampleNote()+filters()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المسافة كم<br>Distance</th><th>الحالة</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="17">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
 }
 function vTop(){
@@ -344,7 +345,16 @@ function sumDE(list,id){var t=0;list.forEach(function(d){t+=+data.days[d][id][DE
 function curMonth(){return (lastDay()||YEST).slice(0,7)}
 function cRec(d){return data.days[d]&&data.days[d][me]}
 var RATE_ORDER=8,RATE_KM=1.15,QRATE={A:2.75,B:2.25,C:1.75,D:1.25,E:0.75,F:0};
-function stmtCalc(id){var ld=lastDay();if(!ld)return null;var mon=ld.slice(0,7),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!ds.length)return null;
+var SMON="";
+function stmtMonths(id){var m={};days().forEach(function(d){if(data.days[d][id])m[d.slice(0,7)]=1});return Object.keys(m).sort().reverse()}
+function stmtMonSel(id,cur){var ms=stmtMonths(id);if(ms.length<2)return "";return '<label class="fcard noprint" style="max-width:220px;margin-bottom:10px"><span>الشهر</span><select id="stmtMon">'+ms.map(function(m){return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+m+'</option>'}).join("")+'</select></label>'}
+function stmtWa(id,st){var ph=data.couriers[id]&&data.couriers[id].ph;return ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):""}
+function stmtPanel(id){var st=stmtCalc(id);if(!st)return "";var wa=stmtWa(id,st),ph=data.couriers[id]&&data.couriers[id].ph;
+  return '<section class="panel stmt"><h2>كشف حساب المندوب</h2>'+stmtMonSel(id,st.mon)+stmtTable(id,st)+
+    '<div class="row noprint" style="margin-top:14px">'+(wa?'<a class="btn pri" style="text-decoration:none" href="'+wa+'" target="_blank" rel="noopener">إرسال على واتساب</a>':'<span class="hint">لا يوجد رقم جوال مسجل لهذا المندوب.</span>')+
+    '<button class="btn" data-sdl="'+esc(id)+'">تنزيل صفحة ويب</button><button class="btn" id="stmtPrint">طباعة / PDF</button></div>'+
+    (ph?'<p class="hint noprint">يُرسل إلى: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>'}
+function stmtCalc(id){var ld=lastDay();if(!ld)return null;var ms=stmtMonths(id),mon=SMON&&ms.indexOf(SMON)>=0?SMON:ld.slice(0,7),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!ds.length)return null;
   var o=0,km=0;ds.forEach(function(d){var x=data.days[d][id];o+=+x[CP]||0;km+=+x[DP]||0});
   var qx=data.couriers[id]&&data.couriers[id].q,seg=qx&&qx[mon]&&String(qx[mon].s||"").trim().toUpperCase(),qr=seg&&QRATE[seg]!=null?QRATE[seg]:0;
   var r2=function(v){return Math.round(v*100)/100},a=r2(o*RATE_ORDER),b=r2(km*RATE_KM),c=r2(o*qr);
@@ -413,7 +423,7 @@ function vCourier(){
       (rowsD?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المرفوضة</th><th>المُبلّغة</th><th>المكتملة</th></tr></thead><tbody>'+rowsD+'</tbody></table></div>':'<p class="hint">لا توجد بيانات رفض مسجلة لك بعد.</p>')+'</section>';}
   if(cs==="stmt"){var st=stmtCalc(id);if(!st)return head+'<section class="panel"><p class="hint">لا توجد بيانات لهذا الشهر بعد.</p></section>';
     var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
-    return head+'<section class="panel stmt"><h2>كشف حساب المندوب</h2>'+stmtTable(id,st)+
+    return head+'<section class="panel stmt"><h2>كشف حساب المندوب</h2>'+stmtMonSel(id,st.mon)+stmtTable(id,st)+
       '<div class="row noprint" style="margin-top:14px">'+(wa?'<a class="btn pri" style="text-decoration:none" href="'+wa+'" target="_blank" rel="noopener">إرسال على واتساب</a>':'<span class="hint">لا يوجد رقم جوال مسجل لك. اطلب من الإدارة إضافته.</span>')+
       '<button class="btn" id="stmtHtml">تنزيل صفحة ويب</button><button class="btn" id="stmtPrint">طباعة / PDF</button></div>'+
       (ph?'<p class="hint noprint">يُرسل إلى الرقم المسجل: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>';}
@@ -571,7 +581,7 @@ function loadStaffData(){
   function C(id){return d.couriers[id]||(d.couriers[id]={})}
   var jobs=[
     sb.from("settings").select("key,value").then(function(r){(r.data||[]).forEach(function(s){if(s.key==="company")d.company=s.value;if(s.key==="last_upload")LASTUP=s.value})}),
-    all("riders","id,name,vehicle,tga","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.name)c.n=r.name;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
+    all("riders","id,name,vehicle,tga,phone","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
     all("daily","*",["day","rider_id"]).then(function(rs){rs.forEach(function(r){(d.days[r.day]||(d.days[r.day]={}))[r.rider_id]=rowToRec(r)})}),
     sb.rpc("riders_with_login").then(function(r){(r.data||[]).forEach(function(id){C(typeof id==="string"?id:id.riders_with_login).h=true})})];
   if(canSee("quality"))jobs.push(all("quality","*",["month","rider_id"]).then(function(rs){rs.forEach(function(q){var c=C(q.rider_id);(c.q||(c.q={}))[q.month]=qToObj(q)})}));
@@ -651,7 +661,8 @@ root.addEventListener("click",function(e){
   if(t.dataset.dmode){ui0.dmode=t.dataset.dmode;render();return}
   if(t.dataset.qm){ui0.qm=t.dataset.qm;render();return}
    if(t.id==="stmtHtml"){stmtDownload(me);return}
-  if(t.id==="stmtPrint"){window.print();return}
+  if(t.dataset.sdl){stmtDownload(t.dataset.sdl);return}
+  if(t.id==="stmtPrint"){document.body.classList.add("pst");window.print();setTimeout(function(){document.body.classList.remove("pst")},500);return}
   if(t.id==="logout"){me=null;LAST=null;ss("hs_portal",null);ui.msg="";ui0.cs="home";data={company:data.company,couriers:{},days:{},staff:[]};render();return}
   if(t.id==="staffOut"){sb.auth.signOut().then(function(){location.reload()});return}
   if(t.id==="saveStaff"){var ch=ui.acc.filter(function(a){return JSON.stringify([a.n,a.r,a.p])!==a.o});
@@ -688,6 +699,7 @@ root.addEventListener("change",function(e){
   if(t.dataset.perm){var pr=t.dataset.perm.split("|"),s=ui.acc[+pr[0]],p=s.p=(s.p||[]).slice(),i=p.indexOf(pr[1]);if(t.checked&&i<0)p.push(pr[1]);if(!t.checked&&i>=0)p.splice(i,1);render()}
   if(t.id==="upDate"){ui.upDate=t.value>YEST?YEST:t.value}
   if(t.id==="qMon"){ui.qm=t.value;render()}
+  if(t.id==="stmtMon"){SMON=t.value;render()}
   if(t.id==="file"&&t.files.length){var fd=ui.upDate||YEST,fs=[].slice.call(t.files);ui.msg="جارٍ قراءة الملفات…";ui.msgOk=true;ui.upload=null;render();
     Promise.all(fs.map(function(f){return parseFile(f,fd).catch(function(err){return {file:f.name,error:err.message}})})).then(function(res){
       var ok=res.filter(function(u){return !u.error&&u.rows}),badF=res.filter(function(u){return u.error||!u.rows});
