@@ -1,6 +1,6 @@
 # daily performance sheet (شيت الأداء اليومي), admin only, exported in fadhel's own xlsx layout
 js=rep(js,'all("riders","id,name,vehicle,tga,phone,category","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);',
- 'all("riders","id,name,vehicle,tga,phone,category,sheet_pos","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.sheet_pos!=null)c.sp=r.sheet_pos;')
+ 'all("riders","id,name,vehicle,tga,phone,category,sheet_pos,region","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.sheet_pos!=null)c.sp=r.sheet_pos;if(r.region)c.rg=r.region;')
 js=rep(js,'''<button data-tab="perm" aria-current="'+(view==="perm")+'">الصلاحيات<small>Roles</small></button>''',
  '''<button data-tab="sheet" aria-current="'+(view==="sheet")+'">شيت الأداء اليومي<small>Daily Sheet</small></button><button data-tab="perm" aria-current="'+(view==="perm")+'">الصلاحيات<small>Roles</small></button>''')
 js=rep(js,'data:isAdmin&&vData,perm:isAdmin&&vPerm}[view];','data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet}[view];')
@@ -18,7 +18,7 @@ var JSZIP_URL="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
 function loadZip(){return window.JSZip?Promise.resolve(window.JSZip):new Promise(function(ok,no){var s=document.createElement("script");s.src=JSZIP_URL;s.onload=function(){ok(window.JSZip)};s.onerror=function(){no(new Error("lib"))};document.head.appendChild(s)})}
 function shMonths(){var m={};days().forEach(function(d){m[d.slice(0,7)]=1});return Object.keys(m).sort().reverse()}
 function shCatOrder(c){return c==="ب"?0:c==="خ"?1:c==="أ"?2:3}
-function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
+function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)&&!data.couriers[id].rg}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
   var px=x.sp==null?1e9:x.sp,py=y.sp==null?1e9:y.sp;if(px!==py)return px-py;var cx=shCatOrder(normCat(x.cat)),cy=shCatOrder(normCat(y.cat));return cx!==cy?cx-cy:(+a)-(+b)})}
 function shLoad(mon){
   if(!SHIQ){SHIQ="loading";all("rider_private","rider_id,iqama","rider_id").then(function(rs){SHIQ={};rs.forEach(function(r){SHIQ[r.rider_id]=r.iqama});render()},function(){SHIQ={};render()})}
