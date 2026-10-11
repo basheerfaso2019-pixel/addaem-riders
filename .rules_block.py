@@ -1,0 +1,20 @@
+# declined: 2 per day allowed, only the excess counts (fadhel 2026-10-10)
+js=rep(js,'function sumDE(list,id){var t=0;list.forEach(function(d){t+=+data.days[d][id][DE]||0});return t}',
+ 'var DE_FREE=2;function deX(v){return Math.max(0,(+v||0)-DE_FREE)}\nfunction sumDE(list,id){var t=0;list.forEach(function(d){t+=deX(data.days[d][id][DE])});return t}')
+js=rep(js,'de:lv&&lv[DE]!=null?+lv[DE]:0,','de:lv&&lv[DE]!=null?deX(lv[DE]):0,')
+js=rep(js,'(v[DE]!=null?kpi("الطلبات المرفوضة",N(v[DE],0),"Declined Deliveries"):"")','(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),\'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">\'+fmt(v[DE],0)+\'</span>\'):"")')
+js=rep(js,'''var rowsD=dd2.slice().reverse().map(function(d){var y=data.days[d][id];return '<tr class="click" data-cday="'+d+'" data-cs="day"><td>'+dl(d)+'</td><td>'+N(y[DE],0)+'</td>''',
+ '''var rowsD=dd2.slice().reverse().map(function(d){var y=data.days[d][id];return '<tr class="click" data-cday="'+d+'" data-cs="day"><td>'+dl(d)+'</td><td>'+N(y[DE],0)+'</td><td>'+N(deX(y[DE]),0)+'</td>''')
+js=rep(js,'<th>اليوم</th><th>المرفوضة</th><th>المُبلّغة</th>','<th>اليوم</th><th>رفضت</th><th>المسجلة</th><th>المُبلّغة</th>')
+js=rep(js,'الطلبات التي وصلتك ورفضتها (Declined Deliveries). كثرة الرفض تخفض نسبة القبول.','المسموح طلبان مرفوضان في اليوم، وما زاد عنهما يُسجَّل عليك هنا. كثرة الرفض تخفض نسبة القبول.')
+# category أ (target riders): same page, no performance-summary button / WhatsApp
+js=rep(js,'''<div class="row">'+(cs!=="stmt"?'<button class="btn pri" data-cs="stmt">تصدير كشف الحساب</button>':"")+''','''<div class="row">'+(cs!=="stmt"&&!stmtBlock(id)?'<button class="btn pri" data-cs="stmt">تصدير كشف الحساب</button>':"")+''')
+# manager tables also show declined counted above 2/day (fadhel: "اريد تطبيقها على الكل")
+js=rep(js,'a.st+=+x[ST]||0;','a.st+=+x[ST]||0;a.de=(a.de||0)+deX(x[DE]);')
+js=rep(js,"""<td>'+N(a.st,0)+'</td>'}""","""<td>'+N(a.st,0)+'</td><td>'+N(a.de||0,0)+'</td>'}""")
+js=rep(js,'<th>الطلبات المجمّعة<br>Stacked Deliveries</th>','<th>الطلبات المجمّعة<br>Stacked Deliveries</th><th>المرفوضة المسجلة<br>Declined (&gt;2/day)</th>')
+js=rep(js,'colspan="15">لا توجد','colspan="16">لا توجد')
+js=rep(js,"""<td>'+N(a.st,0)+'</td><td>'+N(a.di,1)+'</td>""","""<td>'+N(a.st,0)+'</td><td>'+N(a.de||0,0)+'</td><td>'+N(a.di,1)+'</td>""")
+js=rep(js,'<th>المجمّعة<br>Stacked</th>','<th>المجمّعة<br>Stacked</th><th>المرفوضة المسجلة<br>Declined &gt;2</th>')
+js=rep(js,'colspan="18">لا توجد بيانات في هذه الفترة.','colspan="19">لا توجد بيانات في هذه الفترة.')
+js=rep(js,'+kpi("عدم الحضور",N(tot.ns,0),"")+\'</div>\'+bars(ser','+kpi("عدم الحضور",N(tot.ns,0),"")+kpi("المرفوضة المسجلة",N(tot.de||0,0),"ما زاد عن طلبين يومياً")+\'</div>\'+bars(ser')
