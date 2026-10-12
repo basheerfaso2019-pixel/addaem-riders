@@ -120,3 +120,4 @@ EN.update({"تقارير المناديب حسب الطلبات":"Rider reports 
 PH.update({"المناديب الذين أكملوا طلبات في":"Riders who completed orders in"})
 EN.update({"بطاقات البنزين":"Fuel cards","— غير مربوط —":"— not linked —","اسم البطاقة":"Card name","اللوحة":"Plate","تقرير استهلاك المحروقات (الدريس)":"Aldrees fuel consumption report","تم تحديث البنزين":"Fuel updated","جارٍ تحديث البنزين…":"Updating fuel…"})
 EN.update({"كل المدن":"All cities","كل الفئات":"All segments","تصدير PDF":"Export PDF"})
+EN.update({"فئة المندوب":"Rider category","بدون فئة":"No category","تم":"Done"})
