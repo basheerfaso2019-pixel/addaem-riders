@@ -549,6 +549,7 @@ document.addEventListener("click",function(e){var t=e.target;if(!t.closest)retur
   if(t.id==="aCancel"||t.id==="addDlg"){var o=document.getElementById("addDlg");if(o)o.remove();return}
   if(t.id==="aSave")addSave()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("addDlg");if(o)o.remove()}else if(e.key==="Enter"&&e.target.closest&&e.target.closest("#addDlg")&&e.target.tagName==="INPUT")addSave()});
+function kmHide(id){return normCat(data.couriers[id]&&data.couriers[id].cat)==="أ"}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -784,6 +785,7 @@ function vCourier(){
   if(!me)return '<div class="panel"><p class="hint" style="margin:0">هذه الشاشة للمناديب.</p></div>';
   var id=me,ds=days(),mine=ds.filter(function(d){return data.days[d][id]}),ld=lastDay(),cs=ui0.cs;
   var head='<section class="panel"><div class="who"><div><div style="color:var(--muted);font-size:13px">مرحباً</div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row">'+(cs!=="stmt"&&!stmtBlock(id)?'<button class="btn pri" data-cs="stmt">تصدير ملخص الأداء</button>':"")+(cs!=="home"?'<button class="btn" data-cs="home">الرجوع للقائمة</button>':"")+'<button class="btn" id="logout">تسجيل خروج</button></div></div></section>';
+  if(cs==="distance"&&kmHide(id))cs="home";
   if(cs==="home"){
     var lv=ld&&cRec(ld),all=agg(mine.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),w=data.couriers[id]&&data.couriers[id].w;
     var mon=curMonth(),km=0,last=null;mine.forEach(function(d){var x=data.days[d][id];if(d.slice(0,7)===mon)km+=+x[DI]||0});var qx=data.couriers[id]&&data.couriers[id].q,qk=qx&&Object.keys(qx).sort().pop();last=qk&&qx[qk].s;
@@ -792,7 +794,7 @@ function vCourier(){
       (function(){var mm=curMonth(),t=0;mine.forEach(function(d){if(d.slice(0,7)===mm)t+=+data.days[d][id][CP]||0});return tile("all","إجمالي طلبات الشهر",N(t,0),monTxt(mm)+' حتى <span class="num">'+(ld||"—")+'</span><br>اختر أي شهر')})()+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
       tile("quality","جودة التوصيل",last?'<span style="font-size:24px">'+segPill(last)+'</span>':"—",qk?"تصنيف "+monLabel(qk):"لم تُرفع بعد")+
-      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس")+(function(){var st=!stmtBlock(id)&&stmtCalc(id);return st?tile("stmt","ملخص الأداء",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
+      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+(kmHide(id)?"":tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس"))+(function(){var st=!stmtBlock(id)&&stmtCalc(id);return st?tile("stmt","ملخص الأداء",money(st.total),"مستحقات "+monLabel(st.mon)):""})()+'</div>'+
       '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
