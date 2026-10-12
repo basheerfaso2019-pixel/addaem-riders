@@ -119,3 +119,4 @@ PH.update({"آخر يوم متاح:":"Last available day:","عمل منهم":"wo
 EN.update({"تقارير المناديب حسب الطلبات":"Rider reports by orders","PDF · المناديب الأعلى طلبات":"PDF · Top riders by orders","PDF · المناديب متوسطو الطلبات":"PDF · Mid riders by orders","PDF · المناديب الأقل طلبات":"PDF · Lowest riders by orders","جارٍ التصدير…":"Exporting…","مرتبون من الأعلى إلى الأقل ومقسومون إلى ثلاث فئات متساوية تقريباً.":"ranked highest to lowest and split into three near-equal groups."})
 PH.update({"المناديب الذين أكملوا طلبات في":"Riders who completed orders in"})
 EN.update({"بطاقات البنزين":"Fuel cards","— غير مربوط —":"— not linked —","اسم البطاقة":"Card name","اللوحة":"Plate","تقرير استهلاك المحروقات (الدريس)":"Aldrees fuel consumption report","تم تحديث البنزين":"Fuel updated","جارٍ تحديث البنزين…":"Updating fuel…"})
+EN.update({"كل المدن":"All cities","كل الفئات":"All segments","تصدير PDF":"Export PDF"})
