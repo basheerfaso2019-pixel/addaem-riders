@@ -126,3 +126,5 @@ EN.update({"+ إضافة مندوب":"+ Add rider","إضافة مندوب جدي
 EN.update({"سيارة":"Car","دباب":"Bike"})
 EN.update({"ضبط":"Adjust","ملء الدائرة":"Fill circle","الصورة كاملة":"Whole photo","حفظ الصورة":"Save photo","جارٍ فتح الصورة…":"Opening photo…","تعذّر فتح الصورة.":"Could not open the photo.","اسحب الصورة لتحريكها وكبّر أو صغّر بالشريط. اللي داخل الدائرة هو اللي يطلع في البطاقة.":"Drag to move the photo and use the slider to zoom. What is inside the circle appears on the card."})
 PH.update({"ضبط صورة":"Adjust photo of"})
+EN.update({"انتهاء الصلاحية":"Access expires","انتهاء الصلاحية (اختياري)":"Access expires (optional)","مدة سريعة…":"Quick duration…","يوم":"1 day","3 أيام":"3 days","أسبوع":"1 week","شهر":"1 month","بدون انتهاء":"No expiry","منتهي — الحساب موقوف":"Expired — account blocked","حذف":"Delete","انتهت صلاحية حسابك. تواصل مع المدير لتجديدها.":"Your access has expired. Contact the manager to renew it.","لا يمكنك حذف حسابك.":"You cannot delete your own account.","لا يمكن حذف حساب مدير. غيّر دوره أولاً.":"A manager account cannot be deleted. Change its role first."})
+PH.update({"فعّال حتى":"Active until","تم حذف حساب":"Deleted account"})
