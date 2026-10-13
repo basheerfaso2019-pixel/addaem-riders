@@ -41,7 +41,7 @@ function vCards(){cardIqLoad();cardPhotosLoad();cardCfgLoad();
   var first=sel[0]||list[0];if(first&&ph[first]&&CARD.photos[first]===undefined)cardPhoto(first).then(render);
   var cats=[["","الكل"],["أ","فئة أ"],["ب","فئة ب"],["خ","فئة خ"],["ر","مناديب الرياض"],["—","بدون فئة"]];
   var rows=list.slice(0,400).map(function(id){var c=data.couriers[id],on=!!CARD.sel[id];return '<tr'+(on?' class="csel"':'')+'><td><input type="checkbox" data-csel="'+esc(id)+'"'+(on?" checked":"")+'></td><td class="num">'+esc(id)+'</td><td class="s">'+esc(c.n)+'</td><td>'+esc(cardCatOf(id)==="ر"?"الرياض":cardCatOf(id))+'</td><td class="num">'+esc(cardIq(id)||"—")+'</td><td class="num">'+esc(cardPh(id)||"—")+'</td>'+
-    '<td><label class="btn cphoto'+(ph[id]?"":" pri")+'">'+(ph[id]?"✓ صورة":"+ صورة")+'<input type="file" accept="image/*" data-cphoto="'+esc(id)+'" hidden></label></td></tr>'}).join("");
+    '<td style="white-space:nowrap"><label class="btn cphoto'+(ph[id]?"":" pri")+'">'+(ph[id]?"✓ صورة":"+ صورة")+'<input type="file" accept="image/*" data-cphoto="'+esc(id)+'" hidden></label>'+(ph[id]?' <button class="btn cphoto" data-cedit="'+esc(id)+'">ضبط</button>':'')+'</td></tr>'}).join("");
   var noPhoto=sel.filter(function(id){return !ph[id]}).length,noIq=sel.filter(function(id){return !cardIq(id)}).length;
   var g=CARD.cfg&&CARD.cfg!=="loading"?CARD.cfg:CARD_DEF;
   return '<style>'+CARD_CSS+'</style><div class="cardsgrid"><section class="panel"><h2>معاينة البطاقة</h2><p class="hint">'+(first?esc(cname(first)):"اختر مندوباً")+'</p><div class="cprev">'+(first?cardFront(first,CARD.photos[first]||""):"")+cardBack()+'</div>'+
@@ -53,13 +53,54 @@ function vCards(){cardIqLoad();cardPhotosLoad();cardCfgLoad();
     (nSel&&(noPhoto||noIq)?'<p class="hint" style="color:var(--bad)">'+(noPhoto?'<span class="num">'+noPhoto+'</span> بدون صورة. ':'')+(noIq?'<span class="num">'+noIq+'</span> بدون رقم إقامة.':'')+'</p>':'')+
     '<p class="hint" id="cMsg" style="min-height:1.4em;margin:0 0 6px">'+esc(CARD.msg)+'</p>'+
     '<div class="tbl" style="box-shadow:none;max-height:560px;overflow:auto"><table><thead><tr><th></th><th>Rider Id</th><th>الاسم</th><th>الفئة</th><th>الإقامة</th><th>الجوال</th><th>الصورة</th></tr></thead><tbody>'+(rows||'<tr><td class="empty" colspan="7">لا يوجد مناديب بهذا البحث.</td></tr>')+'</tbody></table></div></section></div>'}
-/* square crop around the face area (upper middle), 600px jpeg */
-function cardPhotoUpload(id,file){CARD.msg="جارٍ رفع الصورة…";render();
-  var img=new Image(),u=URL.createObjectURL(file);img.onload=function(){var s=Math.min(img.width,img.height),sx=(img.width-s)/2,sy=img.height>img.width?Math.max(0,(img.height-s)*0.2):0,cv=document.createElement("canvas");cv.width=cv.height=600;
-    cv.getContext("2d").drawImage(img,sx,sy,s,s,0,0,600,600);URL.revokeObjectURL(u);
-    cv.toBlob(function(b){sb.storage.from("rider-photos").upload(id+".jpg",b,{upsert:true,contentType:"image/jpeg"}).then(function(r){if(r.error)throw r.error;if(CARD.ph&&CARD.ph!=="loading")CARD.ph[id]=1;return blobUrl(b)})
-      .then(function(d){CARD.photos[id]=d;CARD.sel[id]=true;CARD.msg="تم حفظ صورة "+cname(id);render()},function(e){CARD.msg="تعذّر رفع الصورة: "+((e&&e.message)||e);render()})},"image/jpeg",0.88)};
-  img.onerror=function(){CARD.msg="الملف ليس صورة.";render()};img.src=u}
+/* photo crop: the circle on the card shows exactly what the manager frames here (drag to move, slider to zoom) */
+var CROP=null,CROP_C=300;
+function cardPhotoUpload(id,file){var img=new Image(),u=URL.createObjectURL(file);img.onload=function(){cropOpen(id,img,file)};img.onerror=function(){URL.revokeObjectURL(u);CARD.msg="الملف ليس صورة.";render()};img.src=u}
+function cardPhotoEdit(id){CARD.msg="جارٍ فتح الصورة…";render();var bk=sb.storage.from("rider-photos");
+  bk.download("orig/"+id+".jpg").then(function(r){if(r.error||!r.data)return bk.download(id+".jpg");return r}).then(function(r){if(r.error||!r.data)throw 0;
+    var img=new Image(),u=URL.createObjectURL(r.data);img.onload=function(){CARD.msg="";render();cropOpen(id,img,null)};img.src=u}).catch(function(){CARD.msg="تعذّر فتح الصورة.";render()})}
+function cropCover(){return Math.max(CROP_C/CROP.img.width,CROP_C/CROP.img.height)}
+function cropContain(){return Math.min(CROP_C/CROP.img.width,CROP_C/CROP.img.height)}
+function cropSet(s,cx,cy){var w0=CROP.img.width*CROP.s,h0=CROP.img.height*CROP.s;if(cx==null){cx=CROP_C/2;cy=CROP_C/2}
+  var fx=(cx-CROP.x)/w0,fy=(cy-CROP.y)/h0;CROP.s=s;var w=CROP.img.width*s,h=CROP.img.height*s;CROP.x=cx-fx*w;CROP.y=cy-fy*h;cropClamp()}
+function cropClamp(){var w=CROP.img.width*CROP.s,h=CROP.img.height*CROP.s;
+  CROP.x=w>=CROP_C?Math.min(0,Math.max(CROP_C-w,CROP.x)):Math.max(0,Math.min(CROP_C-w,CROP.x));CROP.y=h>=CROP_C?Math.min(0,Math.max(CROP_C-h,CROP.y)):Math.max(0,Math.min(CROP_C-h,CROP.y))}
+function cropDraw(){var cv=document.getElementById("cropCv");if(!cv)return;var g=cv.getContext("2d"),k=cv.width/CROP_C;g.setTransform(k,0,0,k,0,0);
+  g.fillStyle="#fff";g.fillRect(0,0,CROP_C,CROP_C);g.drawImage(CROP.img,CROP.x,CROP.y,CROP.img.width*CROP.s,CROP.img.height*CROP.s);
+  g.fillStyle="rgba(20,35,43,.55)";g.beginPath();g.rect(0,0,CROP_C,CROP_C);g.arc(CROP_C/2,CROP_C/2,CROP_C/2-1,0,Math.PI*2,true);g.fill("evenodd");
+  g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(CROP_C/2,CROP_C/2,CROP_C/2-1,0,Math.PI*2);g.stroke();
+  var z=document.getElementById("cropZ");if(z)z.value=String(Math.round(CROP.s/cropCover()*100))}
+function cropOpen(id,img,file){CROP={id:id,img:img,file:file,s:1,x:0,y:0};
+  /* start filled: whole circle covered, portrait photos framed a little above centre where the face usually is */
+  CROP.s=cropCover();var h=img.height*CROP.s;CROP.x=(CROP_C-img.width*CROP.s)/2;CROP.y=h>CROP_C?-(h-CROP_C)*0.2:0;cropClamp();
+  var o=document.getElementById("cropDlg");if(o)o.remove();o=document.createElement("div");o.id="cropDlg";o.className="addov";o.setAttribute("dir","rtl");
+  var mn=Math.round(cropContain()/cropCover()*100);
+  o.innerHTML='<div class="addbox" style="max-width:380px;text-align:center"><h2 style="margin:0 0 4px;font-size:17px">ضبط صورة '+esc(cname(id))+'</h2><p class="hint" style="margin:0 0 10px">اسحب الصورة لتحريكها وكبّر أو صغّر بالشريط. اللي داخل الدائرة هو اللي يطلع في البطاقة.</p>'+
+    '<canvas id="cropCv" width="600" height="600" style="width:'+CROP_C+'px;height:'+CROP_C+'px;max-width:100%;touch-action:none;cursor:grab;border-radius:8px"></canvas>'+
+    '<div class="row" style="gap:8px;align-items:center;margin:10px 0"><span class="hint">−</span><input id="cropZ" type="range" min="'+Math.min(mn,100)+'" max="400" value="100" style="flex:1"><span class="hint">+</span></div>'+
+    '<div class="row" style="gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px"><button class="btn" id="cropFill">ملء الدائرة</button><button class="btn" id="cropFit">الصورة كاملة</button></div>'+
+    '<div class="row" style="gap:8px;justify-content:center"><button class="btn pri" id="cropSave">حفظ الصورة</button><button class="btn" id="cropCancel">إلغاء</button></div></div>';
+  document.body.appendChild(o);if(typeof trTree==="function")try{trTree(o)}catch(e){}
+  var cv=document.getElementById("cropCv"),drag=null;
+  cv.addEventListener("pointerdown",function(e){drag={x:e.clientX,y:e.clientY,ox:CROP.x,oy:CROP.y,k:CROP_C/cv.getBoundingClientRect().width};cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing"});
+  cv.addEventListener("pointermove",function(e){if(!drag)return;CROP.x=drag.ox+(e.clientX-drag.x)*drag.k;CROP.y=drag.oy+(e.clientY-drag.y)*drag.k;cropClamp();cropDraw()});
+  cv.addEventListener("pointerup",function(){drag=null;cv.style.cursor="grab"});
+  cv.addEventListener("wheel",function(e){e.preventDefault();var r=cv.getBoundingClientRect(),k=CROP_C/r.width;cropSet(Math.max(cropContain(),Math.min(cropCover()*4,CROP.s*(e.deltaY<0?1.08:1/1.08))),(e.clientX-r.left)*k,(e.clientY-r.top)*k);cropDraw()},{passive:false});
+  document.getElementById("cropZ").addEventListener("input",function(e){cropSet(cropCover()*(+e.target.value)/100);cropDraw()});
+  cropDraw()}
+function cropClose(){var o=document.getElementById("cropDlg");if(o)o.remove();if(CROP&&CROP.img&&/^blob:/.test(CROP.img.src))URL.revokeObjectURL(CROP.img.src);CROP=null}
+function cropSave(){var C=CROP,id=C.id,cv=document.createElement("canvas"),k=600/CROP_C;cv.width=cv.height=600;var g=cv.getContext("2d");
+  g.fillStyle="#fff";g.fillRect(0,0,600,600);g.drawImage(C.img,C.x*k,C.y*k,C.img.width*C.s*k,C.img.height*C.s*k);
+  var b=document.getElementById("cropSave");if(b){b.disabled=true;b.textContent="جارٍ الحفظ…"}
+  var bk=sb.storage.from("rider-photos");
+  /* keep the original (max 1600px) so the framing can be changed later without re-uploading */
+  var orig=C.file?new Promise(function(ok){var m=Math.min(1,1600/Math.max(C.img.width,C.img.height)),o=document.createElement("canvas");o.width=Math.round(C.img.width*m);o.height=Math.round(C.img.height*m);
+      o.getContext("2d").drawImage(C.img,0,0,o.width,o.height);o.toBlob(function(ob){bk.upload("orig/"+id+".jpg",ob,{upsert:true,contentType:"image/jpeg"}).then(function(){ok()},function(){ok()})},"image/jpeg",0.9)}):Promise.resolve();
+  cv.toBlob(function(bl){orig.then(function(){return bk.upload(id+".jpg",bl,{upsert:true,contentType:"image/jpeg"})}).then(function(r){if(r.error)throw r.error;if(CARD.ph&&CARD.ph!=="loading")CARD.ph[id]=1;return blobUrl(bl)})
+    .then(function(d){CARD.photos[id]=d;CARD.sel[id]=true;CARD.msg="تم حفظ صورة "+cname(id);cropClose();render()},function(e){if(b){b.disabled=false;b.textContent="حفظ الصورة"}CARD.msg="تعذّر رفع الصورة: "+((e&&e.message)||e);render()})},"image/jpeg",0.9)}
+document.addEventListener("click",function(e){var t=e.target;if(!CROP||!t.closest||!t.closest("#cropDlg"))return;
+  if(t.id==="cropSave")cropSave();else if(t.id==="cropCancel"||t.id==="cropDlg")cropClose();
+  else if(t.id==="cropFill"){cropSet(cropCover());cropDraw()}else if(t.id==="cropFit"){cropSet(cropContain());cropDraw()}});
 function cardPrint(){var ids=Object.keys(CARD.sel).filter(function(id){return CARD.sel[id]&&data.couriers[id]}).sort(function(a,b){return data.couriers[a].n.localeCompare(data.couriers[b].n,"ar")});if(!ids.length)return;
   CARD.busy=true;render();
   ids.reduce(function(p,id){return p.then(function(){return cardPhoto(id)})},Promise.resolve()).then(function(){
@@ -80,11 +121,12 @@ function cardSaveCfg(){var g={phone:(document.getElementById("cPhone")||{}).valu
 document.addEventListener("input",function(e){if(e.target.id!=="cQ")return;CARD.q=e.target.value;var pos=e.target.selectionStart;render();var el=document.getElementById("cQ");if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(x){}}});
 function vSoon(){''')
 js=rep(js,'  if(t.dataset.ovpdf){ovPdf(t.dataset.ovpdf);return}','''  if(t.dataset.ovpdf){ovPdf(t.dataset.ovpdf);return}
+  if(t.dataset.cedit){cardPhotoEdit(t.dataset.cedit);return}
   if(t.dataset.call!=null){if(t.dataset.call==="1")cardList().forEach(function(id){CARD.sel[id]=true});else CARD.sel={};render();return}
   if(t.id==="cPrint"){cardPrint();return}''')
 js=rep(js,'  if(t.id==="ovMon"){ui0.ovm=t.value;render()}','''  if(t.id==="ovMon"){ui0.ovm=t.value;render()}
   if(t.dataset.csel!=null){CARD.sel[t.dataset.csel]=t.checked;render();return}
-  if(t.dataset.cphoto!=null&&t.files&&t.files[0]){cardPhotoUpload(t.dataset.cphoto,t.files[0]);return}
+  if(t.dataset.cphoto!=null&&t.files&&t.files[0]){cardPhotoUpload(t.dataset.cphoto,t.files[0]);t.value="";return}
   if(t.id==="cCat"){CARD.cat=t.value;render();return}
   if(t.id==="cMode"){CARD.mode=t.value;render();return}
   if(t.id==="cPhone"||t.id==="cEmail"){cardSaveCfg();return}''')
