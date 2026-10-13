@@ -128,3 +128,5 @@ EN.update({"ضبط":"Adjust","ملء الدائرة":"Fill circle","الصورة
 PH.update({"ضبط صورة":"Adjust photo of"})
 EN.update({"انتهاء الصلاحية":"Access expires","انتهاء الصلاحية (اختياري)":"Access expires (optional)","مدة سريعة…":"Quick duration…","يوم":"1 day","3 أيام":"3 days","أسبوع":"1 week","شهر":"1 month","بدون انتهاء":"No expiry","منتهي — الحساب موقوف":"Expired — account blocked","حذف":"Delete","انتهت صلاحية حسابك. تواصل مع المدير لتجديدها.":"Your access has expired. Contact the manager to renew it.","لا يمكنك حذف حسابك.":"You cannot delete your own account.","لا يمكن حذف حساب مدير. غيّر دوره أولاً.":"A manager account cannot be deleted. Change its role first."})
 PH.update({"فعّال حتى":"Active until","تم حذف حساب":"Deleted account"})
+EN.update({"تصدير المحافظ حسب المبلغ":"Export wallets by amount","الرصيد من":"Balance from","ر.س فأكثر":"SAR or more","اكتب المبلغ، ويطلع لك عدد المناديب اللي رصيدهم يساويه أو أكبر.":"Type an amount to see how many riders have that balance or more."})
+PH.update({"مندوب رصيدهم":"riders with a balance of","ر.س فأكثر، بمجموع":"SAR or more, totalling"})
