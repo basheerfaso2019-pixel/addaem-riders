@@ -130,3 +130,5 @@ EN.update({"انتهاء الصلاحية":"Access expires","انتهاء الص
 PH.update({"فعّال حتى":"Active until","تم حذف حساب":"Deleted account"})
 EN.update({"تصدير المحافظ حسب المبلغ":"Export wallets by amount","الرصيد من":"Balance from","ر.س فأكثر":"SAR or more","اكتب المبلغ، ويطلع لك عدد المناديب اللي رصيدهم يساويه أو أكبر.":"Type an amount to see how many riders have that balance or more."})
 PH.update({"مندوب رصيدهم":"riders with a balance of","ر.س فأكثر، بمجموع":"SAR or more, totalling"})
+EN.update({"عليه مبلغ":"Owes","له مبلغ":"Is owed","اختر «عليه مبلغ» أو «له مبلغ» واكتب المبلغ، ويطلع لك عدد المناديب.":"Pick Owes or Is owed and type an amount to see how many riders match.","مناديب الرياض":"Riyadh riders","غير محدد":"Unknown"})
+PH.update({"مندوب عليهم":"riders owing","مندوب لهم":"riders owed","لا يوجد مناديب عليهم":"No riders owing","لا يوجد مناديب لهم":"No riders owed"})
