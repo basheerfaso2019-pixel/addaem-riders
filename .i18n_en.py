@@ -132,3 +132,4 @@ EN.update({"تصدير المحافظ حسب المبلغ":"Export wallets by am
 PH.update({"مندوب رصيدهم":"riders with a balance of","ر.س فأكثر، بمجموع":"SAR or more, totalling"})
 EN.update({"عليه مبلغ":"Owes","له مبلغ":"Is owed","اختر «عليه مبلغ» أو «له مبلغ» واكتب المبلغ، ويطلع لك عدد المناديب.":"Pick Owes or Is owed and type an amount to see how many riders match.","مناديب الرياض":"Riyadh riders","غير محدد":"Unknown"})
 PH.update({"مندوب عليهم":"riders owing","مندوب لهم":"riders owed","لا يوجد مناديب عليهم":"No riders owing","لا يوجد مناديب لهم":"No riders owed"})
+EN.update({"أسباب التصنيف":"Segment reasons","تصنيف المندوب":"Rider segment","السبب الرئيسي لانخفاض التصنيف":"Main reason for the lower segment","يؤثر على التصنيف":"Affects the segment","ممتاز":"Excellent","الطلبات المكتملة حسب الشهر:":"Completed orders by month:","درجة الجودة النهائية":"Final quality score","لا توجد طلبات تحقق":"No verification orders"})
