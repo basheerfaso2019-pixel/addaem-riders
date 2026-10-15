@@ -24,7 +24,7 @@ function bkRestore(file){var fr=new FileReader();fr.onload=function(){var d;try{
   .then(function(){bk.busy=false;bkSet("تم الاسترجاع. حدّث الصفحة لرؤية البيانات.",true)})
   .catch(function(e){bk.busy=false;bkSet("تعذّر الاسترجاع: "+((e&&e.message)||e),false)})};fr.readAsText(file)}
 function bkPanel(){if(!isAdmin)return "";
-  return '<section class="panel bkp"><h2>النسخة الاحتياطية</h2><p class="hint">نزّل نسخة كاملة من بيانات النظام (المناديب، الإقامات، الأداء اليومي، الجودة، المحافظ، البنزين، الشيت، صور البطاقات) في ملف واحد. احفظه في جهازك أو في Google Drive، ويُفضّل كل أسبوع.</p>'+
+  return '<section class="panel bkp"><h2>النسخة الاحتياطية</h2><p class="hint">نزّل نسخة كاملة من بيانات النظام (المناديب، الإقامات، الأداء اليومي، الجودة، المحافظ، الشيت، صور البطاقات) في ملف واحد. احفظه في جهازك أو في Google Drive، ويُفضّل كل أسبوع.</p>'+
     '<div class="row"><button class="btn pri" id="bkDl">تنزيل نسخة احتياطية</button><label class="btn">استرجاع من نسخة<input type="file" id="bkFile" accept=".json,application/json" hidden></label></div>'+
     '<p class="hint" id="bkMsg" style="color:'+(bk.ok?"var(--good)":"var(--bad)")+'">'+esc(bk.msg||"")+'</p>'+
     '<p class="hint">الملف فيه أرقام الإقامة، فلا ترسله لأحد.</p></section>'}

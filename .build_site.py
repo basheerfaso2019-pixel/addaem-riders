@@ -490,6 +490,7 @@ js=js.replace("fill=\"'+(last?'var(--head)':'var(--bar)')+'\"","fill=\"'+(last?'
 # wording: "كشف الحساب" renamed to "ملخص أداء المندوب" (fadhel 2026-10-10)
 for _a,_b in (("تصدير كشف الحساب","تصدير ملخص الأداء"),("كشف حساب المندوب","ملخص أداء المندوب"),("لا يوجد كشف حساب","لا يوجد ملخص أداء"),("كشف حساب ","ملخص أداء "),("كشف الحساب","ملخص الأداء"),('"kashf-"','"performance-"')):
     js=js.replace(_a,_b)
+exec(open('finhide_block.py',encoding='utf8').read())
 css+='''
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
