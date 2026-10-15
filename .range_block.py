@@ -10,7 +10,8 @@ function rgPanel(id,mine,ld){if(!ld)return "";var ms={};mine.forEach(function(d)
     '<div class="kpis" style="margin-top:12px">'+kpi("أيام العمل",N(ins.length,0),"")+kpi("متوسط يومي",N(ins.length?sum/ins.length:0,1),"")+'</div>'+
     '<p class="hint">كل شهر يُحسب لوحده. البيانات متاحة حتى <span class="num">'+ld+'</span>.</p></section>'}
 function vSoon(){''')
-js=rep(js,'''<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+''','''<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+rgPanel(id,mine,ld)+''')
+# shown at the top of the rider's home page, right under the greeting (fadhel: riders open it on phones)
+js=rep(js,'''return sampleNote()+head+'<div class="tiles">'+''','''return sampleNote()+head+rgPanel(id,mine,ld)+'<div class="tiles">'+''')
 js=rep(js,'  if(t.id==="cday"){ui.cday=t.value>YEST?YEST:t.value;render()}','''  if(t.id==="cday"){ui.cday=t.value>YEST?YEST:t.value;render()}
   if(t.id==="rgM"){ui0.rgm=t.value;ui0.rgf=ui0.rgt=null;render()}
   if((t.id==="rgF"||t.id==="rgT")&&t.value){var mm=t.value.slice(0,7);if(mm!==ui0.rgm){ui0.rgm=mm;ui0.rgf=ui0.rgt=null}if(t.id==="rgF")ui0.rgf=t.value;else ui0.rgt=t.value;render()}''')

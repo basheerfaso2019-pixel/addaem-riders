@@ -946,7 +946,7 @@ function vCourier(){
   if(cs==="home"){
     var lv=ld&&cRec(ld),all=agg(mine.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),w=data.couriers[id]&&data.couriers[id].w;
     var mon=curMonth(),km=0,last=null;mine.forEach(function(d){var x=data.days[d][id];if(d.slice(0,7)===mon)km+=+x[DI]||0});var qx=data.couriers[id]&&data.couriers[id].q,qk=qx&&Object.keys(qx).sort().pop();last=qk&&qx[qk].s;
-    return sampleNote()+head+'<div class="tiles">'+
+    return sampleNote()+head+rgPanel(id,mine,ld)+'<div class="tiles">'+
       tile("day","عدد طلبات اليوم",lv?N(lv[CP],0):"0",ld?dl(ld)+'<br>اختر أي يوم سابق':"لا توجد بيانات")+
       (function(){var mm=curMonth(),t=0;mine.forEach(function(d){if(d.slice(0,7)===mm)t+=+data.days[d][id][CP]||0});return tile("all","إجمالي طلبات الشهر",N(t,0),monTxt(mm)+' حتى <span class="num">'+(ld||"—")+'</span><br>اختر أي شهر')})()+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
@@ -965,7 +965,7 @@ function vCourier(){
       '<div class="kpis" style="margin-top:12px">'+(rk?kpi("ترتيبك في اليوم",'<span class="num">'+rk+'</span> <span style="font-size:14px;color:var(--muted)">من <span class="num">'+arr.length+'</span></span>',v.av!=null?'متوسط المناديب <span class="num">'+fmt(v.av,1)+'</span> طلب':""):"")+
       (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DI]!=null?kpi("المسافة",N(v[DI],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">'+fmt(v[DE],0)+'</span>'):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
     var hist=mine.slice(-14).reverse().map(function(x){var y=data.days[x][id];return '<tr class="click" data-cday="'+x+'"><td>'+dl(x)+'</td><td>'+N(y[CP],0)+'</td><td>'+P(y[AR])+'</td><td>'+N(y[AC])+'</td></tr>'}).join("");
-    return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+rgPanel(id,mine,ld)+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
+    return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
   }
   if(cs==="all"){var amo={};mine.forEach(function(d){var m=d.slice(0,7);amo[m]=(amo[m]||0)+(+data.days[d][id][CP]||0)});var aml=Object.keys(amo).sort().reverse(),am=ui0.am&&amo[ui0.am]!=null?ui0.am:(aml[0]||curMonth());
     var amd=mine.filter(function(d){return d.slice(0,7)===am}),a=agg(amd.map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
