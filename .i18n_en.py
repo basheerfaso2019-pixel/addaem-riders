@@ -54,7 +54,7 @@ EN = {
 "تقرير جودة التوصيل":"Delivery quality report","تعذّر تجهيز الملف:":"Could not prepare the file:","عدد طلبات يوم محدد":"Orders on a specific day",
 "تصنيف جودة التوصيل":"Delivery Quality Segmentation","صف من اليوم الحالي":"rows from today","اسم الشركة المشغلة":"Operating company name",
 "المناديب الموقوفون":"Suspension Riders","حفظ أرقام الإقامة":"Save Iqama numbers","هذا القسم من تقرير":"This section comes from the report",
-"لا توجد بيانات بعد":"No data yet","مخالفات هيئة النقل":"TGA Violations","رجوع لتسجيل الدخول":"Back to sign in","أشهر جودة التوصيل:":"Quality months:",
+"لا توجد بيانات بعد":"No data yet","مخالفات هيئة النقل":"TGA Violations","أكواد الهيئة":"TGA Codes","إضافة كود هيئة على مندوب":"Add a TGA code to a rider","المندوب":"Rider","كود الهيئة":"TGA code","التاريخ":"Date","ملاحظة":"Note","إضافة الكود":"Add code","اختر المندوب…":"Choose rider…","أكواد الهيئة على المناديب":"TGA codes on riders","عدد الأكواد":"Codes","حذف":"Delete","عرض الأكواد":"View codes","⚠ تنبيه أكواد الهيئة:":"⚠ TGA codes alert:","لا توجد أكواد هيئة مسجلة على أي مندوب.":"No TGA codes recorded on any rider.","رجوع لتسجيل الدخول":"Back to sign in","أشهر جودة التوصيل:":"Quality months:",
 "ساعات العمل الفعلية":"Actual working hours","العقد Contract Name":"Contract Name","رصيد المحفظة الحالي":"Current wallet balance",
 "صف بدون ID أو تاريخ":"rows without ID or date","جارٍ قراءة الملفات…":"Reading files…","ملخص أداء المندوب -":"Rider performance summary -",
 "تقرير أداء المناديب":"Riders performance report","لا توجد بيانات بعد.":"No data yet.","رفع تقارير هنقرستيشن":"Upload HungerStation reports",

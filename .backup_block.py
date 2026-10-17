@@ -1,5 +1,5 @@
 # admin backup: download every table (+ rider photos) as one JSON file, and restore from it (fadhel 2026-10-15)
-js=rep(js,'function vSoon(){','''var BK_T=["settings","riders","rider_private","daily","quality","wallet","fuel_label","fuel_map","sheet_extra"],bk={};
+js=rep(js,'function vSoon(){','''var BK_T=["settings","riders","rider_private","daily","quality","wallet","fuel_label","fuel_map","sheet_extra","tga_codes"],bk={};
 function bkAll(t){var out=[];function pg(i){return sb.from(t).select("*").range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data);return r.data.length<1000?out:pg(i+1000)})}return pg(0)}
 function b64(blob){return new Promise(function(ok,no){var f=new FileReader();f.onload=function(){ok(String(f.result).split(",")[1])};f.onerror=no;f.readAsDataURL(blob)})}
 function bkPhotos(){var st=sb.storage.from("rider-photos");return st.list("",{limit:2000}).then(function(r){var fs=(r.data||[]).filter(function(f){return /\\.jpg$/.test(f.name)}),o={};
@@ -15,7 +15,7 @@ function bkChunks(a,n){var o=[];for(var i=0;i<a.length;i+=n)o.push(a.slice(i,i+n
 function bkRestore(file){var fr=new FileReader();fr.onload=function(){var d;try{d=JSON.parse(fr.result)}catch(e){bkSet("الملف ليس نسخة احتياطية صحيحة.",false);return}
   if(!d||d.app!=="addaem-riders"||!d.tables){bkSet("الملف ليس نسخة احتياطية من هذا النظام.",false);return}
   if(!confirm("استرجاع النسخة المؤرخة "+String(d.created).slice(0,10)+"؟ ستُستبدل السجلات الموجودة بنفس المفاتيح، وتبقى السجلات الأخرى كما هي."))return;
-  bk.busy=true;var keys={settings:"key",riders:"id",rider_private:"rider_id",daily:"day,rider_id",quality:"month,rider_id",wallet:"rider_id",fuel_label:"month,label",fuel_map:"label",sheet_extra:"month,rider_id"};
+  bk.busy=true;var keys={settings:"key",riders:"id",rider_private:"rider_id",daily:"day,rider_id",quality:"month,rider_id",wallet:"rider_id",fuel_label:"month,label",fuel_map:"label",sheet_extra:"month,rider_id",tga_codes:"id"};
   BK_T.reduce(function(p,t){var rows=d.tables[t]||[];return p.then(function(){bkSet("جارٍ استرجاع "+t+"…",true);return bkChunks(rows,500).reduce(function(q,c){return q.then(function(){return sb.from(t).upsert(c,{onConflict:keys[t]}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})},Promise.resolve())
   .then(function(){var iq=(d.tables.rider_private||[]).filter(function(r){return r.iqama}).map(function(r){return{id:r.rider_id,iqama:r.iqama}});bkSet("جارٍ تفعيل دخول المناديب…",true);
     return bkChunks(iq,100).reduce(function(q,c){return q.then(function(){return sb.rpc("set_riders",{p_rows:c}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})
