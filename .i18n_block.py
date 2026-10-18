@@ -23,7 +23,7 @@ function applyLang(){var en=LANG==="en";document.documentElement.lang=en?"en":"a
 function setLang(l){LANG=l;try{localStorage.setItem("hs_lang",l)}catch(e){}applyLang();render()}
 function showSplash(ms){var s=document.getElementById("splash");if(!s)return;s.hidden=false;s.classList.remove("out");clearTimeout(showSplash.t);showSplash.t=setTimeout(function(){s.classList.add("out");setTimeout(function(){s.hidden=true},450)},ms||2400)}
 var WAS_IN=null;
-applyLang();i18nWatch();showSplash(2600);
+applyLang();i18nWatch();showSplash(3200);
 function render(){''')
 # after each render: translate, and greet on sign-in
 js=rep(js,'  root.innerHTML=html;','  root.innerHTML=html;trTree(root);\n  var isIn=!!(me||isAdmin||staff);if(WAS_IN===false&&isIn)showSplash(2200);WAS_IN=isIn;')

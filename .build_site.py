@@ -503,6 +503,7 @@ body{padding-bottom:34px}
 .ticker i.sep{color:var(--gold);padding:0}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(50%)}}
 @media (prefers-reduced-motion:reduce){.ticker span{animation:none}}
+.splash .ssl{display:block;font-family:var(--f-display,inherit);font-weight:700;font-size:clamp(17px,3.4vw,24px);color:var(--head-fg);padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid color-mix(in srgb,var(--gold) 45%,transparent)}
 @media print{.ticker{display:none!important}body{padding-bottom:0}}
 '''
 html='''<!doctype html>
@@ -514,7 +515,7 @@ html='''<!doctype html>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head><body><div id="root"></div>
 <div class="ticker" role="note" aria-live="off"><span id="tickerTxt">سبحان الله</span></div>
-<div class="splash" id="splash" hidden role="status"><div><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div></div>
+<div class="splash" id="splash" hidden role="status"><div><span class="ssl">اللهم صلِّ على سيدنا محمد</span><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div></div>
 <script>'''+js+'''</script>
 <script>/* bottom bar: adhkar following each other closely, seamless loop (fadhel 2026-10-18) */
 (function(){var L=["سبحان الله","الحمد لله","لا إله إلا الله","الله أكبر","اللهم صلِّ وسلم على سيدنا محمد وعلى آله وصحبه وسلم"],el=document.getElementById("tickerTxt");if(!el)return;
