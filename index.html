@@ -159,6 +159,17 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .tgared{background:#ff4d4d!important;color:#fff!important;font-weight:700}
 
+.tgaform{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
+.tgaform label{display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.tgaform select,.tgaform input{width:100%}
+.btn.sm{padding:3px 10px;font-size:12.5px}
+.sttiles{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.sttiles>div{flex:1 1 120px;border:1px solid var(--line,#ddd);border-radius:10px;padding:8px 12px;font-size:13px}
+.sttiles b{display:block;font-size:22px}
+.stchip{display:inline-block;border-radius:10px;padding:1px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.st-leave{background:#fff1c2;color:#6b4e00}.st-susp{background:#ffd9b3;color:#7a3a00}.st-end{background:#fde0e0;color:#8a1212}
+.st-done{background:#e6e6e6;color:#444}.st-wait{background:#dbe9f7;color:#1f3864}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -259,7 +270,7 @@ function bars(series,opt){
 function kpi(l,v,s){return '<div class="kpi"><span class="l">'+l+'</span><span class="v">'+v+'</span><span class="s">'+(s||"")+'</span></div>'}
 
 /* ---------- menu ---------- */
-var MENU=[["overall","نظرة عامة","Overall View"],["daily","الأداء اليومي","Daily Performance"],["riders","أداء المناديب","Rider's Performance"],["top","أفضل المناديب","Top Riders Performance"],["shift","الورديات المجدولة","Scheduled Shift",1],["absence","غياب المناديب","Riders Absences"],["quality","تصنيف جودة التوصيل","Delivery Quality Segmentation"],["susp","المناديب الموقوفون","Suspension Riders",1],["tga","مخالفات هيئة النقل","TGA Violations",1],["errors","رموز الأخطاء","Error Codes",1],["wallet","محفظة المندوب","Rider's Wallet"],["distance","المسافة المقطوعة","Distance"]];
+var MENU=[["overall","نظرة عامة","Overall View"],["daily","الأداء اليومي","Daily Performance"],["riders","أداء المناديب","Rider's Performance"],["top","أفضل المناديب","Top Riders Performance"],["shift","الورديات المجدولة","Scheduled Shift",1],["absence","غياب المناديب","Riders Absences"],["quality","تصنيف جودة التوصيل","Delivery Quality Segmentation"],["susp","المناديب الموقوفون","Suspension Riders"],["tga","مخالفات هيئة النقل","TGA Violations",1],["errors","رموز الأخطاء","Error Codes",1],["wallet","محفظة المندوب","Rider's Wallet"],["distance","المسافة المقطوعة","Distance"]];
 var TITLES={courier:"دخول المندوب",data:"رفع البيانات"};MENU.forEach(function(m){TITLES[m[0]]=m[1]});
 function canSee(v){return isAdmin||(!!staff&&(staff.p||[]).indexOf(v)>=0)}
 function roleName(){return isAdmin?"مدير":staff?"موظف · "+staff.n:me?"مندوب":""}
@@ -731,6 +742,53 @@ function tgaStyles(st){var m=st.match(/<cellXfs count="(\d+)"/);if(!m)return st;
   var fm=st.match(/<fills count="(\d+)"/),fid=+fm[1];
   st=st.replace(/<fills count="\d+"/,'<fills count="'+(fid+1)+'"').replace("</fills>",'<fill><patternFill patternType="solid"><fgColor rgb="FFFF4D4D"/><bgColor indexed="64"/></patternFill></fill></fills>');
   return st.replace(/<cellXfs count="\d+"/,'<cellXfs count="'+(TGA_XF+1)+'"').replace("</cellXfs>",'<xf numFmtId="0" fontId="0" fillId="'+fid+'" borderId="2" applyFill="1" applyAlignment="1" xfId="0"><alignment horizontal="center" vertical="center" wrapText="1" /></xf></cellXfs>')}
+/* ---------- rider status: leave / suspended / ended ---------- */
+var SHMON=null,stUi={msg:"",ok:true,busy:false},ST_T={leave:"إجازة",susp:"موقوف",ended:"منتهي العقد"};
+function stToday(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function stGone(id,mon){var s=data.couriers[id]&&data.couriers[id].st;return !!(s&&s.t==="ended"&&s.f&&mon&&s.f.slice(0,7)<mon)}
+function stDays(a,b){return Math.round((Date.parse(b)-Date.parse(a))/864e5)}
+function stLastDay(id){var ds=days();for(var i=ds.length-1;i>=0;i--){var r=data.days[ds[i]][id];if(r&&(r[CP]||0)>0)return ds[i]}return ""}
+function stState(s){var t=stToday();if(s.t==="ended")return {cls:"st-end",txt:"منتهي العقد"};
+  if(s.u&&s.u<t)return {cls:"st-done",txt:(s.t==="leave"?"انتهت الإجازة":"انتهى الإيقاف")};
+  if(s.f&&s.f>t)return {cls:"st-wait",txt:ST_T[s.t]+" تبدأ "+s.f};
+  return {cls:s.t==="leave"?"st-leave":"st-susp",txt:ST_T[s.t]+(s.u?" — باقي "+stDays(t,s.u)+" يوم":"")}}
+function vSusp(){
+  var t=stToday(),ids=Object.keys(data.couriers).filter(function(id){return data.couriers[id].n}).sort(function(a,b){return cname(a).localeCompare(cname(b),"ar")});
+  var form=isAdmin?'<section class="panel"><h2 style="margin:0 0 10px">تسجيل حالة مندوب</h2><div class="tgaform">'+
+    '<label>المندوب<select id="stR"><option value="">اختر المندوب…</option>'+ids.map(function(id){return '<option value="'+esc(id)+'">'+esc(cname(id))+' — '+esc(id)+'</option>'}).join("")+'</select></label>'+
+    '<label>الحالة<select id="stT"><option value="leave">إجازة</option><option value="susp">إيقاف</option><option value="ended">إنهاء عقد</option></select></label>'+
+    '<label><span id="stFl">من تاريخ</span><input id="stF" type="date" value="'+t+'"></label>'+
+    '<label id="stUl">إلى تاريخ<input id="stU" type="date"></label>'+
+    '<label>السبب / ملاحظة<input id="stN" autocomplete="off" placeholder="مثال: حادث"></label>'+
+    '<button class="btn pri" id="stSave"'+(stUi.busy?" disabled":"")+'>حفظ</button></div>'+
+    '<p class="hint" style="margin:8px 0 0">منتهي العقد: لا يستطيع الدخول لبوابة المندوب، ويختفي من شيت الأداء ابتداءً من الشهر التالي لتاريخ الإنهاء. الإجازة والإيقاف للتسجيل والمتابعة فقط.</p>'+
+    '<p class="hint" id="stMsg" style="margin:6px 0 0;color:'+(stUi.ok?"inherit":"#c00")+'">'+esc(stUi.msg)+'</p></section>':'';
+  var rs=Object.keys(data.couriers).filter(function(id){return data.couriers[id].st}),ord={"st-leave":0,"st-susp":1,"st-wait":2,"st-done":3,"st-end":4};
+  rs.sort(function(a,b){var x=stState(data.couriers[a].st),y=stState(data.couriers[b].st);return ord[x.cls]-ord[y.cls]||cname(a).localeCompare(cname(b),"ar")});
+  var cnt=function(c){return rs.filter(function(id){return stState(data.couriers[id].st).cls===c}).length};
+  var tiles='<div class="sttiles"><div><b class="num">'+cnt("st-leave")+'</b>في إجازة</div><div><b class="num">'+cnt("st-susp")+'</b>موقوف</div><div><b class="num">'+cnt("st-end")+'</b>منتهي العقد</div></div>';
+  var body=rs.map(function(id,i){var s=data.couriers[id].st,x=stState(s),c=catOf(id);
+    return '<tr><td class="num">'+(i+1)+'</td><td>'+esc(cname(id))+'</td><td class="num">'+esc(id)+'</td><td>'+(c?'<span class="catp cat-'+({"أ":"a","ب":"b","خ":"k"}[c]||"r")+'">'+esc(c)+'</span>':'')+'</td>'+
+      '<td><span class="stchip '+x.cls+'">'+esc(x.txt)+'</span></td><td class="num">'+esc(s.f||"")+'</td><td class="num">'+esc(s.u||"")+'</td><td style="white-space:normal">'+esc(s.n)+'</td><td class="num">'+esc(stLastDay(id))+'</td>'+
+      (isAdmin?'<td><button class="btn sm" data-stedit="'+esc(id)+'">تعديل</button> <button class="btn sm'+(x.cls==="st-done"?" pri":"")+'" data-stclear="'+esc(id)+'">'+(s.t==="ended"?"إعادة تفعيل":"رجع للعمل")+'</button></td>':'')+'</tr>'}).join("");
+  return form+'<section class="panel"><h2 style="margin:0 0 10px">المناديب في إجازة أو موقوفون أو منتهية عقودهم</h2>'+tiles+
+    '<div class="tbl"><table data-catdone="1"><thead><tr><th>م</th><th>الاسم</th><th>Rider Id</th><th>الفئة</th><th>الحالة</th><th>من</th><th>إلى</th><th>السبب</th><th>آخر يوم عمل</th>'+(isAdmin?'<th></th>':'')+'</tr></thead><tbody>'+
+    (body||'<tr><td class="empty" colspan="10">لا يوجد مندوب في إجازة أو موقوف حالياً.</td></tr>')+'</tbody></table></div></section>'}
+function stSet(m,ok){stUi.msg=m;stUi.ok=ok!==false;var e=document.getElementById("stMsg");if(e){e.textContent=m;e.style.color=stUi.ok?"inherit":"#c00"}}
+function stType(){var v=(document.getElementById("stT")||{}).value,u=document.getElementById("stUl"),f=document.getElementById("stFl");if(u)u.style.display=v==="ended"?"none":"";if(f)f.textContent=v==="ended"?"تاريخ الإنهاء":"من تاريخ"}
+function stSave(id,o){stUi.busy=true;stSet("جارٍ الحفظ…");
+  return sb.from("riders").update(o).eq("id",id).then(function(r){stUi.busy=false;if(r.error){stSet("تعذّر الحفظ: "+r.error.message,false);render();return false}
+    var c=data.couriers[id];if(o.st)c.st={t:o.st,f:o.st_from,u:o.st_until,n:o.st_note||""};else delete c.st;return true})}
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="stT")stType()});
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("#stSave,[data-stedit],[data-stclear]");if(!t)return;
+  if(t.id==="stSave"){var id=document.getElementById("stR").value,ty=document.getElementById("stT").value,f=document.getElementById("stF").value||null,u=ty==="ended"?null:(document.getElementById("stU").value||null),n=document.getElementById("stN").value.trim();
+    if(!id)return stSet("اختر المندوب أولاً.",false);if(u&&f&&u<f)return stSet("تاريخ النهاية قبل تاريخ البداية.",false);
+    if(ty==="ended"&&!confirm("إنهاء عقد "+cname(id)+"؟ لن يستطيع الدخول لبوابة المندوب."))return;
+    t.disabled=true;stSave(id,{st:ty,st_from:f,st_until:u,st_note:n||null}).then(function(ok){if(ok){stUi.msg="تم تسجيل "+cname(id)+": "+ST_T[ty]+(u?" حتى "+u:"")+".";stUi.ok=true}render()});return}
+  if(t.dataset.stedit){var id2=t.dataset.stedit,s=data.couriers[id2].st;window.scrollTo(0,0);
+    document.getElementById("stR").value=id2;document.getElementById("stT").value=s.t;document.getElementById("stF").value=s.f||"";document.getElementById("stU").value=s.u||"";document.getElementById("stN").value=s.n||"";stType();stSet("عدّل البيانات ثم اضغط حفظ.");return}
+  if(t.dataset.stclear){var id3=t.dataset.stclear;if(!confirm("إلغاء حالة "+cname(id3)+" وإرجاعه مندوباً فعّالاً؟"))return;t.disabled=true;
+    stSave(id3,{st:null,st_from:null,st_until:null,st_note:null}).then(function(ok){if(ok){stUi.msg="رجع "+cname(id3)+" مندوباً فعّالاً.";stUi.ok=true}render()});return}});
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -868,7 +926,7 @@ var JSZIP_URL="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
 function loadZip(){return window.JSZip?Promise.resolve(window.JSZip):new Promise(function(ok,no){var s=document.createElement("script");s.src=JSZIP_URL;s.onload=function(){ok(window.JSZip)};s.onerror=function(){no(new Error("lib"))};document.head.appendChild(s)})}
 function shMonths(){var m={};days().forEach(function(d){m[d.slice(0,7)]=1});return Object.keys(m).sort().reverse()}
 function shCatOrder(c){return c==="ب"?0:c==="خ"?1:c==="أ"?2:3}
-function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)&&!data.couriers[id].rg}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
+function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)&&!data.couriers[id].rg&&!stGone(id,SHMON)}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
   var px=x.sp==null?1e9:x.sp,py=y.sp==null?1e9:y.sp;if(px!==py)return px-py;var cx=shCatOrder(normCat(x.cat)),cy=shCatOrder(normCat(y.cat));return cx!==cy?cx-cy:(+a)-(+b)})}
 function shLoad(mon){
   if(!SHIQ){SHIQ="loading";all("rider_private","rider_id,iqama","rider_id").then(function(rs){SHIQ={};rs.forEach(function(r){SHIQ[r.rider_id]=r.iqama});render()},function(){SHIQ={};render()})}
@@ -877,7 +935,7 @@ function shLoad(mon){
 function shCalc(mon){
   var ds=days().filter(function(d){return d.slice(0,7)===mon}),last=ds.length?ds[ds.length-1]:null,nd=last?+last.slice(8,10):0;
   var cnt={},x=SHX[mon]&&SHX[mon]!=="loading"?SHX[mon]:{};
-  var rows=shRiders().map(function(id){var c=data.couriers[id],cat=normCat(c.cat);cnt[cat]=(cnt[cat]||0)+1;
+  SHMON=mon;var rows=shRiders().map(function(id){var c=data.couriers[id],cat=normCat(c.cat);cnt[cat]=(cnt[cat]||0)+1;
     var lv=last&&data.days[last][id],q=c.q&&c.q[mon],dd=[];
     for(var i=1;i<=nd;i++){var d=mon+"-"+(i<10?"0":"")+i,r=data.days[d]&&data.days[d][id];dd.push(r&&r[CP]!=null?+r[CP]:0)}
     var ph=String(c.ph||"").replace(/^966/,""),e=x[id]||{};
@@ -1082,7 +1140,7 @@ applyLang();i18nWatch();showSplash(3200);
 function render(){
   if(booting){root.innerHTML='<div class="login" style="padding:60px 16px;text-align:center"><p class="hint">جارٍ التحميل…</p></div>';return}
   if(!me&&!isAdmin&&!staff)view="courier";
-  var V={overall:vOverall,daily:vDaily,riders:vRiders,top:vTop,absence:vAbsence,wallet:vWallet,quality:vQuality,distance:vDistance,courier:vCourier,data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet,cards:isAdmin&&vCards}[view];
+  var V={overall:vOverall,daily:vDaily,riders:vRiders,top:vTop,absence:vAbsence,wallet:vWallet,quality:vQuality,distance:vDistance,courier:vCourier,data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet,cards:isAdmin&&vCards,susp:vSusp}[view];
   if(view!=="courier"&&view!=="data"&&view!=="perm"&&view!=="sheet"&&view!=="cards"&&!canSee(view))V=staff?function(){return '<div class="panel"><p class="hint" style="margin:0">لم يحدد لك المدير أي قسم بعد.</p></div>'}:vCourier;else if(!V)V=(view==="data"||view==="perm"||view==="sheet"||view==="cards")?vCourier:vSoon;
   var html='<div class="shell'+(isAdmin||staff?"":" solo")+'">'+side()+'<div style="min-width:0">'+bar()+'<main class="content">'+V()+'</main></div></div>';
   var a=document.activeElement,f=a&&a.id,pos=null;try{pos=a.selectionStart}catch(e){}
@@ -1190,7 +1248,7 @@ function loadStaffData(){
   function C(id){return d.couriers[id]||(d.couriers[id]={})}
   var jobs=[
     sb.from("settings").select("key,value").then(function(r){(r.data||[]).forEach(function(s){if(s.key==="company")d.company=s.value;if(s.key==="last_upload")LASTUP=s.value})}),
-    all("riders","id,name,vehicle,tga,phone,category,sheet_pos,region","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.sheet_pos!=null)c.sp=r.sheet_pos;if(r.region)c.rg=r.region;if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.category)c.cat=r.category;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
+    all("riders","id,name,vehicle,tga,phone,category,sheet_pos,region,st,st_from,st_until,st_note","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.st)c.st={t:r.st,f:r.st_from,u:r.st_until,n:r.st_note||""};if(r.sheet_pos!=null)c.sp=r.sheet_pos;if(r.region)c.rg=r.region;if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.category)c.cat=r.category;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
     all("daily","*",["day","rider_id"]).then(function(rs){rs.forEach(function(r){(d.days[r.day]||(d.days[r.day]={}))[r.rider_id]=rowToRec(r)})}),
     sb.rpc("riders_with_login").then(function(r){(r.data||[]).forEach(function(id){C(typeof id==="string"?id:id.riders_with_login).h=true})})];
   if(canSee("quality"))jobs.push(all("quality","*",["month","rider_id"]).then(function(rs){rs.forEach(function(q){var c=C(q.rider_id);(c.q||(c.q={}))[q.month]=qToObj(q)})}));
@@ -1257,7 +1315,7 @@ function work(promise,okMsg){
   return promise.then(function(){return loadStaffData()}).then(function(){ui.busy=false;ui.msg=okMsg;ui.msgOk=true;render()})
   .catch(function(e){ui.busy=false;ui.msgOk=false;ui.msg="تعذّر الحفظ: "+((e&&e.message)||e);render()});
 }
-function riderErr(e){return e==="locked"?"محاولات كثيرة خاطئة. حاول بعد 15 دقيقة.":"رقم الإقامة أو الـ ID غير صحيح."}
+function riderErr(e){return e==="ended"?"تم إنهاء عقدك مع الشركة، لذلك لا يمكنك الدخول. للاستفسار تواصل مع الإدارة.":e==="locked"?"محاولات كثيرة خاطئة. حاول بعد 15 دقيقة.":"رقم الإقامة أو الـ ID غير صحيح."}
 
 /* ---------- events ---------- */
 root.addEventListener("click",function(e){
