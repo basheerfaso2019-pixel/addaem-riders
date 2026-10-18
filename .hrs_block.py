@@ -1,0 +1,2 @@
+# HS sometimes reports 24 actual hours when a rider never closed the shift: cap days of 20h+ at that day's scheduled hours (fadhel 2026-10-18)
+js=rep(js,'o.error_codes=x[EC]==null?null:x[EC];daily.perf.push(o)}','o.error_codes=x[EC]==null?null:x[EC];if(o.actual_hours!=null&&o.actual_hours>=20&&o.planned_hours!=null&&o.planned_hours<o.actual_hours)o.actual_hours=o.planned_hours;daily.perf.push(o)}')

@@ -1295,7 +1295,7 @@ function applyUpload(list){
       if(p.type==="roster"){var iq=/^\d{6,}$/.test(b.iq||"")?b.iq:"";ros.push({id:id,name:b.n||"",iqama:iq,phone:b.ph||"",category:b.cat||""})}});
     Object.keys(p.days).forEach(function(d){Object.keys(p.days[d]).forEach(function(id){var x=p.days[d][id];riders[id]=1;
       if(p.type==="dist")daily.dist.push({day:d,rider_id:id,distance_km:round2(x[DI]),payable_km:round2(x[DP]),completed_dist:x.softCP==null?null:x.softCP});
-      else{var o={day:d,rider_id:id};PERF_COLS.forEach(function(k){var v=x[DBCOL[k]];o[k]=(k==="city"||k==="contract")?(v||null):(v==null?null:round2(v))});o.error_codes=x[EC]==null?null:x[EC];daily.perf.push(o)}})});
+      else{var o={day:d,rider_id:id};PERF_COLS.forEach(function(k){var v=x[DBCOL[k]];o[k]=(k==="city"||k==="contract")?(v||null):(v==null?null:round2(v))});o.error_codes=x[EC]==null?null:x[EC];if(o.actual_hours!=null&&o.actual_hours>=20&&o.planned_hours!=null&&o.planned_hours<o.actual_hours)o.actual_hours=o.planned_hours;daily.perf.push(o)}})});
     Object.keys(p.quality).forEach(function(id){riders[id]=1;Object.keys(p.quality[id]).forEach(function(m){var q=p.quality[id][m];
       qual.push({month:m,rider_id:id,segment:q.s||null,score:q.sc,on_time:q.ot,fail_score:q.fr,verif_rate:q.vr,verif_total:q.vt,verif_ok:q.vs,gross:q.g,completed:q.cp,in_time:q.it,failed:q.f,city:q.ci||null,contract:q.co||null})})});
   });

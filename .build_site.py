@@ -471,6 +471,7 @@ exec(open('range_block.py',encoding='utf8').read())
 exec(open('catcol_block.py',encoding='utf8').read())
 exec(open('ec_block.py',encoding='utf8').read())
 exec(open('susp_block.py',encoding='utf8').read())
+exec(open('hrs_block.py',encoding='utf8').read())
 exec(open('i18n_block.py',encoding='utf8').read())
 # theme v2 (2026-10-10, fadhel asked for a new palette): deep teal + amber
 _L_OLD="""  --bg:#f2f2f2; --surface:#ffffff; --sunk:#f6f6f4; --fg:#1d1f24; --muted:#636873; --line:#e1e1de;
