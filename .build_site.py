@@ -498,7 +498,7 @@ css+='''
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
 .ticker{position:fixed;left:0;right:0;bottom:0;height:32px;overflow:hidden;background:var(--head);color:var(--head-fg);border-top:2px solid var(--gold);z-index:50;font:600 14px/32px var(--f-body,system-ui)}
-.ticker span{position:absolute;left:0;top:0;white-space:nowrap;animation:tick 16s linear infinite}
+.ticker span{position:absolute;left:0;top:0;white-space:nowrap;animation:tick 12s linear infinite;font-size:15px}
 .ticker b{color:var(--gold)}
 @keyframes tick{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
 @media (prefers-reduced-motion:reduce){.ticker span{animation:none;position:static;display:block;text-align:center}}
@@ -512,9 +512,13 @@ html='''<!doctype html>
 <style>body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif}[hidden]{display:none!important}'''+css+'''</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head><body><div id="root"></div>
-<div class="ticker" role="note"><span id="tickerTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div>
+<div class="ticker" role="note" aria-live="off"><span id="tickerTxt">سبحان الله</span></div>
 <div class="splash" id="splash" hidden role="status"><div><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div></div>
 <script>'''+js+'''</script>
+<script>/* bottom bar: adhkar, one phrase per pass (fadhel 2026-10-18) */
+(function(){var L=["سبحان الله","الحمد لله","لا إله إلا الله","الله أكبر","اللهم صلِّ وسلم على سيدنا محمد وعلى آله وصحبه وسلم"],i=0,el=document.getElementById("tickerTxt");if(!el)return;
+el.addEventListener("animationiteration",function(){i=(i+1)%L.length;el.textContent=L[i]});
+if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)setInterval(function(){i=(i+1)%L.length;el.textContent=L[i]},5000)})();</script>
 </body></html>
 '''
 html=html.replace('إعداد المهندس','تصميم المهندس').replace('Prepared by Eng.','Designed by Eng.')  # fadhel 2026-10-10

@@ -18,7 +18,7 @@ var I18N_OBS=new MutationObserver(function(ms){if(LANG!=="en")return;I18N_OBS.di
 function i18nWatch(){I18N_OBS.observe(document.body,{childList:true,subtree:true,characterData:true})}
 var STATIC_AR={};
 function applyLang(){var en=LANG==="en";document.documentElement.lang=en?"en":"ar";document.documentElement.dir=en?"ltr":"rtl";document.title=en?"Rider Performance Portal":"بوابة أداء المناديب";
-  ["tickerTxt","splashTxt"].forEach(function(id){var el=document.getElementById(id);if(!el)return;if(STATIC_AR[id]==null)STATIC_AR[id]=el.innerHTML;el.innerHTML=en?'Prepared by Eng. <b>Fadhel Al-Omaisi</b>':STATIC_AR[id]});
+  ["splashTxt"].forEach(function(id){var el=document.getElementById(id);if(!el)return;if(STATIC_AR[id]==null)STATIC_AR[id]=el.innerHTML;el.innerHTML=en?'Prepared by Eng. <b>Fadhel Al-Omaisi</b>':STATIC_AR[id]});
   var sc=document.getElementById("splashCo");if(sc){if(STATIC_AR.co==null)STATIC_AR.co=sc.textContent;sc.textContent=en?"Al-Daem Al-Mutawwar Logistics Services":STATIC_AR.co}}
 function setLang(l){LANG=l;try{localStorage.setItem("hs_lang",l)}catch(e){}applyLang();render()}
 function showSplash(ms){var s=document.getElementById("splash");if(!s)return;s.hidden=false;s.classList.remove("out");clearTimeout(showSplash.t);showSplash.t=setTimeout(function(){s.classList.add("out");setTimeout(function(){s.hidden=true},450)},ms||2400)}
