@@ -498,10 +498,11 @@ css+='''
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
 .ticker{position:fixed;left:0;right:0;bottom:0;height:32px;overflow:hidden;background:var(--head);color:var(--head-fg);border-top:2px solid var(--gold);z-index:50;font:600 14px/32px var(--f-body,system-ui)}
-.ticker span{position:absolute;left:0;top:0;white-space:nowrap;animation:tick 12s linear infinite;font-size:15px}
-.ticker b{color:var(--gold)}
-@keyframes tick{from{transform:translateX(100vw)}to{transform:translateX(-100%)}}
-@media (prefers-reduced-motion:reduce){.ticker span{animation:none;position:static;display:block;text-align:center}}
+.ticker span{position:absolute;right:0;top:0;white-space:nowrap;direction:rtl;display:flex;animation:tick 40s linear infinite;font-size:15px}
+.ticker i{font-style:normal;padding:0 18px}
+.ticker i.sep{color:var(--gold);padding:0}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(50%)}}
+@media (prefers-reduced-motion:reduce){.ticker span{animation:none}}
 @media print{.ticker{display:none!important}body{padding-bottom:0}}
 '''
 html='''<!doctype html>
@@ -515,10 +516,12 @@ html='''<!doctype html>
 <div class="ticker" role="note" aria-live="off"><span id="tickerTxt">سبحان الله</span></div>
 <div class="splash" id="splash" hidden role="status"><div><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div></div>
 <script>'''+js+'''</script>
-<script>/* bottom bar: adhkar, one phrase per pass (fadhel 2026-10-18) */
-(function(){var L=["سبحان الله","الحمد لله","لا إله إلا الله","الله أكبر","اللهم صلِّ وسلم على سيدنا محمد وعلى آله وصحبه وسلم"],i=0,el=document.getElementById("tickerTxt");if(!el)return;
-el.addEventListener("animationiteration",function(){i=(i+1)%L.length;el.textContent=L[i]});
-if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)setInterval(function(){i=(i+1)%L.length;el.textContent=L[i]},5000)})();</script>
+<script>/* bottom bar: adhkar following each other closely, seamless loop (fadhel 2026-10-18) */
+(function(){var L=["سبحان الله","الحمد لله","لا إله إلا الله","الله أكبر","اللهم صلِّ وسلم على سيدنا محمد وعلى آله وصحبه وسلم"],el=document.getElementById("tickerTxt");if(!el)return;
+var one=L.map(function(t){return'<i>'+t+'</i><i class="sep">✦</i>'}).join("");
+/* half of the strip must cover the screen so the loop has no empty gap */
+function fill(){el.innerHTML=one;var w=el.scrollWidth||1,k=Math.max(1,Math.ceil((window.innerWidth||1000)/w)),h="";for(var n=0;n<k;n++)h+=one;el.innerHTML=h+h;el.style.animationDuration=Math.max(20,el.scrollWidth/2/55)+"s"}
+fill();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fill);var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(fill,300)})})();</script>
 </body></html>
 '''
 html=html.replace('إعداد المهندس','تصميم المهندس').replace('Prepared by Eng.','Designed by Eng.')  # fadhel 2026-10-10
