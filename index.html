@@ -837,7 +837,8 @@ function deWeak(id,mon){var md=days().filter(function(d){return d.slice(0,7)===m
   var a=agg(md.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),sw=0,sn=0;md.forEach(function(d){var x=data.days[d][id];if(x.av!=null&&x.cn){sw+=x.av*x.cn;sn+=x.cn}});
   if(!a.days||!sn||!(sw/sn))return false;var x=(a.cp/a.days)/(sw/sn);return x<.85?"low":x>=1.15?"high":"mid"}
 function deLeave(id){var s=data.couriers[id]&&data.couriers[id].st,t=stToday();return s&&s.t==="leave"&&(!s.f||s.f<=t)&&(!s.u||s.u>=t)?s:null}
-function deNotice(id){var lv=deLeave(id);if(lv){deShow('<div class="denh">🌴 إجازة سعيدة</div><p class="denw">إجازة سعيدة يا <b>'+esc(cname(id))+'</b>، مشتاقين لك 🤍</p><p class="dene" dir="ltr">Happy vacation, <b>'+esc(cname(id))+'</b>! We miss you 🤍</p>'+(lv.u?'<p class="hint" style="margin:4px 0">إجازتك حتى <span class="num">'+esc(lv.u)+'</span></p>':''),"den-high");return}
+function deNotice(id){var lv=deLeave(id);if(lv&&/حادث|اصاب|إصاب|مرض/.test(lv.n||"")){deShow('<div class="denh">🤲 الحمدلله على السلامة</div><p class="denw">يا <b>'+esc(cname(id))+'</b>، الحمدلله على السلامة يا ذيبان، تقوم بالسلامة 🤍</p><p class="dene" dir="ltr">Hi <b>'+esc(cname(id))+'</b>, thank God you are safe. Get well soon, wolf 🤍</p>',"den-high");return}
+  if(lv){deShow('<div class="denh">🌴 إجازة سعيدة</div><p class="denw">إجازة سعيدة يا <b>'+esc(cname(id))+'</b>، مشتاقين لك 🤍</p><p class="dene" dir="ltr">Happy vacation, <b>'+esc(cname(id))+'</b>! We miss you 🤍</p>'+(lv.u?'<p class="hint" style="margin:4px 0">إجازتك حتى <span class="num">'+esc(lv.u)+'</span></p>':''),"den-high");return}
   var mon=curMonth(),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]&&deX(data.days[d][id][DE])>0}),lvl=deWeak(id,mon),weak=!!lvl;if(!ds.length&&!weak)return;
   var tot=0,li=ds.map(function(d){var v=+data.days[d][id][DE]||0,x=deX(v);tot+=x;return '<li>'+dl(d)+': رفضت <b class="num">'+v+'</b> طلب، الزائد <b class="num">'+x+'</b></li>'}).join("");
   deShow((weak?'<div class="denh">'+DEN_M[lvl][0]+'</div><p class="denw">يا <b>'+esc(cname(id))+'</b>، '+DEN_M[lvl][1]+'</p><p class="dene" dir="ltr">Hi <b>'+esc(cname(id))+'</b>, '+DEN_M[lvl][2]+'</p>':'')+
@@ -1319,7 +1320,7 @@ var _all=all;all=function(t,c,o){return _all(t,c,typeof o==="string"?[o,o]:o)};
 function portalToData(res){
   me=res.rider&&res.rider.id||me;LAST=res.last_day||null;
   var d={company:res.company||data.company,couriers:{},days:{},staff:[]},c=d.couriers[me]={};
-  if(res.rider&&res.rider.name)c.n=res.rider.name;if(res.rider&&res.rider.phone)c.ph=res.rider.phone;if(res.rider&&res.rider.category)c.cat=res.rider.category;if(res.rider&&res.rider.st)c.st={t:res.rider.st,f:res.rider.st_from,u:res.rider.st_until,n:""};
+  if(res.rider&&res.rider.name)c.n=res.rider.name;if(res.rider&&res.rider.phone)c.ph=res.rider.phone;if(res.rider&&res.rider.category)c.cat=res.rider.category;if(res.rider&&res.rider.st)c.st={t:res.rider.st,f:res.rider.st_from,u:res.rider.st_until,n:res.rider.st_note||""};
   (res.days||[]).forEach(function(r){var x=rowToRec(r);x.rk=r.rnk;x.cn=r.cnt;x.av=r.avg_completed!=null?+r.avg_completed:null;(d.days[r.day]||(d.days[r.day]={}))[me]=x});
   (res.quality||[]).forEach(function(q){(c.q||(c.q={}))[q.month]=qToObj(q)});
   if(res.wallet)c.w={b:num(res.wallet.balance),c:null,d:res.wallet.as_of};
