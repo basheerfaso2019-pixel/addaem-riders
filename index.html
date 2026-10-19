@@ -217,7 +217,8 @@ body{padding-bottom:34px}
 "use strict";
 var SB_URL="https://uukpnrpkgxmuqiqqjdel.supabase.co",SB_KEY="sb_publishable_BOF7VvUKkmq90xnCKdCUlw_Q_osg7dv";
 var XLSX_URL="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-var sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+try{Object.keys(localStorage).forEach(function(k){if(/^sb-.*-auth-token/.test(k))localStorage.removeItem(k)})}catch(e){}
+var sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storage:window.sessionStorage}});
 var root=document.getElementById("root");
 var RIDER_ONLY=location.hash==="#rider";
 window.addEventListener("hashchange",function(){location.reload()});

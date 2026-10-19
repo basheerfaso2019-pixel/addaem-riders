@@ -32,3 +32,6 @@ function vSoon(){''')
 css+='''
 .den-wel{text-align:center}.denwel{font-size:30px;font-weight:800;margin:14px 0 12px!important;color:#0f4c4a}
 '''
+# staff sign-in lasts only while the tab/browser is open: closing it means typing the password again (fadhel 2026-10-19);
+# old sessions saved in localStorage by earlier versions are dropped
+js=rep(js,'var sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});','try{Object.keys(localStorage).forEach(function(k){if(/^sb-.*-auth-token/.test(k))localStorage.removeItem(k)})}catch(e){}\nvar sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storage:window.sessionStorage}});')
