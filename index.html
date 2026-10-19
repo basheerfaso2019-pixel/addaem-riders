@@ -179,6 +179,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 .denbar{height:4px;background:#f3c5c0;border-radius:3px;overflow:hidden}.denbar i{display:block;height:100%;background:#c62828;animation:denBar 10s linear forwards}
 @keyframes denBar{from{width:100%}to{width:0}}@keyframes denIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}
 
+.den-wel{text-align:center}.denwel{font-size:30px;font-weight:800;margin:14px 0 12px!important;color:#0f4c4a}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -849,13 +851,22 @@ function deShow(html,cls){var old=document.getElementById("deN");if(old)old.remo
   document.body.appendChild(el);el.querySelector(".denx").onclick=function(){el.remove()};
   DEN_T=setTimeout(function(){el.remove()},10000)}
 /* ---------- employee access expiry while logged in ---------- */
-var EXPW={t:null,i:null};
+var STAFF_WEL="",EXPW={t:null,i:null,sm:null,uid:null},SESS_OPTS=[2,5,10,15,30,60,120,240,480];
 try{var _em=sessionStorage.getItem("hs_expmsg");if(_em){sessionStorage.removeItem("hs_expmsg");ui.msg=_em;ui.msgOk=false;ui0.who="staff"}}catch(e){}
-function expKick(){clearTimeout(EXPW.t);clearInterval(EXPW.i);try{sessionStorage.setItem("hs_expmsg","انتهت صلاحية حسابك. تواصل مع المدير لتجديدها.")}catch(e){}
+function sessTxt(m){m=+m;return m%60===0?(m===60?"ساعة":m===120?"ساعتان":(m/60)+" ساعات"):m===2?"دقيقتان":m+(m>2&&m<=10?" دقائق":" دقيقة")}
+function sessCell(s,i){var v=s.sm?+s.sm:"",o=SESS_OPTS.slice();if(v&&o.indexOf(v)<0)o.push(v);o.sort(function(a,b){return a-b});
+  return '<div style="margin-top:6px;font-size:12px">مدة الجلسة بعد كل دخول:<br><select data-asess="'+i+'" style="font-size:12px"><option value=""'+(v?"":" selected")+'>بدون حد</option>'+o.map(function(m){return '<option value="'+m+'"'+(m===v?" selected":"")+'>'+sessTxt(m)+'</option>'}).join("")+'<option value="m">عدد دقائق…</option></select></div>'}
+document.addEventListener("change",function(e){var t=e.target;if(!t||!t.dataset||t.dataset.asess==null)return;var v=t.value;
+  if(v==="m"){var q=prompt("كم دقيقة بعد تسجيل الدخول؟","2");q=q&&+digits(q);if(!q||q<=0){render();return}v=String(Math.round(q))}
+  ui.acc[+t.dataset.asess].sm=v;render()});
+function sessStart(uid){var k="hs_sess_"+uid,v=null;try{v=+localStorage.getItem(k)}catch(e){}if(!v){v=Date.now();try{localStorage.setItem(k,String(v))}catch(e){}}return v}
+function expKick(why){clearTimeout(EXPW.t);clearInterval(EXPW.i);
+  try{if(EXPW.uid)localStorage.removeItem("hs_sess_"+EXPW.uid);sessionStorage.setItem("hs_expmsg",why==="sess"?"انتهت مدة الجلسة ("+sessTxt(EXPW.sm)+"). سجّل الدخول من جديد.":"انتهت صلاحية حسابك. تواصل مع المدير لتجديدها.")}catch(e){}
   sb.auth.signOut().then(function(){location.reload()},function(){location.reload()})}
-function expArm(iso){clearTimeout(EXPW.t);if(!iso)return;var ms=new Date(iso)-new Date();if(ms<=0)return expKick();if(ms<2147483000)EXPW.t=setTimeout(expKick,ms+500)}
-/* re-read the expiry every 20s so a change by the manager applies without a re-login */
-function expWatch(uid,iso){expArm(iso);clearInterval(EXPW.i);EXPW.i=setInterval(function(){sb.from("staff").select("expires_at,role").eq("user_id",uid).maybeSingle().then(function(r){if(r.error)return;if(!r.data)return expKick();if(r.data.role!=="admin")expArm(r.data.expires_at)})},20000)}
+function expArm(iso,sm){clearTimeout(EXPW.t);EXPW.sm=sm||null;var now=Date.now(),a=iso?new Date(iso).getTime():Infinity,b=sm?sessStart(EXPW.uid)+sm*6e4:Infinity,end=Math.min(a,b),why=b<a?"sess":"exp";
+  if(end===Infinity)return;if(end<=now)return expKick(why);if(end-now<2147483000)EXPW.t=setTimeout(function(){expKick(why)},end-now+300)}
+/* re-read expiry and session length every 20s so a change by the manager applies without a re-login */
+function expWatch(uid,iso,sm){EXPW.uid=uid;expArm(iso,sm);clearInterval(EXPW.i);EXPW.i=setInterval(function(){sb.from("staff").select("expires_at,role,session_min").eq("user_id",uid).maybeSingle().then(function(r){if(r.error)return;if(!r.data)return expKick();if(r.data.role!=="admin")expArm(r.data.expires_at,r.data.session_min)})},20000)}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -909,12 +920,12 @@ function expPast(iso){return !!iso&&new Date(iso)<=new Date()}
 /* expiry only applies to employees: managers never expire */
 function expCell(s,i){if(s.r!=="staff")return '<td class="hint" style="font-size:12px">—</td>';
   var st=!s.x?'<span class="hint" style="font-size:12px">بدون انتهاء</span>':expPast(s.x)?'<b style="color:var(--bad);font-size:12px">منتهي — الحساب موقوف</b>':'<span style="font-size:12px;color:var(--good)">فعّال حتى <span class="num" dir="ltr">'+expTxt(s.x)+'</span></span>';
-  return '<td style="white-space:nowrap"><select data-aexpq="'+i+'" style="font-size:12px"><option value="">مدة سريعة…</option><option value="m">عدد دقائق…</option><option value="'+(2/1440)+'">دقيقتان</option><option value="'+(5/1440)+'">5 دقائق</option><option value="'+(10/1440)+'">10 دقائق</option><option value="'+(30/1440)+'">30 دقيقة</option><option value="'+(1/24)+'">ساعة</option><option value="'+(3/24)+'">3 ساعات</option><option value="'+(12/24)+'">12 ساعة</option><option value="1">يوم</option><option value="3">3 أيام</option><option value="7">أسبوع</option><option value="30">شهر</option><option value="0">بدون انتهاء</option></select><br><input type="datetime-local" data-aexp="'+i+'" value="'+expLocal(s.x)+'" style="font-size:12px;margin-top:4px"><br>'+st+'</td>'}
+  return '<td style="white-space:nowrap"><select data-aexpq="'+i+'" style="font-size:12px"><option value="">مدة سريعة…</option><option value="m">عدد دقائق…</option><option value="'+(2/1440)+'">دقيقتان</option><option value="'+(5/1440)+'">5 دقائق</option><option value="'+(10/1440)+'">10 دقائق</option><option value="'+(30/1440)+'">30 دقيقة</option><option value="'+(1/24)+'">ساعة</option><option value="'+(3/24)+'">3 ساعات</option><option value="'+(12/24)+'">12 ساعة</option><option value="1">يوم</option><option value="3">3 أيام</option><option value="7">أسبوع</option><option value="30">شهر</option><option value="0">بدون انتهاء</option></select><br><input type="datetime-local" data-aexp="'+i+'" value="'+expLocal(s.x)+'" style="font-size:12px;margin-top:4px"><br>'+st+sessCell(s,i)+'</td>'}
 function staffErr(e){var m=e&&e.message;if(m==="cannot_delete_self")return "لا يمكنك حذف حسابك.";if(m==="cannot_delete_admin")return "لا يمكن حذف حساب مدير. غيّر دوره أولاً.";return m==="taken"?"اسم المستخدم مستخدم من قبل، اختر اسماً آخر.":m==="bad_username"?"اسم المستخدم: حروف إنجليزية وأرقام فقط، من 3 إلى 30.":m==="short_password"?"كلمة المرور 8 أحرف على الأقل.":m==="not_allowed"?"هذه العملية للمدير فقط.":"تعذّر الحفظ: "+m}
 function vPerm(){
-  if(!ui.acc){ui.acc="loading";sb.rpc("list_accounts2").then(function(r){if(r.error){ui.acc=[];ui.msg="تعذّر تحميل الحسابات: "+r.error.message;ui.msgOk=false}else ui.acc=r.data.map(function(a){var x=a.expires_at?new Date(a.expires_at).toISOString():"";return{id:a.user_id,e:a.email,n:a.name||"",r:a.role||"",p:a.perms||[],x:x,o:JSON.stringify([a.name||"",a.role||"",a.perms||[],x])}});render()});}
+  if(!ui.acc){ui.acc="loading";sb.rpc("list_accounts3").then(function(r){if(r.error){ui.acc=[];ui.msg="تعذّر تحميل الحسابات: "+r.error.message;ui.msgOk=false}else ui.acc=r.data.map(function(a){var x=a.expires_at?new Date(a.expires_at).toISOString():"";return{id:a.user_id,e:a.email,n:a.name||"",r:a.role||"",p:a.perms||[],x:x,sm:a.session_min||"",o:JSON.stringify([a.name||"",a.role||"",a.perms||[],x,a.session_min||""])}});render()});}
   if(ui.acc==="loading")return '<div class="panel"><p class="hint" style="margin:0">جارٍ التحميل…</p></div>';
-  var dr=ui.acc,dirty=dr.some(function(a){return JSON.stringify([a.n,a.r,a.p,a.x||""])!==a.o});
+  var dr=ui.acc,dirty=dr.some(function(a){return JSON.stringify([a.n,a.r,a.p,a.x||"",a.sm?+a.sm:""])!==a.o});
   var rows=dr.map(function(s,i){var self=s.id===myUid;return '<tr><td class="s"><input data-aname="'+i+'" value="'+esc(s.n)+'" placeholder="الاسم" style="min-width:120px"><br><span class="num" style="color:var(--muted);font-size:12px" dir="ltr">'+esc(uname(s.e))+'</span>'+(self||!s.r?'':' <button class="btn" style="padding:2px 8px;font-size:12px" data-newpw="'+i+'"'+(ui.busy?" disabled":"")+'>كلمة مرور جديدة</button>')+(self||s.r==="admin"?'':' <button class="btn" style="padding:2px 8px;font-size:12px;color:var(--bad);border-color:var(--bad)" data-adel="'+i+'"'+(ui.busy?" disabled":"")+'>حذف</button>')+(self?'<br><span style="color:var(--muted);font-size:12px">هذا حسابك، مدير بكل الصلاحيات</span>':'')+'</td>'+
     '<td><select data-arole="'+i+'"'+(self?" disabled":"")+'><option value=""'+(!s.r?" selected":"")+'>بدون دخول</option><option value="staff"'+(s.r==="staff"?" selected":"")+'>موظف</option><option value="admin"'+(s.r==="admin"?" selected":"")+'>مدير</option></select></td>'+expCell(s,i)+
     PERMS.map(function(m){return '<td><input type="checkbox" data-perm="'+i+'|'+m[0]+'"'+((s.p||[]).indexOf(m[0])>=0||s.r==="admin"?" checked":"")+(s.r!=="staff"?" disabled":"")+' aria-label="'+esc(m[1])+'"></td>'}).join("")+'</tr>'}).join("");
@@ -1338,13 +1349,13 @@ function portalToData(res){
 /* staff session: read own role, first account becomes the manager */
 function enterStaff(user,name){
   myUid=user.id;
-  return sb.from("staff").select("name,role,perms,expires_at").eq("user_id",user.id).maybeSingle().then(function(r){
+  return sb.from("staff").select("name,role,perms,expires_at,session_min,welcome").eq("user_id",user.id).maybeSingle().then(function(r){
     if(r.data)return r.data;
     return sb.rpc("claim_admin",{p_name:name||user.email}).then(function(c){return c.data?{name:name||user.email,role:"admin",perms:[]}:null})
   }).then(function(s){
     if(!s){isAdmin=false;staff=null;ui.msg="تم الدخول، لكن حسابك بانتظار أن يمنحك المدير الصلاحيات.";ui.msgOk=true;ui0.who="staff";return sb.auth.signOut()}
     if(s.role!=="admin"&&expPast(s.expires_at)){isAdmin=false;staff=null;ui.msg="انتهت صلاحية حسابك. تواصل مع المدير لتجديدها.";ui.msgOk=false;ui0.who="staff";return sb.auth.signOut()}
-    isAdmin=s.role==="admin";if(!isAdmin)expWatch(user.id,s.expires_at);staff=isAdmin?null:{n:s.name||user.email,p:s.perms||[]};
+    isAdmin=s.role==="admin";if(!isAdmin)expWatch(user.id,s.expires_at,s.session_min);STAFF_WEL=s.welcome||"";staff=isAdmin?null:{n:s.name||user.email,p:s.perms||[]};
     return loadStaffData().then(function(){var v=ss("hs_view");view=v&&(canSee(v)||isAdmin&&(v==="data"||v==="perm"))?v:isAdmin?"daily":((staff.p&&staff.p[0])||"none")});
   });
 }
@@ -1420,7 +1431,7 @@ root.addEventListener("click",function(e){
   if(t.id==="staffOut"){sb.auth.signOut().then(function(){location.reload()});return}
   if(t.id==="saveStaff"){var ch=ui.acc.filter(function(a){return JSON.stringify([a.n,a.r,a.p])!==a.o});
     work(ch.reduce(function(p,a){return p.then(function(){
-      var q=a.r?sb.from("staff").upsert({user_id:a.id,name:a.n||a.e,role:a.r,perms:a.r==="staff"?a.p:[],expires_at:a.r==="staff"&&a.x?a.x:null},{onConflict:"user_id"}):sb.from("staff").delete().eq("user_id",a.id);
+      var q=a.r?sb.from("staff").upsert({user_id:a.id,name:a.n||a.e,role:a.r,perms:a.r==="staff"?a.p:[],expires_at:a.r==="staff"&&a.x?a.x:null,session_min:a.r==="staff"&&a.sm?+a.sm:null},{onConflict:"user_id"}):sb.from("staff").delete().eq("user_id",a.id);
       return q.then(function(r){if(r.error)throw r.error})})},Promise.resolve()).then(function(){ui.acc=null}),"تم حفظ الصلاحيات.");return}
   if(t.dataset.adel!=null){var dl0=ui.acc[+t.dataset.adel];if(!confirm("حذف حساب الموظف «"+(dl0.n||uname(dl0.e))+"» نهائياً؟ لن يستطيع الدخول مرة أخرى."))return;ui.busy=true;render();
     staffFn({action:"delete",user_id:dl0.id}).then(function(){ui.busy=false;ui.acc=null;ui.msgOk=true;ui.msg="تم حذف حساب "+(dl0.n||uname(dl0.e))+".";render()}).catch(function(e){ui.busy=false;ui.msgOk=false;ui.msg=staffErr(e);render()});return}
@@ -1500,7 +1511,7 @@ root.addEventListener("submit",function(e){
     p.then(function(r){
       if(r.error){ui.busy=false;ui.msgOk=false;ui.msg=/invalid login/i.test(r.error.message)?"اسم المستخدم أو كلمة المرور غير صحيحة.":/not confirmed/i.test(r.error.message)?"فعّل حسابك من الرسالة التي وصلت بريدك أولاً.":/registered/i.test(r.error.message)?"هذا البريد مسجّل من قبل. اختر تسجيل الدخول.":r.error.message;render();return}
       if(!r.data.session){ui.busy=false;ui.msgOk=true;ui0.signup=false;ui.msg="تم إنشاء الحساب. افتح الرسالة التي وصلت بريدك لتفعيله، ثم سجّل الدخول.";render();return}
-      return enterStaff(r.data.user,nm).then(function(){ui.busy=false;if(isAdmin||staff)ui.msg="";render()});
+      try{localStorage.setItem("hs_sess_"+r.data.user.id,String(Date.now()))}catch(e){}return enterStaff(r.data.user,nm).then(function(x){if(STAFF_WEL&&(isAdmin||staff)){var w=STAFF_WEL;setTimeout(function(){deShow('<p class="denwel">'+esc(w)+'</p>',"den-high den-wel")},2700)}return x}).then(function(){ui.busy=false;if(isAdmin||staff)ui.msg="";render()});
     }).catch(function(err){ui.busy=false;ui.msgOk=false;ui.msg="تعذّر الدخول: "+(err.message||err);render()});
   }
   if(id==="addRider"){var rid=digits(document.getElementById("rid").value).trim(),riq=digits(document.getElementById("riq").value).trim();if(!rid||!riq)return;
