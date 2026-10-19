@@ -831,8 +831,8 @@ function rpPdf(){if(!RP||!RP.rows.length)return;var Q={f:RP.f,rows:RP.rows.slice
   .then(function(){OV_BUSY="";render()})}
 /* ---------- rider: rejected-orders notice after login ---------- */
 var DEN_T=null,DEN_M={low:["⚠️ تنبيه الأداء","شغلك ضعيف، شد حيلك الله يرضى عليك 🤲","your performance is weak. Please work harder, may God be pleased with you 🤲"],
-  mid:["💪 أداؤك متوسط","شغلك متوسط، شد حيلك شوي، أنت بطل 💪","your performance is average. Push a little harder, you are a hero 💪"],
-  high:["🏆 أداء ممتاز","أنت بطل، استمر 🏆","you are a hero, keep it up 🏆"]};
+  mid:["💪 أداؤك متوسط","شغلك متوسط، شد حيلك شوي، أنت ذيبان 💪","your performance is average. Push a little harder, you are a wolf 💪"],
+  high:["🏆 أداء ممتاز","أنت ذيبان، استمر 🏆","you are a wolf, keep it up 🏆"]};
 function deWeak(id,mon){var md=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]});if(!md.length)return false;
   var a=agg(md.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),sw=0,sn=0;md.forEach(function(d){var x=data.days[d][id];if(x.av!=null&&x.cn){sw+=x.av*x.cn;sn+=x.cn}});
   if(!a.days||!sn||!(sw/sn))return false;var x=(a.cp/a.days)/(sw/sn);return x<.85?"low":x>=1.15?"high":"mid"}
