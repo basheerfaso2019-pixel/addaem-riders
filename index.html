@@ -1164,13 +1164,13 @@ function vCourier(){
   if(cs==="distance"&&kmHide(id))cs="home";
   if(cs==="home"){
     var lv=ld&&cRec(ld),all=agg(mine.map(function(d){return{d:d,id:id,x:data.days[d][id]}})),w=data.couriers[id]&&data.couriers[id].w;
-    var mon=curMonth(),km=0,last=null;mine.forEach(function(d){var x=data.days[d][id];if(d.slice(0,7)===mon)km+=+x[DI]||0});var qx=data.couriers[id]&&data.couriers[id].q,qk=qx&&Object.keys(qx).sort().pop();last=qk&&qx[qk].s;
+    var mon=curMonth(),km=0,last=null;mine.forEach(function(d){var x=data.days[d][id];if(d.slice(0,7)===mon)km+=+x[DP]||0});var qx=data.couriers[id]&&data.couriers[id].q,qk=qx&&Object.keys(qx).sort().pop();last=qk&&qx[qk].s;
     return sampleNote()+head+rgPanel(id,mine,ld)+'<div class="tiles">'+
       tile("day","عدد طلبات اليوم",lv?N(lv[CP],0):"0",ld?dl(ld)+'<br>اختر أي يوم سابق':"لا توجد بيانات")+
       (function(){var mm=curMonth(),t=0;mine.forEach(function(d){if(d.slice(0,7)===mm)t+=+data.days[d][id][CP]||0});return tile("all","إجمالي طلبات الشهر",N(t,0),monTxt(mm)+' حتى <span class="num">'+(ld||"—")+'</span><br>اختر أي شهر')})()+
       tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لم تُرفع بعد")+
       tile("quality","جودة التوصيل",last?'<span style="font-size:24px">'+segPill(last)+'</span>':"—",qk?"تصنيف "+monLabel(qk):"لم تُرفع بعد")+
-      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+(kmHide(id)?"":tile("distance","المسافة المقطوعة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس"))+""+'</div>'+
+      tile("declined","الطلبات المرفوضة",N(sumDE(mine,id),0),'كل الأيام حتى <span class="num">'+(ld||"—")+'</span>')+(kmHide(id)?"":tile("distance","المسافة المستحقة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',"هذا الشهر حتى أمس"))+""+'</div>'+
       '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
@@ -1182,7 +1182,7 @@ function vCourier(){
     else{var rk=v.rk,arr={length:v.cn};
       res+='<div class="hero"><span class="hero-num num">'+fmt(v[CP],0)+'</span><span>طلب مكتمل في '+dl(d)+'</span></div>'+
       '<div class="kpis" style="margin-top:12px">'+(rk?kpi("ترتيبك في اليوم",'<span class="num">'+rk+'</span> <span style="font-size:14px;color:var(--muted)">من <span class="num">'+arr.length+'</span></span>',v.av!=null?'متوسط المناديب <span class="num">'+fmt(v.av,1)+'</span> طلب':""):"")+
-      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DI]!=null?kpi("المسافة",N(v[DI],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">'+fmt(v[DE],0)+'</span>'):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
+      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DP]!=null?kpi("المسافة المستحقة",N(v[DP],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">'+fmt(v[DE],0)+'</span>'):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
     var hist=mine.slice(-14).reverse().map(function(x){var y=data.days[x][id];return '<tr class="click" data-cday="'+x+'"><td>'+dl(x)+'</td><td>'+N(y[CP],0)+'</td><td>'+P(y[AR])+'</td><td>'+N(y[AC])+'</td></tr>'}).join("");
     return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
   }
@@ -1212,15 +1212,15 @@ function vCourier(){
       (qms.length>1?'<section class="panel"><h2>الأشهر السابقة</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>الشهر</th><th>التصنيف</th><th>الدرجة</th><th>في الوقت</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");}
   if(cs==="distance"){
     var months={};mine.forEach(function(d){months[d.slice(0,7)]=1});var ml=Object.keys(months).sort().reverse();var mon3=ui0.mon&&months[ui0.mon]?ui0.mon:(ml[0]||curMonth());
-    var md=mine.filter(function(d){return d.slice(0,7)===mon3}),tk=0;var tp=0;md.forEach(function(d){tk+=+data.days[d][id][DI]||0;tp+=+data.days[d][id][DP]||0});
+    var md=mine.filter(function(d){return d.slice(0,7)===mon3}),tk=0;var tp=0;md.forEach(function(d){tk+=+data.days[d][id][DP]||0;tp=tk});
     var dd=ui0.dday&&md.indexOf(ui0.dday)>=0?ui0.dday:md[md.length-1];
     var ctl='<div class="row" style="margin-bottom:14px"><label>الشهر<select id="dMon">'+ml.map(function(m){return '<option value="'+m+'"'+(m===mon3?" selected":"")+'>'+m+'</option>'}).join("")+'</select></label><div class="seg" role="group"><button data-dmode="day" aria-pressed="'+(ui0.dmode==="day")+'">يوم محدد</button><button data-dmode="month" aria-pressed="'+(ui0.dmode==="month")+'">إجمالي الشهر</button></div>'+
       (ui0.dmode==="day"&&md.length?'<label>اليوم<select id="dDay">'+md.slice().reverse().map(function(d){return '<option value="'+d+'"'+(d===dd?" selected":"")+'>'+wd(d)+' '+d+'</option>'}).join("")+'</select></label>':"")+'</div>';
     var out=!md.length?'<p class="hint">لا توجد أيام مسجلة لك في هذا الشهر.</p>':ui0.dmode==="day"?
-      '<div class="hero"><span class="hero-num num">'+fmt(data.days[dd][id][DI],1)+'</span><span>كم في '+dl(dd)+'</span></div><div class="kpis" style="margin-top:12px">'+kpi("المسافة المدفوعة",N(data.days[dd][id][DP],1)+' كم',"Payable KM")+kpi("الطلبات المكتملة",N(data.days[dd][id][CP],0),"")+kpi("متوسط كم للطلب",data.days[dd][id][CP]?N(data.days[dd][id][DI]/data.days[dd][id][CP],1):"—","")+'</div>':
-      '<div class="hero"><span class="hero-num num">'+fmt(tk,1)+'</span><span>كم في '+monLabel(mon3)+'</span></div><div class="kpis" style="margin-block:12px">'+kpi("المسافة المدفوعة",N(tp,1)+' كم',"Payable KM")+'</div><p class="hint">خلال <span class="num">'+md.length+'</span> يوم عمل حتى <span class="num">'+md[md.length-1]+'</span>، بمتوسط <span class="num">'+fmt(tk/md.length,1)+'</span> كم يومياً.</p>';
-    var series=md.slice(-31).map(function(d){return{d:d,v:+data.days[d][id][DI]||0}});
-    return sampleNote()+head+'<section class="panel"><h2>المسافة المقطوعة</h2>'+ctl+out+'</section>'+(md.length?'<section class="panel"><h2>المسافة اليومية</h2><p class="hint">كيلومتر لكل يوم في الشهر <span class="num">'+mon3+'</span></p>'+bars(series,{h:170,label:"المسافة اليومية"})+'</section>':"");
+      '<div class="hero"><span class="hero-num num">'+fmt(data.days[dd][id][DP],1)+'</span><span>كم مستحقة في '+dl(dd)+'</span></div><div class="kpis" style="margin-top:12px">'+kpi("الطلبات المكتملة",N(data.days[dd][id][CP],0),"")+kpi("متوسط كم للطلب",data.days[dd][id][CP]?N((+data.days[dd][id][DP]||0)/data.days[dd][id][CP],1):"—","")+'</div>':
+      '<div class="hero"><span class="hero-num num">'+fmt(tk,1)+'</span><span>كم مستحقة في '+monLabel(mon3)+'</span></div><p class="hint" style="margin-top:12px">خلال <span class="num">'+md.length+'</span> يوم عمل حتى <span class="num">'+md[md.length-1]+'</span>، بمتوسط <span class="num">'+fmt(tk/md.length,1)+'</span> كم يومياً.</p>';
+    var series=md.slice(-31).map(function(d){return{d:d,v:+data.days[d][id][DP]||0}});
+    return sampleNote()+head+'<section class="panel"><h2>المسافة المستحقة <small>Payable KM</small></h2>'+ctl+out+'</section>'+(md.length?'<section class="panel"><h2>المسافة المستحقة اليومية</h2><p class="hint">كيلومتر مستحق لكل يوم في الشهر <span class="num">'+mon3+'</span></p>'+bars(series,{h:170,label:"المسافة اليومية"})+'</section>':"");
   }
   return "";
 }
