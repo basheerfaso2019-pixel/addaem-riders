@@ -217,6 +217,13 @@ html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband .coby{color:#ffffff}.coband .coby b{color:#f7941d}
 @media print{.coband{background:#fff}.coband .coname{color:#2b3192}}
 
+.side{background:linear-gradient(180deg,#dde8fa 0%,#cddcf4 100%);border-inline-end-color:#bccde9}
+.side hr{border-color:#bccde9}
+.side button:hover,.side .navlink:hover{background:#c3d4f0}
+.side button[aria-current="true"]{background:#ffffff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{background:var(--surface);border-inline-end-color:var(--line)}:root:not([data-theme="light"]) .side button[aria-current="true"]{background:var(--menu-sel)}:root:not([data-theme="light"]) .side button:hover{background:var(--sunk)}}
+@media print{.side{background:none}}
+
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
 .ticker{position:fixed;left:0;right:0;bottom:0;height:32px;overflow:hidden;background:var(--head);color:var(--head-fg);border-top:2px solid var(--gold);z-index:50;font:600 14px/32px var(--f-body,system-ui)}
