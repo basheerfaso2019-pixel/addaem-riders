@@ -34,9 +34,9 @@ css+='''
 '''
 # light sidebar tint (fadhel 2026-10-21 asked for a soft colour for the menu); dark mode keeps its navy
 css+='''
-.side{background:linear-gradient(180deg,#dde8fa 0%,#cddcf4 100%);border-inline-end-color:#bccde9}
-.side hr{border-color:#bccde9}
-.side button:hover,.side .navlink:hover{background:#c3d4f0}
+.side{background:linear-gradient(180deg,#fff6ea 0%,#fde7cf 100%);border-inline-end-color:#f3d2ad}
+.side hr{border-color:#f3d2ad}
+.side button:hover,.side .navlink:hover{background:#fbdcba}
 .side button[aria-current="true"]{background:#ffffff}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{background:var(--surface);border-inline-end-color:var(--line)}:root:not([data-theme="light"]) .side button[aria-current="true"]{background:var(--menu-sel)}:root:not([data-theme="light"]) .side button:hover{background:var(--sunk)}}
 @media print{.side{background:none}}
