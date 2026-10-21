@@ -181,6 +181,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .den-wel{text-align:center}.denwel{font-size:30px;font-weight:800;margin:14px 0 12px!important;color:#0f4c4a}
 
+.hires{height:calc(100vh - 150px);min-height:540px;border:1px solid var(--line);border-radius:14px}.hiref{position:absolute;z-index:4;border:0;border-radius:14px;background:#fff;display:none}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -290,12 +292,12 @@ function side(){
   if(!isAdmin&&!staff)return "";
   var co='<div class="co"><b>'+esc(data.company||"شركة التشغيل")+'</b><span>'+esc(roleName())+'</span></div>';
   var items=MENU.filter(function(m){return canSee(m[0])});
-  var extra=isAdmin?'<hr><a class="navlink" href="#rider" target="_blank" rel="noopener">شاشة المندوب<small>Rider link</small></a><button data-tab="sheet" aria-current="'+(view==="sheet")+'">شيت الأداء اليومي<small>Daily Sheet</small></button><button data-tab="cards" aria-current="'+(view==="cards")+'">بطاقات المناديب<small>Rider ID Cards</small></button><button data-tab="perm" aria-current="'+(view==="perm")+'">الصلاحيات<small>Roles</small></button><button data-tab="data" aria-current="'+(view==="data")+'">رفع البيانات<small>Upload</small></button><button id="staffOut">تسجيل خروج<small>Sign out</small></button>':'<hr><button id="staffOut">تسجيل خروج<small>Sign out</small></button>';
+  var extra=isAdmin?'<hr><a class="navlink" href="#rider" target="_blank" rel="noopener">شاشة المندوب<small>Rider link</small></a><button data-tab="sheet" aria-current="'+(view==="sheet")+'">شيت الأداء اليومي<small>Daily Sheet</small></button><button data-tab="cards" aria-current="'+(view==="cards")+'">بطاقات المناديب<small>Rider ID Cards</small></button><button data-tab="hire" aria-current="'+(view==="hire")+'">طلب توظيف مندوب<small>Job Application</small></button><button data-tab="perm" aria-current="'+(view==="perm")+'">الصلاحيات<small>Roles</small></button><button data-tab="data" aria-current="'+(view==="data")+'">رفع البيانات<small>Upload</small></button><button id="staffOut">تسجيل خروج<small>Sign out</small></button>':'<hr><button id="staffOut">تسجيل خروج<small>Sign out</small></button>';
   var mb=function(m){return '<button data-tab="'+m[0]+'" aria-current="'+(view===m[0])+'"'+(m[3]?' class="soon"':"")+'>'+m[1]+'<small>'+m[2]+'</small></button>'},soon=items.filter(function(m){return m[3]}).map(mb).join(""),out='<button id="staffOut">';
   if(soon)extra=extra.replace(out,'<hr>'+soon+out);
   return '<nav class="side">'+co+items.filter(function(m){return !m[3]}).map(mb).join("")+extra+'</nav>';
 }
-TITLES.perm="الصلاحيات";TITLES.sheet="شيت الأداء اليومي";TITLES.cards="بطاقات المناديب";
+TITLES.perm="الصلاحيات";TITLES.sheet="شيت الأداء اليومي";TITLES.cards="بطاقات المناديب";TITLES.hire="طلب توظيف مندوب";
 function bar(){var ld=lastDay();return '<div class="coband"><span class="coname">'+esc(data.company||"شركة التشغيل")+'</span><span class="coby">تصميم المهندس / <b>فاضل العميسي</b></span><span class="cosub">بوابة أداء مناديب هنقرستيشن</span></div><header class="bar"><h1>'+esc((isAdmin||staff)?TITLES[view]:"بوابة المندوب")+'</h1><span class="chip">آخر يوم متاح: '+(ld?dl(ld):"—")+'</span>'+(roleName()?'<span class="chip">'+esc(roleName())+'</span>':"")+'<button class="chip langbtn noi18n" id="langBtn" type="button">'+(LANG==="en"?"العربية":"English")+'</button></header>'}
 function sampleNote(){return false?'<div class="note">هذه بيانات تجريبية للعرض فقط. ارفع ملف هنقرستيشن من «رفع البيانات» لتظهر بياناتك الحقيقية.</div>':""}
 
@@ -689,7 +691,7 @@ function qReasons(q){if(!q)return "";var pc=function(v){return v==null||isNaN(v)
 function rdQuality(id){var qq=(data.couriers[id]&&data.couriers[id].q)||{},ms=Object.keys(qq).sort().reverse();if(!ms.length)return '<section class="panel"><h2>تصنيف المندوب</h2><p class="hint" style="margin:0">لم تُرفع بيانات جودة التوصيل لهذا المندوب.</p></section>';
   var m=ui0.rqm&&qq[ui0.rqm]?ui0.rqm:ms[0];
   return '<section class="panel"><div class="stmthead"><h2>تصنيف المندوب · '+monLabel(m)+'</h2>'+(ms.length>1?'<div class="stmttools"><select id="rqMon" aria-label="الشهر">'+ms.map(function(x){return '<option value="'+x+'"'+(x===m?" selected":"")+'>'+monTxt(x)+'</option>'}).join("")+'</select></div>':'')+'</div>'+qReasons(qq[m])+'</section>'}
-var BK_T=["settings","riders","rider_private","daily","quality","wallet","fuel_label","fuel_map","sheet_extra","tga_codes"],bk={};
+var BK_T=["settings","riders","rider_private","daily","quality","wallet","fuel_label","fuel_map","sheet_extra","tga_codes","private_settings"],bk={};
 function bkAll(t){var out=[];function pg(i){return sb.from(t).select("*").range(i,i+999).then(function(r){if(r.error)throw r.error;out=out.concat(r.data);return r.data.length<1000?out:pg(i+1000)})}return pg(0)}
 function b64(blob){return new Promise(function(ok,no){var f=new FileReader();f.onload=function(){ok(String(f.result).split(",")[1])};f.onerror=no;f.readAsDataURL(blob)})}
 function bkPhotos(){var st=sb.storage.from("rider-photos");return st.list("",{limit:2000}).then(function(r){var fs=(r.data||[]).filter(function(f){return /\.jpg$/.test(f.name)}),o={};
@@ -705,7 +707,7 @@ function bkChunks(a,n){var o=[];for(var i=0;i<a.length;i+=n)o.push(a.slice(i,i+n
 function bkRestore(file){var fr=new FileReader();fr.onload=function(){var d;try{d=JSON.parse(fr.result)}catch(e){bkSet("الملف ليس نسخة احتياطية صحيحة.",false);return}
   if(!d||d.app!=="addaem-riders"||!d.tables){bkSet("الملف ليس نسخة احتياطية من هذا النظام.",false);return}
   if(!confirm("استرجاع النسخة المؤرخة "+String(d.created).slice(0,10)+"؟ ستُستبدل السجلات الموجودة بنفس المفاتيح، وتبقى السجلات الأخرى كما هي."))return;
-  bk.busy=true;var keys={settings:"key",riders:"id",rider_private:"rider_id",daily:"day,rider_id",quality:"month,rider_id",wallet:"rider_id",fuel_label:"month,label",fuel_map:"label",sheet_extra:"month,rider_id",tga_codes:"id"};
+  bk.busy=true;var keys={settings:"key",riders:"id",rider_private:"rider_id",daily:"day,rider_id",quality:"month,rider_id",wallet:"rider_id",fuel_label:"month,label",fuel_map:"label",sheet_extra:"month,rider_id",tga_codes:"id",private_settings:"key"};
   BK_T.reduce(function(p,t){var rows=d.tables[t]||[];return p.then(function(){bkSet("جارٍ استرجاع "+t+"…",true);return bkChunks(rows,500).reduce(function(q,c){return q.then(function(){return sb.from(t).upsert(c,{onConflict:keys[t]}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})},Promise.resolve())
   .then(function(){var iq=(d.tables.rider_private||[]).filter(function(r){return r.iqama}).map(function(r){return{id:r.rider_id,iqama:r.iqama}});bkSet("جارٍ تفعيل دخول المناديب…",true);
     return bkChunks(iq,100).reduce(function(q,c){return q.then(function(){return sb.rpc("set_riders",{p_rows:c}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})
@@ -868,6 +870,17 @@ function expArm(iso,sm){clearTimeout(EXPW.t);EXPW.sm=sm||null;var now=Date.now()
   if(end===Infinity)return;if(end<=now)return expKick(why);if(end-now<2147483000)EXPW.t=setTimeout(function(){expKick(why)},end-now+300)}
 /* re-read expiry and session length every 20s so a change by the manager applies without a re-login */
 function expWatch(uid,iso,sm){EXPW.uid=uid;expArm(iso,sm);clearInterval(EXPW.i);EXPW.i=setInterval(function(){sb.from("staff").select("expires_at,role,session_min").eq("user_id",uid).maybeSingle().then(function(r){if(r.error)return;if(!r.data)return expKick();if(r.data.role!=="admin")expArm(r.data.expires_at,r.data.session_min)})},20000)}
+/* ---------- job application form ---------- */
+var HIRE={st:0,fr:null};
+function hireLoad(){if(HIRE.st)return;HIRE.st=1;
+  sb.from("private_settings").select("key,value").in("key",["hire_owner_id","hire_owner"]).then(function(r){var o={};(r.data||[]).forEach(function(x){if(x.key==="hire_owner_id")o.note_owner_id=x.value;if(x.key==="hire_owner")o.note_owner=x.value});window.HIRE_CFG=o;HIRE.st=2},function(){window.HIRE_CFG={};HIRE.st=2})}
+function hirePos(){var s=document.getElementById("hireSlot"),f=HIRE.fr;
+  if(!isAdmin){if(f){f.remove();HIRE.fr=null;HIRE.st=0;window.HIRE_CFG=null}return}
+  if(!s){if(f)f.style.display="none";return}
+  if(!f){if(HIRE.st!==2)return;f=HIRE.fr=document.createElement("iframe");f.src="hiring.html";f.title="طلب توظيف مندوب";f.className="hiref";document.body.appendChild(f)}
+  var b=s.getBoundingClientRect();f.style.display="block";f.style.top=(b.top+window.scrollY)+"px";f.style.left=(b.left+window.scrollX)+"px";f.style.width=b.width+"px";f.style.height=b.height+"px"}
+setInterval(hirePos,200);window.addEventListener("resize",hirePos);
+function vHire(){hireLoad();setTimeout(hirePos,0);return '<div id="hireSlot" class="hires"><p class="hint" style="padding:16px">جارٍ فتح النموذج…</p></div>'}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -1219,8 +1232,8 @@ applyLang();i18nWatch();showSplash(3200);
 function render(){
   if(booting){root.innerHTML='<div class="login" style="padding:60px 16px;text-align:center"><p class="hint">جارٍ التحميل…</p></div>';return}
   if(!me&&!isAdmin&&!staff)view="courier";
-  var V={overall:vOverall,daily:vDaily,riders:vRiders,top:vTop,absence:vAbsence,wallet:vWallet,quality:vQuality,distance:vDistance,courier:vCourier,data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet,cards:isAdmin&&vCards,susp:vSusp}[view];
-  if(view!=="courier"&&view!=="data"&&view!=="perm"&&view!=="sheet"&&view!=="cards"&&!canSee(view))V=staff?function(){return '<div class="panel"><p class="hint" style="margin:0">لم يحدد لك المدير أي قسم بعد.</p></div>'}:vCourier;else if(!V)V=(view==="data"||view==="perm"||view==="sheet"||view==="cards")?vCourier:vSoon;
+  var V={overall:vOverall,daily:vDaily,riders:vRiders,top:vTop,absence:vAbsence,wallet:vWallet,quality:vQuality,distance:vDistance,courier:vCourier,data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet,cards:isAdmin&&vCards,hire:isAdmin&&vHire,susp:vSusp}[view];
+  if(view!=="courier"&&view!=="data"&&view!=="perm"&&view!=="sheet"&&view!=="cards"&&view!=="hire"&&!canSee(view))V=staff?function(){return '<div class="panel"><p class="hint" style="margin:0">لم يحدد لك المدير أي قسم بعد.</p></div>'}:vCourier;else if(!V)V=(view==="data"||view==="perm"||view==="sheet"||view==="cards"||view==="hire")?vCourier:vSoon;
   var html='<div class="shell'+(isAdmin||staff?"":" solo")+'">'+side()+'<div style="min-width:0">'+bar()+'<main class="content">'+V()+'</main></div></div>';
   var a=document.activeElement,f=a&&a.id,pos=null;try{pos=a.selectionStart}catch(e){}
   root.innerHTML=html;trTree(root);

@@ -1,0 +1,884 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>طلب توظيف مندوب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap">
+<style id="pageCss">
+/* ===== printable pages (shared by preview, PDF and print file) ===== */
+.page{width:210mm;height:297mm;background:#fff;color:#111;position:relative;overflow:hidden;font-family:"Noto Naskh Arabic","IBM Plex Sans Arabic",Tahoma,serif;font-size:10.5pt;line-height:1.55;direction:rtl;box-sizing:border-box}
+.page *{box-sizing:border-box}
+.lh-top{position:absolute;top:5mm;left:0;right:22mm;height:2.2mm;background:linear-gradient(90deg,#e6ecf5,#2f4e86 70%,#20386b)}
+.lh-tri{position:absolute;top:0;right:0;width:36mm;height:30mm;background:linear-gradient(135deg,#f6a133,#f28a1a);clip-path:polygon(18% 0,100% 0,100% 100%)}
+.lh-tri2{position:absolute;top:5mm;right:20mm;width:20mm;height:14mm;background:linear-gradient(120deg,#2f4e86,#5d7fb8);clip-path:polygon(0 0,100% 0,0 100%);opacity:.9}
+.lh-logo{position:absolute;top:10mm;left:12mm;width:34mm}
+.lh-logo img{width:100%;display:block}
+.lh-logo small{display:block;text-align:center;font-family:"IBM Plex Sans Arabic",sans-serif;font-weight:700;color:#2b3192;font-size:10.5pt;line-height:1.2;margin-top:.5mm}
+.lh-logo small i{display:block;font-style:normal;color:#f28a1a;font-size:7pt;font-weight:600}
+.lh-cr{position:absolute;top:13mm;right:30mm;direction:ltr;text-align:left;font-family:"IBM Plex Sans Arabic",sans-serif;color:#2b3192;font-size:10.5pt;line-height:1.5}
+.lh-cr b{font-weight:700}
+.lh-foot{position:absolute;left:5mm;right:5mm;bottom:5mm}
+.lh-foot .ln{height:1.6mm;background:linear-gradient(90deg,#e6ecf5,#2f4e86 60%,#20386b);margin-bottom:2mm}
+.lh-foot .row{display:flex;justify-content:space-between;align-items:center;direction:ltr;font-family:"IBM Plex Sans Arabic",sans-serif;font-size:7.6pt;color:#1a2240;padding:0 3mm 2mm}
+.lh-foot .row span{display:flex;align-items:center;gap:1.6mm}
+.lh-foot .row svg{width:4.2mm;height:4.2mm;fill:none;stroke:#2f4e86;stroke-width:1.8}
+.lh-foot .band{height:6mm;background:linear-gradient(90deg,#f28a1a,#f6a133)}
+.body{position:absolute;top:36mm;left:12mm;right:12mm;bottom:24mm}
+.body.nolh{top:16mm;bottom:12mm}
+.t-title{text-align:center;font-weight:700;font-size:13pt;margin:0 0 3mm}
+.t-title u{text-underline-offset:1.5mm}
+.t-en{text-align:center;font-weight:700;font-size:11.5pt;font-family:"Times New Roman",serif;direction:ltr;margin:0 0 3mm}
+.grid{width:100%;border-collapse:collapse;margin-bottom:3mm}
+.grid td,.grid th{border:.3mm solid #444;padding:1.2mm 2mm;vertical-align:middle}
+.grid th{background:#f0f0f0;font-weight:700;font-size:9.5pt;text-align:right}
+.grid th .e{font-family:"Times New Roman",serif;direction:ltr;unicode-bidi:isolate}
+.grid.tight td,.grid.tight th{padding:.6mm 2mm}
+.grid td.v{height:10mm;text-align:center;font-weight:700;font-size:12pt}
+.box2{border:.7mm solid #222;padding:.8mm}
+.fill{font-weight:700;color:#0b2a6f}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.p{margin:0 0 2.2mm;text-align:justify}
+.en{direction:ltr;text-align:justify;font-family:"Times New Roman",serif;font-size:10.5pt}
+.en.b{font-weight:700}
+ol.ar{margin:0 0 3mm;padding-right:6mm}
+ol.ar li{margin-bottom:1.6mm}
+ol.en{margin:0 0 3mm;padding-left:6mm;direction:ltr;font-family:"Times New Roman",serif}
+ol.en li{margin-bottom:1.4mm;text-align:justify}
+.sigline{display:flex;gap:8mm;align-items:flex-end;margin:4mm 0}
+.sigline span{flex:1;white-space:nowrap}
+.sigline i{display:inline-block;min-width:38mm;border-bottom:.3mm solid #333;font-style:normal;text-align:center;font-weight:700;color:#0b2a6f;padding:0 1mm}
+.kv{display:grid;gap:1mm;margin-bottom:3mm}
+.kv div{display:flex;gap:3mm}
+.kv b{min-width:24mm}
+.ibanbox{display:flex;direction:ltr;gap:0;justify-content:flex-start;flex-wrap:nowrap}
+.ibanbox span{width:5.6mm;height:7mm;border:.3mm solid #444;margin-left:-.3mm;display:grid;place-items:center;font-family:"IBM Plex Sans Arabic",monospace;font-weight:700;font-size:10pt;color:#0b2a6f}
+.ibanbox span.gap{margin-left:1.2mm}
+.chk{display:inline-block;width:3.6mm;height:3.6mm;border:.3mm solid #333;border-radius:50%;vertical-align:middle;margin:0 1mm;position:relative}
+.chk.on::after{content:"";position:absolute;inset:.7mm;border-radius:50%;background:#0b2a6f}
+.sq{display:inline-grid;place-items:center;width:12mm;height:9mm;border:.3mm solid #333;font-weight:700;color:#0b2a6f}
+.idphoto{width:100%;height:100%;object-fit:contain;display:block}
+.signtbl td{height:14mm}
+.approvals{display:flex;justify-content:space-between;direction:ltr;font-family:"Times New Roman",serif;font-weight:700;font-size:10pt;margin-top:3mm;padding:0 4mm}
+.note-box{border:.3mm solid #444;display:grid;grid-template-columns:1fr 1fr}
+.note-box > div{padding:2.5mm;font-size:10pt;text-align:justify}
+.note-box > div + div{border-right:.3mm solid #444}
+.att-title{font-family:"IBM Plex Sans Arabic",sans-serif;font-weight:700;font-size:13pt;margin:0 0 3mm;color:#2b3192}
+.att-img{width:100%;height:calc(100% - 12mm);object-fit:contain;border:.3mm solid #ddd}
+.smallcap{font-size:8.5pt;color:#333}
+.terms{display:grid;grid-template-columns:1fr 1fr;border:.6mm solid #222}
+.terms > div{padding:1.6mm 2mm;font-size:7.5pt;line-height:1.38}
+.terms > div + div{border-right:.4mm solid #222}
+.terms .en{font-size:7.4pt;line-height:1.28}
+.terms ol{margin:0;padding-right:4.5mm}
+.terms ol.en{padding-left:4mm;padding-right:0}
+.terms li{margin-bottom:.6mm}
+</style>
+<style>
+/* ===== app shell ===== */
+:root{--bg:#eef1f7;--surface:#ffffff;--fg:#141a33;--muted:#5b6386;--line:#d9deeb;--indigo:#2b3192;--orange:#f28a1a;--ok:#1d7a4a;--warn:#b25b00;--chip:#e8ebf8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1124;--surface:#171b36;--fg:#eceffd;--muted:#a3a9cf;--line:#2a2f57;--indigo:#9ea4ff;--orange:#ff9b33;--ok:#4cc38a;--warn:#ffb562;--chip:#22274d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1124;--surface:#171b36;--fg:#eceffd;--muted:#a3a9cf;--line:#2a2f57;--indigo:#9ea4ff;--orange:#ff9b33;--ok:#4cc38a;--warn:#ffb562;--chip:#22274d;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;direction:rtl;font-size:14.5px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar .in{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;max-width:1500px;margin-inline:auto}
+.bar h1{font-size:1.05rem;margin:0;font-weight:700}
+.bar .sp{flex:1}
+.btn{font-family:inherit;font-weight:600;font-size:.92rem;border-radius:10px;padding:8px 14px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn.pri{background:var(--orange);border-color:var(--orange);color:#1a1300}
+.btn.ind{background:var(--indigo);border-color:var(--indigo);color:var(--surface)}
+.btn:disabled{opacity:.55;cursor:default}
+.wrapper{display:grid;grid-template-columns:420px 1fr;gap:18px;max-width:1500px;margin-inline:auto;padding:16px}
+.wrapper > *{min-width:0}
+@media (max-width:1000px){.wrapper{grid-template-columns:1fr}}
+.panel{display:grid;gap:14px;align-content:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.card h2{font-size:1rem;margin:0 0 4px}
+.card p.hint{margin:0 0 10px;color:var(--muted);font-size:.85rem}
+.drops{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:10px;display:grid;gap:6px;justify-items:center;text-align:center;cursor:pointer;position:relative;min-height:112px;align-content:center}
+.drop:hover,.drop.over{border-color:var(--orange)}
+.drop b{font-size:.9rem}
+.drop small{color:var(--muted);font-size:.76rem}
+.drop.wide{grid-column:1/-1;min-height:120px;border-color:var(--orange);background:color-mix(in srgb,var(--orange) 6%,transparent)}
+.thumbs{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.drop img.th{width:54px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.thumbs .more{font-size:.78rem;align-self:center;color:var(--muted)}
+.dact{display:flex;gap:6px;position:relative;z-index:2}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.st{font-size:.76rem;font-weight:600}
+.st.run{color:var(--warn)} .st.ok{color:var(--ok)} .st.err{color:#c0392b}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.fields .full{grid-column:1/-1}
+label.f{display:grid;gap:3px;font-size:.8rem;color:var(--muted);min-width:0}
+label.f input,label.f select{font-family:inherit;font-size:.92rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%;min-width:0}
+label.f input.auto{border-color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}
+label.f input:focus,label.f select:focus{outline:2px solid var(--orange);outline-offset:0}
+.ltrin{direction:ltr;text-align:left}
+details.card summary{cursor:pointer;font-weight:700;font-size:1rem;list-style:none}
+details.card summary::after{content:"▾";float:left;color:var(--muted)}
+details.card[open] summary{margin-bottom:10px}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;overflow:hidden}
+.preview .top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.preview .top b{font-size:.95rem}
+.pages{display:grid;justify-content:center;gap:14px;zoom:var(--z,.62)}
+.pages .page{box-shadow:0 2px 14px rgba(0,0,0,.18)}
+.msg{font-size:.85rem;color:var(--muted)}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:20}
+.legend{display:flex;gap:6px;align-items:center;font-size:.78rem;color:var(--muted)}
+.legend i{width:12px;height:12px;border-radius:3px;border:2px solid var(--ok)}
+.checks{display:grid;gap:6px}
+.ck{font-size:.86rem;padding:7px 10px;border-radius:8px;background:var(--chip);line-height:1.6}
+.ck.err{background:color-mix(in srgb,#c0392b 14%,var(--surface));color:var(--fg);border-inline-start:3px solid #c0392b}
+.ck.warn{border-inline-start:3px solid var(--warn)}
+.ck.ok{border-inline-start:3px solid var(--ok)}
+.ck.sp{border-inline-start:3px solid var(--indigo)}
+.ck small{color:var(--muted)}
+.mini{font-family:inherit;font-size:.78rem;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:2px 8px;cursor:pointer;margin-inline-start:4px}
+.alertbar{background:color-mix(in srgb,#c0392b 14%,var(--surface));border:1px solid #c0392b;border-radius:10px;padding:9px 12px;font-size:.88rem;margin-bottom:10px}
+</style>
+
+<div class="bar"><div class="in">
+  <h1>نموذج طلب التوظيف · الدعم المطور</h1>
+  <span class="sp"></span>
+  <button class="btn" id="btnClear" type="button">مسح البيانات</button>
+  <button class="btn ind" id="btnHtml" type="button">تحميل ملف للطباعة</button>
+  <button class="btn pri" id="btnPdf" type="button">تحميل PDF</button>
+</div></div>
+
+<div class="wrapper">
+  <div class="panel">
+    <section class="card">
+      <h2>١. أضف المرفقات</h2>
+      <p class="hint">ارفع ملف المستندات كامل مرة وحدة، أو كل مستند في خانته (صورة أو PDF). يقرأ النظام الإقامة والآيبان والجواز والرخصة ويعبّي الخانات في كل الصفحات تلقائياً.</p>
+      <div class="drops" id="drops"></div>
+      <p class="msg" id="aiMsg" style="margin:10px 0 0"></p>
+    </section>
+
+    <details class="card" id="apiCard">
+      <summary>القراءة الدقيقة بمفتاح Claude (اختياري)</summary>
+      <p class="hint">بدون مفتاح، يقرأ النظام الصور بأداة على الجهاز (أقل دقة، وأول مرة تأخذ دقيقة). للقراءة الدقيقة والمراجعة الذكية أضف مفتاح Claude API من console.anthropic.com، ويُحفظ في هذا المتصفح فقط.</p>
+      <div class="fields"><label class="f full">مفتاح Claude API<input type="password" id="apiKey" class="ltrin" placeholder="sk-ant-..." autocomplete="off"></label></div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap"><button class="btn" type="button" id="apiSave">حفظ واختبار</button><button class="btn" type="button" id="apiDel">حذف المفتاح</button><span class="msg" id="apiSt"></span></div>
+    </details>
+
+    <section class="card" id="checksCard">
+      <h2>التحقق والمراجعة</h2>
+      <p class="hint">يقارن بيانات المرفقات ببعضها للتأكد أنها لنفس الشخص، ويتحقق من صحة الآيبان والإقامة، ويقترح تصحيحات إملائية.</p>
+      <div id="checks" class="checks"></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap"><button class="btn" id="btnReview" type="button">مراجعة ذكية الآن</button><span class="msg" id="revSt"></span></div>
+    </section>
+
+    <details class="card" open>
+      <summary>٢. بيانات طلب التوظيف</summary>
+      <p class="hint" style="margin-top:0">الراتب والمشروع والهدف ونقل الكفالة والمبالغ، تظهر في جدول الصفحة الأولى.</p>
+      <div class="fields" id="f-app"></div>
+    </details>
+
+    <details class="card" open>
+      <summary>٣. بيانات الموظف</summary>
+      <div class="legend" style="margin-bottom:8px"><i></i> خانة عبّأها النظام من المرفقات</div>
+      <div class="fields" id="f-personal"></div>
+    </details>
+    <details class="card" open>
+      <summary>٤. البنك</summary>
+      <div class="fields" id="f-bank"></div>
+    </details>
+    <details class="card">
+      <summary>٥. الوظيفة والمركبة</summary>
+      <div class="fields" id="f-job"></div>
+    </details>
+    <details class="card">
+      <summary>٦. السلفة والسند</summary>
+      <div class="fields" id="f-adv"></div>
+    </details>
+  </div>
+
+  <div class="preview">
+    <div class="alertbar" id="alertBar" hidden></div>
+    <div class="top">
+      <b>معاينة النموذج (<span id="pgCount">10</span> صفحات)</b>
+      <label class="legend">التكبير <input type="range" id="zoom" min="0.35" max="1" step="0.05" value="0.62"></label>
+    </div>
+    <div class="pages" id="pages"></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<div id="renderBox" style="position:fixed;left:-30000px;top:0;zoom:1"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+const LOGO="data:image/png;base64,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";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,3200)}
+const pad=n=>String(n).padStart(2,'0');
+function todayG(){const d=new Date();return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`}
+function todayH(){try{const p=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const g=t=>(p.find(x=>x.type===t)||{}).value;return `${g('year')}/${g('month')}/${g('day')}`}catch(e){return ''}}
+const DATEKEYS=['doc_date','join_date'];
+
+/* ---------- fields ---------- */
+const F={
+ personal:[
+  ['first_ar','الاسم الأول'],['father_ar','اسم الأب'],['grand_ar','اسم الجد'],['family_ar','اسم العائلة'],
+  ['name_en','الاسم بالإنجليزي','full',1],['iqama','رقم الإقامة / الهوية','',1],['nationality','الجنسية'],
+  ['dob','تاريخ الميلاد','',1],['iqama_exp','تاريخ انتهاء الإقامة','',1],['profession','المهنة في الإقامة'],
+  ['passport_no','رقم الجواز','',1],['license_no','رقم رخصة القيادة','',1],['license_exp','انتهاء الرخصة','',1],
+  ['mobile1','الجوال 1','',1],['mobile2','الجوال 2','',1],['email','البريد الإلكتروني','full',1],
+  ['city','المدينة'],['district','الحي'],['street','الشارع','full'],
+  ['contact_name','شخص للتواصل'],['contact_rel','صلة القرابة'],['contact_phone','رقم شخص التواصل','',1]],
+ bank:[['iban','رقم الآيبان (IBAN)','full',1],['bank_name','اسم البنك'],['acct_holder','اسم صاحب الحساب'],['bank_problem','لدي مشكلة في الحساب','sel:لا|نعم']],
+ app:[['project','اسم المشروع','list:هنقرستيشن|جاهز|كيتا|ذا شفز|مرسول|تويو|نون|أمازون|آي مايل|أرامكس|سمسا|ناقل|سبل'],['salary','الراتب (ريال)','',1],
+  ['target','الهدف (عدد الطلبات)','',1],['vehicle_type','نوع المركبة','list:سيارة|دراجة نارية'],
+  ['transfers','عدد مرات نقل الكفالة','',1],['pay_required','المطلوب دفعه (ريال)','',1],['pay_paid','ما تم دفعه (ريال)','',1],['pay_remaining','المتبقي (يُحسب تلقائياً)','',1]],
+ job:[['job_title','المسمى الوظيفي'],['join_date','تاريخ الانضمام','',1],['orders_required','عدد الطلبات المطلوبة'],
+  ['car_type','نوع السيارة'],['plate','رقم اللوحة'],['color','اللون'],['model_year','سنة الصنع','',1],
+  ['doc_date','تاريخ تحرير المستندات','',1]],
+ adv:[['adv_amount','مبلغ السلفة (ريال)','',1],['adv_inst_value','قيمة القسط (ريال)','',1],['adv_inst_count','عدد الأقساط','',1],
+  ['adv_start','بداية القسط','full'],['direct_manager','المدير المباشر'],['adv_method','طريقة الصرف','sel:|نقداً|STC Pay|حوالة بنكية|تصرف مع الراتب|تسوية'],
+  ['note_city','مدينة تحرير السند'],['note_amount','مبلغ السند (ريال)','',1],['note_copies','السندات لأمر','sel:2|org|owner'],['note_owner','اسم المستفيد في السند الثاني','full'],['note_owner_id','رقم هوية المستفيد','',1]]
+};
+const LBL={};for(const g in F)for(const [k,l] of F[g])LBL[k]=l;
+const NOTE_LBL={'2':'سندان: واحد للمؤسسة وواحد لوضحى','org':'سند واحد لأمر المؤسسة','owner':'سند واحد لأمر وضحى'};
+const DEF={note_owner:'وضحى حسن بن محمد العرجاني',note_owner_id:'',job_title:'مندوب توصيل',orders_required:'شهرياً',adv_start:'يبدأ الخصم من ثاني شهر عمل',direct_manager:'إدارة الموارد البشرية',note_amount:'10000',bank_problem:'لا',note_copies:'2',vehicle_type:'سيارة'};
+/* owner ID is not stored in this public file; the dashboard passes it to managers (private_settings) */
+try{const P=window.parent!==window&&window.parent.HIRE_CFG;if(P)for(const k in P)if(P[k])DEF[k]=P[k]}catch(e){}
+let S={}, AUTO=new Set(), MANUAL=new Set();
+try{const d=JSON.parse(localStorage.getItem('dm-job')||'null'); if(d){S=d.S||{};AUTO=new Set(d.A||[]);MANUAL=new Set(d.M||[])}}catch(e){}
+let EXT={};
+try{const d=JSON.parse(localStorage.getItem('dm-job')||'null'); if(d&&d.E)EXT=d.E}catch(e){}
+for(const k of DATEKEYS) if(!MANUAL.has(k)) delete S[k];
+for(const k in DEF) if(S[k]==null||S[k]==='') S[k]=DEF[k];
+function save(){try{localStorage.setItem('dm-job',JSON.stringify({S,A:[...AUTO],M:[...MANUAL],E:EXT}))}catch(e){}}
+
+function buildFields(){
+ for(const g in F){
+  const box=$('#f-'+g);box.innerHTML='';
+  for(const [k,label,opt,ltr] of F[g]){
+   const L=document.createElement('label');L.className='f'+(opt==='full'?' full':'');
+   L.append(label);
+   let el;
+   if(opt&&opt.startsWith('sel:')){el=document.createElement('select');for(const o of opt.slice(4).split('|')){const op=document.createElement('option');op.value=o;op.textContent=(k==='note_copies'&&NOTE_LBL[o])||o||'—';el.append(op)}}
+   else{el=document.createElement('input');el.type='text';if(ltr){el.className='ltrin';el.inputMode='decimal'}
+    if(opt&&opt.startsWith('list:')){const dl=document.createElement('datalist');dl.id='dl_'+k;for(const o of opt.slice(5).split('|')){const op=document.createElement('option');op.value=o;dl.append(op)}L.append(dl);el.setAttribute('list',dl.id)}}
+   el.id='in_'+k;el.value=S[k]||'';el.dataset.k=k;if(DATEKEYS.includes(k))el.placeholder='تلقائي: تاريخ يوم الطباعة';
+   el.addEventListener('input',()=>{S[k]=el.value;if(k==='pay_required'||k==='pay_paid')autoRemain();if(el.value==='')MANUAL.delete(k);else MANUAL.add(k);AUTO.delete(k);el.classList.remove('auto');if(k==='iban'){S[k]=normIban(el.value);fillBank();syncInputs()}schedule();save();clearTimeout(window._ck);window._ck=setTimeout(renderChecks,300)});
+   L.append(el);box.append(L);
+  }
+ }
+ markAuto();
+}
+function autoRemain(){if(MANUAL.has('pay_remaining'))return;const r=num(S.pay_required),p=num(S.pay_paid);if(r||p){S.pay_remaining=String(Math.max(0,r-p));const e=document.getElementById('in_pay_remaining');if(e)e.value=S.pay_remaining}}
+function markAuto(){document.querySelectorAll('[data-k]').forEach(el=>{el.classList.toggle('auto',AUTO.has(el.dataset.k))})}
+function syncInputs(){document.querySelectorAll('[data-k]').forEach(el=>{const v=S[el.dataset.k]||'';if(el.value!==v)el.value=v});markAuto()}
+const normIban=s=>String(s||'').replace(/\s+/g,'').toUpperCase();
+
+/* ---------- attachments ---------- */
+const DOCS=[
+ {id:'bundle',t:'ملف المستندات كامل',d:'PDF فيه الإقامة والآيبان والجواز… أو عدة صور مرة واحدة',multi:1},
+ {id:'iqama',t:'الإقامة / الهوية',d:'صورة الإقامة أو أبشر'},
+ {id:'iban',t:'خطاب الآيبان',d:'شهادة الحساب البنكي'},
+ {id:'passport',t:'جواز السفر',d:'اختياري'},
+ {id:'license',t:'رخصة القيادة',d:'اختياري'},
+ {id:'other1',t:'مرفق إضافي',d:'أي مستند آخر'}];
+const TYPES=['iqama','iban','passport','license','other'];
+const ATT={}; // id -> {name, pages:[{blob,url,type?}], status, cls}
+let LIM=null;
+function buildDrops(){
+ const box=$('#drops');box.innerHTML='';
+ for(const d of DOCS){
+  const a=ATT[d.id];const pg=a&&a.pages||[];
+  const el=document.createElement('div');el.className='drop'+(d.multi?' wide':'');
+  el.innerHTML=(pg.length?`<div class="thumbs">${pg.slice(0,6).map(p=>`<img class="th" src="${p.url}" alt="">`).join('')}${pg.length>6?`<span class="more">+${pg.length-6}</span>`:''}</div>`:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>')+
+   `<b>${d.t}</b><small>${a?esc(a.name):d.d}</small>`+(a&&a.status?`<span class="st ${a.cls||''}">${a.status}</span>`:'')+
+   `<input type="file" accept="image/*,application/pdf" ${d.multi?'multiple':''} aria-label="${d.t}">`+
+   (pg.length?`<div class="dact"><button type="button" class="mini" data-re>إعادة القراءة</button><button type="button" class="mini" data-rm>حذف</button></div>`:'');
+  const inp=el.querySelector('input');
+  inp.addEventListener('change',()=>{if(inp.files.length)addFiles(d.id,[...inp.files])});
+  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over')});
+  el.addEventListener('dragleave',()=>el.classList.remove('over'));
+  el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('over');const f=[...e.dataTransfer.files];if(f.length)addFiles(d.id,d.multi?f:[f[0]])});
+  const re=el.querySelector('[data-re]');if(re)re.addEventListener('click',e=>{e.stopPropagation();extract(d.id,true)});
+  const rm=el.querySelector('[data-rm]');if(rm)rm.addEventListener('click',e=>{e.stopPropagation();delete ATT[d.id];for(const k of Object.keys(EXT))if(k===d.id||(d.id==='bundle'&&k.startsWith('b_')))delete EXT[k];applyExt();buildDrops();schedule();scheduleReview()});
+  box.append(el);
+ }
+}
+function canvasBlob(c){return new Promise(r=>c.toBlob(r,'image/jpeg',.9))}
+async function fileToImages(file,maxPages){
+ if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)){
+  const lib=window.pdfjsLib; if(!lib) throw {code:'pdf_lib'};
+  lib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const pdf=await lib.getDocument({data:await file.arrayBuffer()}).promise;
+  const out=[];
+  for(let i=1;i<=Math.min(pdf.numPages,maxPages);i++){
+   const page=await pdf.getPage(i);const base=page.getViewport({scale:1});const sc=Math.min(2.4,2000/Math.max(base.width,base.height));const vp=page.getViewport({scale:sc});
+   const c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+   const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+   await page.render({canvasContext:ctx,viewport:vp}).promise;out.push(await canvasBlob(c));
+  }
+  return out;
+ }
+ const url=URL.createObjectURL(file);
+ try{
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej({code:'img'});i.src=url});
+  const sc=Math.min(1,2600/Math.max(img.width,img.height));
+  const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+  const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);
+  return [await canvasBlob(c)];
+ }finally{URL.revokeObjectURL(url)}
+}
+const blobToDataURL=b=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)});
+
+async function addFiles(id,files){
+ const multi=id==='bundle';
+ ATT[id]={name:files.map(f=>f.name).join('، '),pages:[],status:'جارٍ تجهيز الملف…',cls:'run'};buildDrops();
+ const pages=[];
+ try{for(const f of files){for(const blob of await fileToImages(f,multi?20:3))pages.push({blob,url:await blobToDataURL(blob)})}}
+ catch(e){ATT[id].status=e&&e.code==='pdf_lib'?'قارئ PDF لم يتحمّل، ارفع صورة بدلاً منه':'تعذّر فتح الملف، جرّب صورة JPG أو PNG';ATT[id].cls='err';buildDrops();return}
+ if(!pages.length){ATT[id].status='الملف فارغ';ATT[id].cls='err';buildDrops();return}
+ ATT[id].pages=pages;ATT[id].status=`تمت الإضافة (${pages.length} صفحة)`;ATT[id].cls='ok';
+ buildDrops();schedule();
+ extract(id);
+}
+
+/* ---------- AI extraction ---------- */
+let samplePromise=null;
+function getSample(){if(!samplePromise)samplePromise=(window.claude&&window.claude.use)?window.claude.use('sample').catch(()=>null):Promise.resolve(null);return samplePromise}
+/* ---- reading outside Claude: Anthropic API key (optional) ---- */
+const apiKey=()=>{try{return localStorage.getItem('dm-api-key')||''}catch(e){return ''}};
+let API_MODEL=null;
+async function apiModel(key){
+ if(API_MODEL)return API_MODEL;
+ const h={'x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+ const r=await fetch('https://api.anthropic.com/v1/models?limit=50',{headers:h});
+ if(!r.ok)throw {code:r.status===401?'bad_key':'api_'+r.status};
+ const d=await r.json();const ids=(d.data||[]).map(m=>m.id);
+ API_MODEL=ids.find(i=>/sonnet/i.test(i))||ids.find(i=>/opus/i.test(i))||ids[0];
+ if(!API_MODEL)throw {code:'no_model'};return API_MODEL;
+}
+function apiReader(key){
+ const f={};
+ f.limits=async()=>({images:{maxCount:8}});
+ f.json=async(prompt,opts)=>{
+  const model=await apiModel(key);
+  const content=[];
+  for(const b of (opts&&opts.images)||[]){const u=await blobToDataURL(b);content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:u.split(',')[1]}})}
+  content.push({type:'text',text:prompt+'\n\nأرجع JSON فقط بدون أي نص آخر.'});
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','content-type':'application/json'},body:JSON.stringify({model,max_tokens:3000,messages:[{role:'user',content}]})});
+  if(!r.ok)throw {code:r.status===401?'bad_key':r.status===429?'rate_limited':'api_'+r.status};
+  const d=await r.json();const t=(d.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+  const m=t.match(/\{[\s\S]*\}/);if(!m)throw {code:'invalid_json'};
+  try{return JSON.parse(m[0])}catch(e){throw {code:'invalid_json'}}
+ };
+ return f;
+}
+async function getReader(){const s=await getSample();if(s)return s;const k=apiKey();return k?apiReader(k):null}
+
+/* ---- free fallback: on-device OCR (works in the downloaded file) ---- */
+let tessP=null;
+function loadTess(){if(!tessP)tessP=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';sc.onload=()=>res(window.Tesseract);sc.onerror=()=>{tessP=null;rej({code:'ocr_load'})};document.head.append(sc)});return tessP}
+let tessW=null;
+const TPRE=`const _f=self.fetch.bind(self);self.fetch=async(u,o)=>{u=String(u);for(const l of ['ara','eng']){if(u.indexOf(l+'.traineddata')>-1){const b=atob(self.__EMB[l]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Response(a)}}return _f(u,o)};
+const _cu=URL.createObjectURL(new Blob([self.__EMB.core],{type:'text/javascript'}));const _is=self.importScripts.bind(self);self.importScripts=(...u)=>_is(...u.map(x=>String(x).indexOf('tesseract-core')>-1?_cu:x));`;
+async function makeTessWorker(T){
+ const g=id=>{const e=document.getElementById(id);return e?e.textContent:null};
+ if(g('emb-tw')){
+  const src='self.__EMB='+JSON.stringify({ara:g('emb-ta').trim(),eng:g('emb-te').trim(),core:g('emb-tc')})+';\n'+TPRE+'\n'+g('emb-tw');
+  const url=URL.createObjectURL(new Blob([src],{type:'text/javascript'}));
+  return T.createWorker(['ara','eng'],1,{workerPath:url,workerBlobURL:false,corePath:'https://local.invalid/tesseract-core-lstm.wasm.js',langPath:'https://local.invalid/lang',gzip:true,cacheMethod:'none'});
+ }
+ return T.createWorker(['ara','eng']);
+}
+async function upscale(blob){try{const u=URL.createObjectURL(blob);const img=await new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=u});URL.revokeObjectURL(u);const sc=Math.min(3,Math.max(1,2600/Math.max(img.width,img.height)));if(sc<=1.05)return blob;const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);return await canvasBlob(c)}catch(e){return blob}}
+async function ocrText(blob){const T=await loadTess();if(!tessW)tessW=await makeTessWorker(T);const r=await tessW.recognize(await upscale(blob));return latinDigits(r.data.text||'')}
+const COUNTRIES={'اليمن':['YEMEN','يمن'],'مصر':['EGYPT','مصر'],'الهند':['INDIA','هند'],'باكستان':['PAKISTAN','باكستان'],'بنجلاديش':['BANGLADESH','بنجلاديش','بنغلاديش'],'السودان':['SUDAN','سودان'],'الفلبين':['PHILIPPINES','فلبين'],'نيبال':['NEPAL','نيبال'],'سوريا':['SYRIA','سوري'],'الأردن':['JORDAN','اردن','أردن'],'إثيوبيا':['ETHIOPIA','اثيوبيا','إثيوبيا'],'سريلانكا':['SRI LANKA','سريلانكا'],'إندونيسيا':['INDONESIA','اندونيسيا'],'أفغانستان':['AFGHANISTAN','افغانستان'],'نيجيريا':['NIGERIA','نيجيريا'],'كينيا':['KENYA','كينيا'],'أوغندا':['UGANDA','اوغندا'],'تشاد':['CHAD','تشاد'],'المغرب':['MOROCCO','مغرب'],'تونس':['TUNISIA','تونس'],'لبنان':['LEBANON','لبنان'],'فلسطين':['PALESTINE','فلسطين'],'السعودية':['SAUDI','سعودي']};
+function parseText(t,type){
+ const o={};const T=t.replace(/[ \t]+/g,' ');
+ const ib=T.replace(/[ \-]/g,'').toUpperCase().match(/SA\d{22}/);if(ib)o.iban=ib[0];
+ const iq=T.match(/(?<!\d)[12]\d{9}(?!\d)/);if(iq&&type!=='iban')o.iqama=iq[0];
+ const dates=[];for(const m of T.matchAll(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})|(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/g)){const y=+(m[1]||m[6]),mo=+(m[2]||m[5]),d=+(m[3]||m[4]);if(y>1900&&y<2100&&mo<=12&&d<=31)dates.push(`${y}/${pad(mo)}/${pad(d)}`)}
+ dates.sort();
+ if(type==='iqama'||type==='passport'){const dob=dates.find(d=>+d.slice(0,4)<2012);if(dob)o.dob=dob;const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex&&type==='iqama')o.iqama_exp=ex}
+ if(type==='license'){const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex)o.license_exp=ex}
+ const STOP=/KINGDOM|SAUDI|ARABIA|MINISTRY|INTERIOR|RESIDENT|IDENTITY|PERMIT|BANK|ACCOUNT|IBAN|PASSPORT|REPUBLIC|LICENSE|DRIVING|NAME|NUMBER|CURRENT|DETAILS|SWIFT|BRANCH/;
+ const lines=t.split(/\n/).map(x=>x.trim()).filter(Boolean);
+ const en=lines.map(x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim()).filter(x=>x.split(' ').length>=3&&x===x.toUpperCase()&&x.length>=10&&!STOP.test(x));
+ if(en[0]){if(type==='iban')o.acct_holder=en[0];else o.name_en=en[0]}
+ const ARSTOP=/المملكة|العربية|السعودية|وزارة|الداخلية|هوية|مقيم|إقامة|اقامة|البنك|بنك|الحساب|حساب|رخصة|جواز|المهنة|الجنسية|تاريخ|رقم|العنوان|الديانة|صاحب العمل|النسخة|الإصدار|الانتهاء/;
+ let arName='';
+ const lbl=lines.find(x=>/الاسم\s*[:：]/.test(x));if(lbl)arName=lbl.split(/[:：]/).pop();
+ if(!arName){const c=lines.map(x=>x.replace(/[^؀-ۿ ]/g,' ').replace(/\s+/g,' ').trim()).filter(x=>{const w=x.split(' ');return w.length>=3&&w.length<=6&&w.every(z=>z.length>=2)&&!ARSTOP.test(x)});arName=c[0]||''}
+ arName=arName.replace(/[^؀-ۿ ]/g,' ').split(/\s+/).filter(w=>w&&w!=='بن'&&w!=='بنت').join(' ');
+ if(arName&&type!=='iban'){const w=arName.split(' ');o.first_ar=w[0]||'';o.father_ar=w[1]||'';if(w.length>=4){o.grand_ar=w.slice(2,-1).join(' ');o.family_ar=w[w.length-1]}else o.family_ar=w[2]||''}
+ else if(arName&&type==='iban'&&!o.acct_holder)o.acct_holder=arName;
+ if(type!=='iban'){const up=T.toUpperCase();for(const [ar,keys] of Object.entries(COUNTRIES)){if(keys.some(k=>up.includes(k.toUpperCase())||T.includes(k))){if(ar!=='السعودية'||type==='passport'){o.nationality=ar;break}}}}
+ if(!o.nationality&&o.iqama&&o.iqama[0]==='1'&&type!=='iban')o.nationality='السعودية';
+ const mob=T.match(/(?<!\d)05\d{8}(?!\d)/);if(mob)o.mobile1=mob[0];
+ const em=T.match(/[\w.+-]+@[\w-]+\.[\w.]+/);if(em)o.email=em[0];
+ if(type==='passport'){const pn=T.match(/\b[A-Z]{1,2}\d{6,8}\b/);if(pn)o.passport_no=pn[0]}
+ return clean(o);
+}
+function classify(t){const u=t.toUpperCase();if(/IBAN|آيبان|ايبان|الحساب|ACCOUNT/.test(u)&&/SA\s?\d/.test(u.replace(/\s/g,' ')))return 'iban';if(/PASSPORT|جواز/.test(u))return 'passport';if(/DRIVING|رخصة|LICENSE/.test(u)&&!/مقيم|RESIDENT/.test(u))return 'license';if(/مقيم|إقامة|اقامة|RESIDENT|هوية|IQAMA/.test(u))return 'iqama';return 'other'}
+async function ocrExtract(id){
+ const a=ATT[id];if(!a)return;
+ a.status='جارٍ قراءة الصور على الجهاز… (أول مرة تأخذ دقيقة)';a.cls='run';buildDrops();
+ try{
+  let n=0;
+  if(id==='bundle'){for(const k of Object.keys(EXT))if(k.startsWith('b_'))delete EXT[k]}
+  for(let i=0;i<a.pages.length;i++){
+   const p=a.pages[i];a.status=`جارٍ قراءة الصفحة ${i+1} من ${a.pages.length}…`;buildDrops();
+   const txt=await ocrText(p.blob);
+   const type=id==='bundle'?classify(txt):(id.startsWith('other')?classify(txt):id);p.type=type;
+   const o=parseText(txt,type);const key=id==='bundle'?'b_'+type:id;
+   EXT[key]=EXT[key]||{};for(const k in o)if(!EXT[key][k]){EXT[key][k]=o[k];n++}
+   if(!Object.keys(EXT[key]).length)delete EXT[key];
+  }
+  applyExt();
+  a.status=n?`✓ قراءة على الجهاز: ${n} معلومة (راجعها)`:'لم أستطع قراءة البيانات، عبّئها يدوياً أو أضف مفتاح Claude';a.cls=n?'ok':'err';
+  $('#aiMsg').textContent=n?'القراءة على الجهاز أقل دقة من Claude، راجع الأسماء والتواريخ قبل التحميل.':'';
+ }catch(e){a.status=e&&e.code==='ocr_load'?'تعذّر تحميل أداة القراءة (تحتاج إنترنت)':'تعذّرت القراءة على الجهاز';a.cls='err'}
+ buildDrops();schedule();renderChecks();
+}
+const KEYS={
+ first_ar:'الاسم الأول بالعربي',father_ar:'اسم الأب بالعربي',grand_ar:'اسم الجد بالعربي',family_ar:'اسم العائلة بالعربي',
+ name_en:'الاسم الكامل بالإنجليزي كما هو مكتوب',iqama:'رقم الإقامة أو الهوية (10 أرقام)',nationality:'الجنسية: اسم الدولة بالعربي مثل اليمن، مصر، باكستان',
+ dob:'تاريخ الميلاد ميلادي بصيغة YYYY/MM/DD',iqama_exp:'تاريخ انتهاء الإقامة ميلادي YYYY/MM/DD',profession:'المهنة كما في الإقامة بالعربي',
+ passport_no:'رقم الجواز',license_no:'رقم رخصة القيادة',license_exp:'تاريخ انتهاء الرخصة ميلادي YYYY/MM/DD',
+ iban:'رقم الآيبان IBAN بدون مسافات بأحرف كبيرة يبدأ بـ SA (24 خانة)',bank_name:'اسم البنك بالعربي',acct_holder:'اسم صاحب الحساب كما في خطاب البنك',
+ mobile1:'رقم الجوال إن وجد',email:'البريد الإلكتروني إن وجد',city:'المدينة',district:'الحي',street:'الشارع'};
+const DOC_HINT={iqama:'صورة إقامة/هوية مقيم سعودية أو لقطة شاشة من أبشر (الوثائق الرقمية)',iban:'خطاب أو شهادة آيبان أو تفاصيل حساب من تطبيق بنك سعودي',license:'رخصة قيادة سعودية',passport:'جواز سفر',other1:'مستند للموظف'};
+const RULES=`قواعد: اقرأ النص العربي والإنجليزي بدقة. الأرقام بالأرقام الإنجليزية 0-9 حتى لو كانت مكتوبة بالهندية (٠١٢٣). إذا كان التاريخ هجرياً فقط فاكتبه كما هو مع "هـ". قسّم الاسم العربي: أول/أب/جد/عائلة؛ إن كان ثلاثياً فاترك الجد فارغاً. لا تخمّن أي قيمة غير ظاهرة.`;
+const keyList=()=>Object.entries(KEYS).map(([k,v])=>`"${k}": ${v}`).join('\n');
+function errText(e){const c=e&&e.code;return c==='bad_key'?'مفتاح Claude API غير صحيح':c==='not_granted'?'لم يُسمح بالقراءة التلقائية (اسمح لـ Claude من نافذة الإذن)':c==='rate_limited'?'كثرة الطلبات، أعد المحاولة بعد دقيقة':c==='images_unavailable'?'قراءة الصور غير متاحة في هذا العرض':c==='image_rejected'?'الصورة غير مقبولة، جرّب صورة أوضح JPG':c==='sampling_disabled'?'القراءة التلقائية معطّلة لهذا الحساب':c==='invalid_json'?'لم تُفهم النتيجة، اضغط إعادة القراءة':'تعذّرت القراءة'+(c?' ('+c+')':'')}
+const latinDigits=t=>String(t).replace(/[٠-٩]/g,d=>d.charCodeAt(0)-1632).replace(/[۰-۹]/g,d=>d.charCodeAt(0)-1776);
+function clean(o){const r={};if(!o||typeof o!=='object')return r;for(const k in KEYS){let x=o[k];if(x==null)continue;x=latinDigits(x).trim();if(!x||x==='-'||/^(غير|لا يوجد|n\/a|null)/i.test(x))continue;if(k==='iban')x=normIban(x);if(k==='iqama'||k==='mobile1')x=x.replace(/[^\d+]/g,'');r[k]=x}return r}
+async function extractBundle(a,sample,max,manual){
+ for(const k of Object.keys(EXT))if(k.startsWith('b_'))delete EXT[k];
+ const total=a.pages.length;let n=0,fail=null;
+ for(let start=0;start<total;start+=max){
+  const chunk=a.pages.slice(start,start+max);
+  a.status=`جارٍ القراءة… الصفحات ${start+1}–${start+chunk.length} من ${total}`;a.cls='run';buildDrops();
+  const prompt=`أمامك ${chunk.length===1?'صفحة واحدة':chunk.length+' صفحات'} بالترتيب (أرقامها ${start+1} إلى ${start+chunk.length}) من ملف موظف واحد في السعودية. قد تكون بعض الصفحات نماذج شركة أو إقرارات مكتوبة، وبعضها مستندات رسمية: إقامة أو لقطة أبشر، خطاب آيبان أو تفاصيل حساب بنكي، جواز سفر، رخصة قيادة.
+1) صنّف كل صفحة: iqama | iban | passport | license | other (النماذج والإقرارات = other).
+2) استخرج البيانات من المستندات الرسمية فقط (iqama, iban, passport, license). من صفحات other خذ فقط رقم الجوال والبريد والعنوان إن وُجدت.
+أرجع JSON فقط بهذا الشكل:
+{"pages":[{"page":${start+1},"type":"iqama"}],"iqama":{...},"iban":{...},"passport":{...},"license":{...},"other":{...}}
+كل كائن يحتوي هذه المفاتيح (ضع "" لغير الموجود):
+${keyList()}
+${RULES}`;
+  try{
+   const r=await sample.json(prompt,{images:chunk.map(p=>p.blob),modelTier:'default',cache:!manual});
+   for(const t of TYPES){const o=clean(r&&r[t]);const key='b_'+t;EXT[key]=EXT[key]||{};for(const k in o){if(!EXT[key][k]){EXT[key][k]=o[k];n++}}if(!Object.keys(EXT[key]).length)delete EXT[key]}
+   (r&&Array.isArray(r.pages)?r.pages:[]).forEach(p=>{const pg=a.pages[(+p.page||0)-1];if(pg&&TYPES.includes(p.type))pg.type=p.type});
+   applyExt();
+  }catch(e){fail=e;if(e&&['not_granted','images_unavailable','sampling_disabled','rate_limited'].includes(e.code))break}
+ }
+ a.status=n?`✓ تم استخراج ${n} معلومة من ${total} صفحة`:(fail?errText(fail):'لم أجد بيانات واضحة، جرّب صوراً أوضح');a.cls=n?'ok':'err';
+ if(fail&&n)a.status+=' (بعض الصفحات تعذّرت)';
+ $('#aiMsg').textContent=n?'تم التعبئة في كل الصفحات. راجع الخانات الخضراء وقسم التحقق قبل التحميل.':'';
+ buildDrops();schedule();scheduleReview();
+}
+async function extract(id,manual){
+ const a=ATT[id];if(!a||!a.pages||!a.pages.length)return;
+ const sample=await getReader();
+ if(!sample)return ocrExtract(id);
+ if(!LIM)LIM=await sample.limits().catch(()=>null);
+ if(LIM&&!LIM.images)return ocrExtract(id);
+ const max=(LIM&&LIM.images&&LIM.images.maxCount)||5;
+ const imgs=a.pages.slice(0,max).map(p=>p.blob);
+ a.status='جارٍ قراءة البيانات…';a.cls='run';buildDrops();
+ if(id==='bundle')return extractBundle(a,sample,max,manual);
+ let prompt;
+ if(id==='bundle'){
+  prompt=`أمامك ${imgs.length} صورة/صفحة بالترتيب لمستندات موظف واحد في السعودية (قد تشمل: إقامة أو لقطة أبشر، خطاب آيبان أو تفاصيل حساب بنكي، جواز سفر، رخصة قيادة، أو نماذج أخرى).
+1) صنّف كل صفحة: iqama | iban | passport | license | other.
+2) استخرج البيانات من كل نوع مستند على حدة.
+أرجع JSON فقط بهذا الشكل:
+{"pages":[{"page":1,"type":"iqama"}],"iqama":{...},"iban":{...},"passport":{...},"license":{...},"other":{...}}
+كل كائن يحتوي هذه المفاتيح (ضع "" لغير الموجود):
+${keyList()}
+${RULES}`;
+ }else{
+  prompt=`أنت تقرأ مستنداً لموظف في السعودية. نوع المستند: ${DOC_HINT[id]||'مستند'}.${imgs.length>1?` (${imgs.length} صفحات)`:''}
+استخرج البيانات الظاهرة فقط. أرجع JSON واحداً فقط بهذه المفاتيح (ضع "" لغير الموجود):
+${keyList()}
+${RULES}`;
+ }
+ try{
+  const r=await sample.json(prompt,{images:imgs,modelTier:'default',cache:!manual});
+  let n=0;
+  if(id==='bundle'){
+   for(const k of Object.keys(EXT))if(k.startsWith('b_'))delete EXT[k];
+   for(const t of TYPES){const o=clean(r&&r[t]);if(Object.keys(o).length){EXT['b_'+t]=o;n+=Object.keys(o).length}}
+   (r&&Array.isArray(r.pages)?r.pages:[]).forEach(p=>{const pg=a.pages[(+p.page||0)-1];if(pg&&TYPES.includes(p.type))pg.type=p.type});
+  }else{EXT[id]=clean(r);n=Object.keys(EXT[id]).length}
+  applyExt();buildDrops();
+  a.status=n?`✓ تم استخراج ${n} معلومة`:'لم أجد بيانات واضحة، جرّب صورة أوضح';a.cls=n?'ok':'err';
+  $('#aiMsg').textContent=n?'تم التعبئة في كل الصفحات. راجع الخانات الخضراء وقسم التحقق قبل التحميل.':'';
+  scheduleReview();
+ }catch(e){a.status=errText(e);a.cls='err';if(e&&['not_granted','images_unavailable','sampling_disabled'].includes(e.code))$('#aiMsg').textContent='القراءة التلقائية غير متاحة الآن، تقدر تعبّي الخانات يدوياً.'}
+ buildDrops();
+}
+const PRI={_:['iqama','passport','license','iban','other1','other2'],
+ iban:['iban','other1','other2','iqama'],bank_name:['iban','other1','other2'],acct_holder:['iban','other1','other2'],
+ mobile1:['other1','other2','iqama','iban','license','passport'],email:['other1','other2','iban','iqama'],
+ city:['other1','other2','iqama','license'],district:['other1','other2','iqama'],street:['other1','other2','iqama'],
+ license_no:['license','other1','other2'],license_exp:['license','other1','other2'],passport_no:['passport','iqama','other1','other2']};
+function fillBank(){
+ const BANKS={'10':'البنك الأهلي السعودي','80':'مصرف الراجحي','20':'بنك الرياض','30':'البنك العربي الوطني','45':'البنك السعودي الأول (ساب)','15':'بنك البلاد','05':'مصرف الإنماء','60':'بنك الجزيرة','65':'البنك السعودي للاستثمار','55':'البنك السعودي الفرنسي','40':'البنك الأهلي السعودي','50':'البنك السعودي الأول (ساب)'};
+ const ib=normIban(S.iban);if(/^SA\d{4}/.test(ib)&&!MANUAL.has('bank_name')&&(!S.bank_name||AUTO.has('bank_name'))){const bn=BANKS[ib.slice(4,6)];if(bn){S.bank_name=bn;AUTO.add('bank_name')}}
+}
+function applyExt(){
+ for(const k in KEYS){
+  if(MANUAL.has(k))continue;
+  let val='';const order=[];for(const d of (PRI[k]||PRI._)){order.push(d,'b_'+(d.startsWith('other')?'other':d))}
+  for(const d of order){if(EXT[d]&&EXT[d][k]){val=EXT[d][k];break}}
+  if(!val){for(const d in EXT){if(EXT[d][k]){val=EXT[d][k];break}}}
+  if(val){S[k]=val;AUTO.add(k)}else if(AUTO.has(k)){delete S[k];AUTO.delete(k)}
+ }
+
+ fillBank();
+ syncInputs();save();schedule();renderChecks();
+}
+
+/* ---------- checks ---------- */
+const cnt=n=>n===1?'تنبيه واحد':n===2?'تنبيهان':n<=10?n+' تنبيهات':n+' تنبيهاً';
+const DOCNAME={iqama:'الإقامة',iban:'خطاب الآيبان',license:'رخصة القيادة',passport:'الجواز',other1:'المرفق الإضافي',b_iqama:'الإقامة (الملف المجمّع)',b_iban:'الآيبان (الملف المجمّع)',b_passport:'الجواز (الملف المجمّع)',b_license:'الرخصة (الملف المجمّع)',b_other:'مستند آخر (الملف المجمّع)'};
+const normAr=t=>String(t||'').replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[^؀-ۿ\s]/g,' ').split(/\s+/).map(w=>w.replace(/^ال/,'')).filter(w=>w.length>1);
+const normEn=t=>String(t||'').toUpperCase().replace(/[^A-Z\s]/g,' ').split(/\s+/).map(w=>w.replace(/^AL(?=[A-Z]{3})/,'').replace(/[AEIOUY]/g,'').replace(/(.)\1+/g,'$1')).filter(w=>w.length>1);
+function overlap(a,b,norm){const A=norm(a),B=new Set(norm(b));if(!A.length||!B.size)return null;let m=0;for(const x of A)if(B.has(x))m++;return m/Math.min(A.length,B.size)}
+const isLatin=t=>/[A-Za-z]/.test(t||'')&&!/[\u0600-\u06FF]/.test(t||'');
+function ibanOk(i){i=normIban(i);if(!/^SA\d{22}$/.test(i))return false;const r=i.slice(4)+i.slice(0,4);let m=0;for(const ch of r){const c=/[A-Z]/.test(ch)?String(ch.charCodeAt(0)-55):ch;for(const d of c)m=(m*10+ +d)%97}return m===1}
+function parseD(t){const m=String(t||'').match(/(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);if(!m||/هـ/.test(t))return null;return new Date(+m[1],+m[2]-1,+m[3])}
+let AIREV={issues:[],spelling:[]};
+function localChecks(){
+ const L=[];const add=(lv,msg)=>L.push({lv,msg});
+ const docs=Object.keys(EXT);
+ // same person across documents
+ const iqs=docs.map(d=>[d,EXT[d].iqama]).filter(x=>x[1]);
+ for(let i=1;i<iqs.length;i++)if(iqs[i][1]!==iqs[0][1])add('err',`رقم الإقامة في ${DOCNAME[iqs[i][0]]} (${iqs[i][1]}) لا يطابق ${DOCNAME[iqs[0][0]]} (${iqs[0][1]})`);
+ const en=docs.map(d=>[d,EXT[d].name_en]).filter(x=>x[1]);
+ for(let i=1;i<en.length;i++){const o=overlap(en[i][1],en[0][1],normEn);if(o!==null&&o<.5)add('err',`الاسم في ${DOCNAME[en[i][0]]} لا يطابق ${DOCNAME[en[0][0]]}`)}
+ const arn=d=>[EXT[d].first_ar,EXT[d].father_ar,EXT[d].grand_ar,EXT[d].family_ar].filter(Boolean).join(' ');
+ const ar=docs.map(d=>[d,arn(d)]).filter(x=>x[1]);
+ for(let i=1;i<ar.length;i++){const o=overlap(ar[i][1],ar[0][1],normAr);if(o!==null&&o<.5)add('err',`الاسم العربي في ${DOCNAME[ar[i][0]]} لا يطابق ${DOCNAME[ar[0][0]]}`)}
+ const holder=S.acct_holder;
+ if(holder){const o=isLatin(holder)?overlap(holder,S.name_en,normEn):overlap(holder,fullAr(),normAr);if(o!==null&&o<.5)add('err','اسم صاحب الحساب البنكي لا يطابق اسم الموظف')}
+ // field validity
+ if(S.iban&&!ibanOk(S.iban))add('err','رقم الآيبان غير صحيح (يجب أن يكون 24 خانة تبدأ بـ SA ويجتاز رقم التحقق)');
+ if(S.iqama&&!/^[12]\d{9}$/.test(S.iqama))add('warn','رقم الإقامة/الهوية يجب أن يكون 10 أرقام ويبدأ بـ 1 أو 2');
+ const now=new Date();now.setHours(0,0,0,0);
+ const ie=parseD(S.iqama_exp);if(ie){if(ie<now)add('err','الإقامة منتهية الصلاحية');else if((ie-now)/864e5<30)add('warn','الإقامة تنتهي خلال أقل من 30 يوماً')}
+ const le=parseD(S.license_exp);if(le&&le<now)add('warn','رخصة القيادة منتهية الصلاحية');
+ if(S.mobile1&&!/^(05\d{8}|\+?9665\d{8})$/.test(S.mobile1.replace(/\s/g,'')))add('warn','رقم الجوال 1 غير مكتمل أو بصيغة غير سعودية');
+ const miss=[['first_ar','الاسم الأول'],['family_ar','اسم العائلة'],['iqama','رقم الإقامة'],['nationality','الجنسية'],['iban','الآيبان'],['mobile1','الجوال']].filter(([k])=>!S[k]).map(x=>x[1]);
+ if(miss.length)add('warn','خانات أساسية فارغة: '+miss.join('، '));
+ if(!ATT.iqama&&!EXT.iqama&&!EXT.b_iqama)add('warn','لم تُرفق صورة الإقامة بعد');
+ return L;
+}
+function allIssues(){return [...localChecks(),...AIREV.issues.map(x=>({lv:x.level==='error'?'err':'warn',msg:x.message,ai:1}))]}
+function renderChecks(){
+ const box=$('#checks');if(!box)return;const L=allIssues();
+ const sp=AIREV.spelling||[];
+ let h='';
+ if(!L.length&&!sp.length)h='<div class="ck ok">✓ لا توجد ملاحظات. البيانات متطابقة.</div>';
+ for(const x of L)h+=`<div class="ck ${x.lv}">${x.lv==='err'?'⛔':'⚠️'} ${esc(x.msg)}${x.ai?' <small>(مراجعة ذكية)</small>':''}</div>`;
+ sp.forEach((x,i)=>{h+=`<div class="ck sp">✎ <b>${esc(LBL[x.key]||x.key)}</b>: «${esc(x.current)}» ← «${esc(x.suggested)}» <small>${esc(x.reason||'')}</small> <button class="mini" data-sp="${i}" type="button">تطبيق</button></div>`});
+ box.innerHTML=h;
+ box.querySelectorAll('[data-sp]').forEach(b=>b.addEventListener('click',()=>{const x=sp[+b.dataset.sp];S[x.key]=x.suggested;MANUAL.add(x.key);AUTO.delete(x.key);sp.splice(+b.dataset.sp,1);syncInputs();save();schedule();renderChecks()}));
+ const errs=L.filter(x=>x.lv==='err').length;
+ const bar=$('#alertBar');bar.hidden=!errs;bar.textContent=errs?`⛔ يوجد ${cnt(errs)} تحتاج مراجعة قبل الطباعة، منها احتمال أن المرفقات لا تخص نفس الشخص. راجع قسم التحقق.`:'';
+}
+let revT;function scheduleReview(){clearTimeout(revT);revT=setTimeout(()=>{if(Object.keys(EXT).length)aiReview(false)},900)}
+async function aiReview(manual){
+ const sample=await getReader();const st=$('#revSt');
+ if(!sample){st.textContent=manual?'المراجعة الذكية تحتاج إضافة مفتاح Claude API. التحقق التلقائي يعمل.':'';return}
+ st.textContent='جارٍ المراجعة…';
+ const data={by_document:Object.fromEntries(Object.entries(EXT).map(([d,o])=>[DOCNAME[d],o])),form_values:Object.fromEntries(Object.keys(LBL).filter(k=>S[k]&&!['adv_start','orders_required','note_copies','bank_problem','adv_method'].includes(k)).map(k=>[k,S[k]]))};
+ const prompt=`أنت مراجع لملف توظيف مندوب توصيل في السعودية. لديك بيانات مستخرجة من كل مستند مرفق، وقيم النموذج.
+المطلوب:
+1) تحقق هل جميع المستندات تخص نفس الشخص (قارن الأسماء العربية والإنجليزية مع مراعاة اختلاف التهجئة والنقل الحرفي، ورقم الإقامة، وتاريخ الميلاد، وصاحب الحساب البنكي). أي اختلاف حقيقي يدل على شخص مختلف = level "error".
+2) ملاحظات منطقية أخرى (تواريخ غير منطقية، جنسية لا تتطابق، أرقام ناقصة) = level "warning".
+3) أخطاء إملائية في القيم العربية النصية فقط (مثل همزات: الابيض→الأبيض، احمد→أحمد، المدن والأحياء والمهن). لا تقترح تغيير الأرقام أو الآيبان أو البريد أو الأسماء الإنجليزية، ولا تغيّر الاسم إلى اسم آخر.
+أرجع JSON فقط: {"issues":[{"level":"error"|"warning","message":"رسالة قصيرة بالعربي"}],"spelling":[{"key":"اسم المفتاح كما في form_values","current":"...","suggested":"...","reason":"سبب قصير"}]}
+لا تكرر ملاحظة، ولا تذكر إلا ما هو موجود فعلاً.
+البيانات:
+${JSON.stringify(data)}`;
+ try{
+  const r=await sample.json(prompt,{modelTier:'default',cache:!manual});
+  AIREV={issues:Array.isArray(r&&r.issues)?r.issues.filter(x=>x&&x.message):[],spelling:Array.isArray(r&&r.spelling)?r.spelling.filter(x=>x&&x.key&&S[x.key]&&x.suggested&&x.suggested!==S[x.key]&&S[x.key]===x.current):[]};
+  st.textContent='آخر مراجعة: '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+ }catch(e){st.textContent=e&&e.code==='rate_limited'?'كثرة الطلبات، حاول بعد قليل.':'تعذّرت المراجعة الذكية.'}
+ renderChecks();
+}
+
+/* ---------- helpers for pages ---------- */
+const val=k=>S[k]||(DATEKEYS.includes(k)?todayG():'');
+const v=k=>esc(val(k));
+const fullAr=()=>[S.first_ar,S.father_ar,S.grand_ar,S.family_ar].filter(Boolean).join(' ');
+const nm=()=>esc(fullAr()||S.name_en||'');
+function num(n){const x=Number(String(n||'').replace(/[^\d.]/g,''));return isFinite(x)&&x>0?x:0}
+function fmt(n){return n?Number(n).toLocaleString('en-US'):''}
+function tafqit(n){
+ n=Math.floor(n);if(!n)return '';
+ const ones=['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة','أحد عشر','اثنا عشر','ثلاثة عشر','أربعة عشر','خمسة عشر','ستة عشر','سبعة عشر','ثمانية عشر','تسعة عشر'];
+ const tens=['','','عشرون','ثلاثون','أربعون','خمسون','ستون','سبعون','ثمانون','تسعون'];
+ const hund=['','مائة','مائتان','ثلاثمائة','أربعمائة','خمسمائة','ستمائة','سبعمائة','ثمانمائة','تسعمائة'];
+ function lt1000(x){const h=Math.floor(x/100),r=x%100,p=[];if(h)p.push(hund[h]);if(r){if(r<20)p.push(ones[r]);else{const o=r%10,t=Math.floor(r/10);p.push(o?ones[o]+' و'+tens[t]:tens[t])}}return p.join(' و')}
+ const parts=[];const m=Math.floor(n/1e6),th=Math.floor((n%1e6)/1000),r=n%1000;
+ if(m)parts.push(m===1?'مليون':m===2?'مليونان':m<=10?lt1000(m)+' ملايين':lt1000(m)+' مليون');
+ if(th)parts.push(th===1?'ألف':th===2?'ألفان':th<=10?lt1000(th)+' آلاف':lt1000(th)+' ألف');
+ if(r)parts.push(lt1000(r));
+ return parts.join(' و')+' ريال';
+}
+function ibanBoxes(){
+ const s=normIban(S.iban);const n=Math.max(24,s.length);let h='';
+ for(let i=0;i<n;i++)h+=`<span${i&&i%4===0?' class="gap"':''}>${esc(s[i]||'')}</span>`;
+ return `<div class="ibanbox">${h}</div>`;
+}
+const ICO={phone:'<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',web:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',pin:'<svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'};
+function LH(inner){return `<section class="page"><div class="lh-top"></div><div class="lh-tri2"></div><div class="lh-tri"></div>
+<div class="lh-logo"><img src="${LOGO}" alt="DM"><small>الدعم المطور<i>للخدمات اللوجستية</i></small></div>
+<div class="lh-cr"><b>C.R:</b> 1010816440<br>VAT: 310808278300003</div>
+<div class="body">${inner}</div>
+<div class="lh-foot"><div class="ln"></div><div class="row"><span>${ICO.phone}+966 50 277 4745</span><span>${ICO.web}D.almutawir@gmail.com</span><span>${ICO.pin}Saudi Arabia, AL HAFUF- Al Hufayrah Dist. Head Office. 8903, 36441.</span></div><div class="band"></div></div></section>`}
+const F_=x=>`<span class="fill">${x}</span>`;
+
+/* ---------- pages ---------- */
+function p1(){
+ const bq=ATT.bundle&&ATT.bundle.pages.find(p=>p.type==='iqama');const iq=(ATT.iqama&&ATT.iqama.pages[0]&&ATT.iqama.pages[0].url)||(bq&&bq.url);
+ return LH(`<p class="t-title"><u>طلب توظيف (Employment Application)</u></p>
+<table class="grid"><tr><th>الاسم الأول <span class="e">First Name</span></th><th>اسم الأب <span class="e">Fathers Name</span></th><th>اسم الجد <span class="e">Grand Father's</span></th><th>اسم العائلة <span class="e">Family Name</span></th></tr>
+<tr><td class="v fill">${v('first_ar')}</td><td class="v fill">${v('father_ar')}</td><td class="v fill">${v('grand_ar')}</td><td class="v fill">${v('family_ar')}</td></tr></table>
+<table class="grid"><tr><th style="width:50%">رقم الإقامة <span class="e">No. Of ID / Iqama</span></th><th>رقم الجوال <span class="e">Mobile No.</span></th></tr>
+<tr><td class="v fill ltr">${v('iqama')}</td><td class="v fill ltr">${v('mobile1')}</td></tr></table>
+<table class="grid"><tr><th style="width:50%">البريد الالكتروني <span class="e">E-mail</span></th><th>تاريخ الميلاد <span class="e">Date Of Birth</span></th></tr>
+<tr><td class="v fill ltr" style="font-size:10pt">${v('email')}</td><td class="v fill ltr">${v('dob')}</td></tr></table>
+<table class="grid"><tr><th>الحساب البنكي <span class="e">IBAN Number</span></th><th style="width:34%">اسم البنك <span class="e">Bank Name</span>: ${F_(v('bank_name'))}</th></tr>
+<tr><td colspan="2" style="padding:2mm">${ibanBoxes()}<div style="display:flex;justify-content:space-between;margin-top:1.5mm;font-size:9.5pt"><span><span class="chk ${S.bank_problem==='نعم'?'on':''}"></span> لدي مشكلة في الحساب</span><span class="ltr" style="font-family:'Times New Roman',serif;font-weight:700">I have a problem with my bank account</span></div></td></tr></table>
+<div class="box2"><table class="grid" style="margin:0;table-layout:fixed">
+<tr><th>الهدف<br><span class="e">Target</span></th><th>نوع المركبة<br><span class="e">Vehicle type</span></th><th>الراتب<br><span class="e">Salary</span></th><th>اسم المشروع<br><span class="e">Project name</span></th><th style="width:36%">صورة الهوية<br><span class="e">ID photo</span></th></tr>
+<tr><td class="v fill" style="height:18mm">${S.target?esc(S.target)+' طلب':''}</td><td class="v fill">${v('vehicle_type')}</td><td class="v fill">${num(S.salary)?fmt(num(S.salary))+' ريال':''}</td><td class="v fill">${v('project')}</td><td rowspan="3" style="padding:1mm;height:52mm">${iq?`<img class="idphoto" src="${iq}" alt="">`:''}</td></tr>
+<tr><th>عدد مرات نقل الكفالة<br><span class="e">No. Transferred</span></th><th>المطلوب دفعه<br><span class="e">Payment required</span></th><th>ما تم دفعه<br><span class="e">Amount paid</span></th><th>المتبقي<br><span class="e">remaining amount</span></th></tr>
+<tr><td class="v fill" style="height:22mm">${v('transfers')}</td><td class="v fill">${num(S.pay_required)?fmt(num(S.pay_required))+' ريال':''}</td><td class="v fill">${num(S.pay_paid)?fmt(num(S.pay_paid))+' ريال':''}</td><td class="v fill">${(S.pay_remaining||'')!==''?(num(S.pay_remaining)?fmt(num(S.pay_remaining)):'0')+' ريال':''}</td></tr>
+</table></div>
+<p style="margin:3mm 0 0;font-weight:700"><span class="chk"></span> أقر بأني اطلعت على المعلومات المسجلة وأني متأكد من صحتها وبناء عليه أوافق بالتوقيع والبصمة.</p>
+<p class="en b" style="margin:0 0 3mm">I acknowledge that I have reviewed the recorded information and am certain of its accuracy, and accordingly I agree by signing and fingerprinting.</p>
+<table class="grid signtbl"><tr><th>الاسم <span class="e">Name</span></th><th>التوقيع <span class="e">Sign</span></th><th>البصمة <span class="e">Finger Print</span></th><th>التاريخ <span class="e">Date</span></th></tr>
+<tr><td class="fill" style="text-align:center">${nm()}</td><td></td><td></td><td class="fill ltr" style="text-align:center">${v('doc_date')}</td></tr></table>
+<div class="approvals"><span>Operation</span><span>Operations Manager</span><span>Fleet Manager</span><span>HR</span><span>General Manager</span></div>`)}
+
+function empTable(){return `<p style="font-weight:700;margin:0 0 1.5mm">بيانات الموظف:</p>
+<div class="box2" style="margin-bottom:4mm"><table class="grid" style="margin:0">
+<tr><th style="width:30%">الاسم كامل - <span class="e">Full Name</span></th><td class="fill">${nm()}</td></tr>
+<tr><th>رقم الهوية - <span class="e">ID No</span></th><td class="fill ltr" style="text-align:right">${v('iqama')}</td></tr>
+<tr><th>الجنسية - <span class="e">Nationality</span></th><td class="fill">${v('nationality')}</td></tr>
+<tr><th>المسمى الوظيفي - <span class="e">Job Title</span></th><td class="fill">${v('job_title')}</td></tr>
+<tr><th>تاريخ الانضمام - <span class="e">Date of Joining</span></th><td class="fill ltr" style="text-align:right">${v('join_date')}</td></tr></table></div>`}
+function sigAr(withDate){return `<div class="sigline"><span>الاسم: <i>${nm()}</i></span><span>التوقيع: <i></i></span><span>البصمة: <i></i></span>${withDate?`<span>التاريخ: <i class="ltr">${v('doc_date')}</i></span>`:''}</div>`}
+function sigEn(withDate){return `<div class="sigline" style="direction:ltr;font-family:'Times New Roman',serif;font-weight:700"><span>Name: <i>${nm()}</i></span><span>Signature: <i></i></span><span>Fingerprint: <i></i></span>${withDate?`<span>Date: <i>${v('doc_date')}</i></span>`:''}</div>`}
+function idEn(){return `<div class="en b" style="text-align:left;line-height:1.7;margin-bottom:2mm">I, the undersigned: ${F_(esc(S.name_en||fullAr()))}<br>Iqama No.: ${F_(v('iqama'))}<br>Nationality: ${F_(v('nationality'))}</div>`}
+
+function p2(){return LH(`<p class="t-title">نموذج تعهد خاص بالمخالفات المرورية</p>${empTable()}
+<p style="font-weight:700;margin:0 0 1.5mm">نص التعهد:</p>
+<p class="p">أقرّ أنا الموقع أدناه بأنه في حال قامت مؤسسة الدعم المطور للخدمات اللوجستية بسداد أي مخالفة مرورية مسجلة على <b>إقامتي</b>، فإنني أوافق بشكل نهائي وغير قابل للنقض على:</p>
+<ol class="ar"><li><b>استقطاع كامل قيمة المخالفة من راتبي مباشرة</b>، دون الحاجة إلى إشعار مسبق أو الرجوع إليّ.</li>
+<li>أدرك أن هذا الإجراء يهدف إلى <b>تفادي الغرامات الإضافية أو إيقاف الإقامة أو تعطيل العمل</b>، وأتفهم أهميته التشغيلية والإدارية.</li>
+<li>أتحمل المسؤولية الكاملة عن جميع المخالفات المرورية التي تُسجل علي، وأتعهد بالحرص على عدم تكرارها.</li>
+<li>أقرّ بأن هذا التعهد يُعتبر جزءاً من بنود التوظيف وشروط الاستمرار في العمل، ويحق للشركة اتخاذ ما تراه مناسباً في حال عدم الالتزام أو رفض الاستقطاع.</li></ol>
+<p class="en b" style="margin:0 0 1mm">Declaration:</p>
+<ol class="en"><li>I, the undersigned, acknowledge that if Al-Daam Al-Mutawer Logistics Services Establishment pays any traffic violation registered against my residence permit, I hereby irrevocably and finally agree to:</li>
+<li><b>Deduct the full amount of the violation from my salary directly</b>, without prior notice or the need to obtain my further approval.</li>
+<li>I understand this measure is essential to <b>avoid additional penalties, Iqama suspension, or disruption of operations</b>, and I recognize its importance.</li>
+<li>I accept full responsibility for all traffic violations registered under my name and commit to avoiding such violations in the future.</li>
+<li>I acknowledge that this declaration is an integral part of my employment terms, and the company has the right to take necessary actions in case of non-compliance or refusal of deduction.</li></ol>
+${sigAr(true)}`)}
+
+function p3(){return LH(`<p class="t-title" style="margin:-4mm 0 1.5mm">وثيقة اشتراك مندوب توصيل متعاون</p>
+<div class="box2" style="margin-bottom:1.5mm"><table class="grid tight" style="margin:0;font-size:9pt">
+<tr><th colspan="2">الاسم كامل <span class="e">Full Name</span>: ${F_(nm())}</th></tr>
+<tr><td colspan="2"><b>العنوان <span class="ltr">Address</span>:</b> ${F_(v('city'))} &nbsp;&nbsp; <b>حي:</b> ${F_(v('district'))} &nbsp;&nbsp; <b>الشارع:</b> ${F_(v('street'))}</td></tr>
+<tr><td style="width:50%"><b>جوال 1 <span class="ltr">Mobile-1</span>:</b> ${F_('<span class="ltr">'+v('mobile1')+'</span>')}</td><td><b>الجنسية <span class="ltr">Nationality</span>:</b> ${F_(v('nationality'))} &nbsp; <b>رقم الهوية <span class="ltr">ID No.</span>:</b> ${F_('<span class="ltr">'+v('iqama')+'</span>')}</td></tr>
+<tr><td><b>جوال 2 <span class="ltr">Mobile-2</span>:</b> ${F_('<span class="ltr">'+v('mobile2')+'</span>')}</td><td><b>رقم شخص للتواصل <span class="ltr">Related Contact</span>:</b> ${F_(v('contact_name'))}${S.contact_rel?' - '+F_(v('contact_rel')):''} ${F_('<span class="ltr">'+v('contact_phone')+'</span>')}</td></tr>
+<tr><td><b>عدد الطلبات المطلوبة <span class="ltr">Orders required</span>:</b> ${F_(S.target?esc(S.target)+' طلب':'')}</td><td>${F_(v('orders_required'))}</td></tr></table></div>
+<p style="font-weight:700;margin:0 0 1mm"><u>بيانات المركبة Vehicle Details</u></p>
+<div class="box2" style="margin-bottom:2mm"><table class="grid" style="margin:0"><tr><th>نوع السيارة <span class="e">Car Type</span></th><th>رقم اللوحة <span class="e">Plate No</span></th><th>اللون <span class="e">Color</span></th><th>سنة الصنع <span class="e">Model</span></th></tr>
+<tr><td class="v fill" style="height:7mm;font-size:10pt">${v('car_type')}</td><td class="v fill" style="font-size:10pt">${v('plate')}</td><td class="v fill" style="font-size:10pt">${v('color')}</td><td class="v fill" style="font-size:10pt">${v('model_year')}</td></tr></table></div>
+<p style="font-weight:700;margin:0 0 1mm">بنود الوثيقة: <span class="ltr">Application Terms</span></p>
+<div class="terms"><div><b>وثيقة التزامات المندوب – الدعم المطور للخدمات اللوجستية</b><ol>
+<li><b>آلية احتساب الأجر:</b> تُحتسب القيمة المستحقة لكل عملية توصيل (من نقطة A إلى نقطة B) بناءً على عدد التوصيلات المُنفذة.</li>
+<li><b>آلية السداد:</b> تُحصّل المبالغ المستحقة لجميع الطلبات بمقر الشركة بشكل أسبوعي كحد أقصى، ابتداءً من تاريخ آخر سداد. وفي حال التأخير عن السداد لأكثر من يومين، يحق للشركة المطالبة لدى الجهات القانونية بالمبالغ المتعثرة.</li>
+<li><b>الزي والمظهر:</b> يلتزم المندوب بالزي الرسمي (بطاقة العمل + الصدرية أو التيشيرت) خلال أوقات الدوام، ويحق للشركة اتخاذ الإجراءات النظامية عند عدم الالتزام.</li>
+<li><b>التعامل مع العملاء:</b> يشترط الالتزام باللباقة والنظافة الشخصية ونظافة المركبة (من الداخل والخارج) عند تسليم واستلام الطلبات.</li>
+<li><b>سلامة الشحنة:</b> يتحمّل المندوب مسؤولية المحافظة على الشحنة من لحظة الاستلام وحتى التسليم، ويُحاسب على أي تلف أو ضرر ناتج عن سوء النقل أو الإهمال.</li>
+<li><b>الدعم الفني:</b> في حال حدوث أي مشكلة، يجب التواصل مع الدعم الفني عبر التطبيق أو المشرف الميداني واتباع جميع التعليمات المرتبطة بسلامة النقل.</li>
+<li><b>التزامات مالية:</b> تُعتبر المبالغ المُحصلة ديناً شخصياً على المندوب، ويحق للشركة رفع مطالبة قانونية بعد مرور يومين دون سداد، ويتحمّل المندوب التكاليف القانونية كاملة.</li>
+<li><b>فسخ العقد:</b> يحق للشركة إنهاء التعاقد عند الإخلال بشروط العقد أو الأنظمة العامة أو أنظمة المرور والسلامة.</li>
+<li><b>الخصوصية:</b> أتعهد بعدم مشاركة أي معلومات تتعلق بالطلبات مع أي جهة أخرى، وألتزم بسرية العمل وخصوصيته.</li></ol>
+<b>إقرار وتعهد:</b> أقر أنا الموقع أدناه بأنني اطلعت على البنود أعلاه، وتم تدريبي على نظام العمل واستقبال وتوصيل الطلبات، وأقر بأن الشركة غير مسؤولة عن أي مخالفة قانونية أو مالية أرتكبها، وأتحمل كامل المسؤولية أمام الجهات المختصة.<br><b>الحد الائتماني: 1000 ريال سعودي في اليوم.</b></div>
+<div class="en"><b>Delivery Partner Agreement:</b> Advanced support for logistics services<ol class="en">
+<li><b>Delivery Compensation:</b> The due amount for each delivery (from Point A to Point B) is calculated per completed order.</li>
+<li><b>Payment Mechanism:</b> The amounts due for all orders shall be collected at the company's premises on a weekly basis at the latest, starting from the date of the last payment. In the event of a delay in payment for more than two days, the company reserves the right to pursue the outstanding amounts through the legal authorities.</li>
+<li><b>Dress Code &amp; Appearance:</b> The delivery partner is required to adhere to the official dress code (ID badge and uniform vest or t-shirt) during working hours. Failure to comply grants the company the right to apply appropriate penalties or disciplinary actions.</li>
+<li><b>Customer Interaction:</b> Professionalism and courteous behavior are expected at all times. The vehicle used for deliveries must be clean, inside and out.</li>
+<li><b>Shipment Care:</b> The delivery partner is fully responsible for the safety and condition of the package from pickup (Point A) to delivery (Point B). Any damage due to mishandling will be the responsibility of the delivery partner.</li>
+<li><b>Support &amp; Communication:</b> In the event of any issue, the delivery partner must promptly contact technical support via the app or the field supervisor and must comply with all transport and safety instructions.</li>
+<li><b>Financial Responsibility:</b> All collected amounts are considered personal debt. If not settled with the company within two days, the company has the right to file legal claims with the appropriate authorities. The delivery partner will bear all legal and administrative costs.</li>
+<li><b>Contract Termination:</b> The company reserves the right to terminate the agreement if the partner violates any terms, public regulations, safety protocols, or traffic laws.</li>
+<li><b>Data Privacy Commitment:</b> I commit not to share any order-related data or information with any external party and to respect the confidentiality of work.</li></ol>
+<b>Acknowledgment &amp; Commitment:</b> I, the undersigned, acknowledge and agree to the above terms. I confirm that I have been trained on the order management and delivery system. I also acknowledge that the company is not responsible for any legal, regulatory, or financial violations I may commit, and I accept full liability before the relevant authorities.</div></div>
+<table class="grid tight" style="margin-top:1.5mm"><tr><th>الاسم <span class="e">Name</span></th><th>التوقيع <span class="e">Sign</span></th><th>البصمة <span class="e">Finger Print</span></th><th>التاريخ <span class="e">Date</span></th></tr>
+<tr><td class="fill" style="text-align:center;height:10mm">${nm()}</td><td></td><td></td><td class="fill ltr" style="text-align:center">${v('doc_date')}</td></tr></table>`)}
+
+function p4(){return LH(`<p class="t-title" style="margin-bottom:1mm">إقرار معرفة والتزام بشروط العمل</p><p class="t-en"><u>Acknowledgment of Understanding and Commitment to Work Terms</u></p>
+<div style="display:flex;gap:8mm;font-weight:700;margin-bottom:2mm"><span>أنا الموقع: ${F_(nm())}</span><span>رقم الإقامة: ${F_('<span class="ltr">'+v('iqama')+'</span>')}</span><span>التاريخ: ${F_('<span class="ltr">'+v('doc_date')+'</span>')}</span></div>
+<p class="p" style="font-weight:700">أقر أنا بأنه قد تم اطلاعي وموافقتي الكاملة على جميع شروط العمل المعتمدة لدى مؤسسة الدعم المطور للخدمات اللوجستية، وألتزم بكامل مسؤولياتي والتزامي بما يلي:</p>
+<ol class="ar" style="font-weight:700"><li>الالتزام التام بعدم صرف أو استخدام أي مبالغ نقدية تخص تطبيقات التوصيل، والقيام بسداد هذه المبالغ أولاً بأول وفقاً للنظام والإجراءات المعتمدة في المؤسسة.</li>
+<li>تحقيق الأهداف الشهرية (التارقت) المحددة من قبل المؤسسة، والسعي الدؤوب لتحقيقها بكفاءة عالية.</li>
+<li>الالتزام بتعليمات وتوجيهات المشرف المباشر دون أي اعتراض أو تأخير، مع احترام الهيكل التنظيمي للمؤسسة.</li>
+<li>أداء جميع المهام المتعلقة بخدمة المؤسسة ضمن التطبيق أو المشاريع التي تحددها الإدارة، دون الامتناع أو الاعتراض.</li>
+<li>تحمل كافة المسؤوليات النظامية والإدارية والقانونية المترتبة على أي مخالفة أو تقصير في الالتزام بما ورد أعلاه.</li></ol>
+<p class="p" style="font-weight:700">وقد تم تحرير هذا الإقرار مني، بعد أن تم اطلاعي على جميع بنوده وفهمها، وأوقع عليه بمحض إرادتي الكاملة.</p>
+<div class="sigline"><span>اسم المندوب: <i>${nm()}</i></span><span>التوقيع: <i></i></span><span>البصمة: <i></i></span></div>
+<div class="en b" style="text-align:left;line-height:1.6;margin:2mm 0">Name I, the undersigned: ${F_(esc(S.name_en||fullAr()))}<br>ID / Residency Number: ${F_(v('iqama'))}</div>
+<p class="en b">Hereby acknowledge that I have been fully informed of and agree to all the work terms and conditions approved by us and I commit fully to my responsibilities and obligations as follows:</p>
+<ol class="en" style="font-weight:700"><li>Strict adherence to not disbursing or using any cash amounts related to delivery applications, and to repay these amounts promptly according to the policies and procedures established by the establishment.</li>
+<li>Achieving the monthly targets set by the establishment, and diligently striving to meet them efficiently.</li>
+<li>Complying with the instructions and directives of my direct supervisor without objection or delay, while respecting the organizational structure of the establishment.</li>
+<li>Performing all tasks related to serving the establishment within the application or projects designated by management, without refusal or objection.</li>
+<li>Bearing all legal, administrative, and regulatory responsibilities arising from any violation or failure to comply with the above terms.</li></ol>
+<p class="en b">This acknowledgment has been issued by me after fully understanding all its terms, and I sign it of my own free will.</p>
+${sigEn(true)}`)}
+
+function p5(){return LH(`<p class="t-title" style="margin-bottom:1mm">تعهد وإقرار بتحمل أي رسوم حكومية سابقة تظهر وقت أو بعد نقل الكفالة</p><p class="t-en"><u>Undertaking to bear any prior government fees upon or after sponsorship transfer.</u></p>
+<div style="display:flex;gap:8mm;font-weight:700;margin-bottom:2mm"><span>أقر أنا المندوب: ${F_(nm())}</span><span>رقم الإقامة: ${F_('<span class="ltr">'+v('iqama')+'</span>')}</span><span>الجنسية: ${F_(v('nationality'))}</span></div>
+<p class="p" style="font-weight:700;font-size:11pt">أقر وأتعهد أنا المذكور بياناتي أعلاه بأنني قد اتفقت مع مؤسسة الدعم المطور للخدمات اللوجستية على تحملي الكامل لجميع الرسوم والمبالغ المالية المتعلقة بأي رسوم أو مستحقات سابقة لوقت نقل الكفالة وخاصة بكرت العمل، والتي قد تظهر لاحقاً أو لم تكن واضحة للمؤسسة وقت نقل خدماتي / كفالتي إلى المؤسسة. كما أقر وأتعهد كذلك بتحمل كافة الرسوم الخاصة بإصدار أو تجديد كرت العمل عند تجديد إقامتي والتي تخص ما قبل النقل فقط، أو أي مبالغ مترتبة على ذلك مستقبلاً، دون أدنى مسؤولية مالية على المؤسسة. وألتزم بسداد تلك الرسوم فور طلبها أو خصمها من مستحقاتي المالية النظامية، وأقر بأن هذا التعهد صدر مني بكامل إرادتي دون أي إكراه أو ضغط، وأنا مسؤول عن صحة ما ورد فيه.</p>
+${sigAr(false)}
+<div style="height:6mm"></div>${idEn()}
+<p class="en b" style="font-size:11pt">I hereby acknowledge and undertake that I have agreed with Al-Daam Al-Mutawer Logistics Services Establishment to fully bear all fees and financial amounts related to any prior dues or charges before the date of sponsorship transfer, especially those related to the work permit, whether such amounts appear later or were not clear to the establishment at the time of transferring my services/sponsorship. I further acknowledge and undertake to bear all fees related to the issuance or renewal of the work permit upon renewing my residency, limited only to the period prior to the transfer, as well as any resulting amounts in the future, without any financial liability on the establishment. I commit to settling these amounts upon request or allowing them to be deducted from my lawful financial entitlements. I also confirm that this undertaking has been made voluntarily, without any coercion or pressure, and I am fully responsible for its contents.</p>
+${sigEn(false)}`)}
+
+function p6(){return LH(`<p class="t-title" style="margin-bottom:1mm">إقرار وتعهد بتحمل المخالفات والغرامات</p><p class="t-en"><u>Acknowledgment and Undertaking to Bear Violations and Fines</u></p>
+<div style="font-weight:700;line-height:1.8;margin-bottom:1mm">أقر أنا الاسم: ${F_(nm())}<br>رقم الإقامة: ${F_('<span class="ltr">'+v('iqama')+'</span>')}<br>الجنسية: ${F_(v('nationality'))} &nbsp;&nbsp;، التاريخ: ${F_('<span class="ltr">'+v('doc_date')+'</span>')}</div>
+<p class="p" style="font-weight:700;font-size:11pt">بأنني أتحمل كامل المسؤولية النظامية والمالية عن أي مخالفة أو غرامة أتسبب بها أثناء عملي وتصدر بحقي من قبل الهيئة العامة للنقل في المملكة العربية السعودية، وذلك نتيجة أي مخالفة للأنظمة أو اللوائح أو التعليمات المعمول بها. كما أتعهد بسداد كافة الغرامات والمبالغ المالية والتكاليف المترتبة على تلك المخالفات، بما في ذلك – على سبيل المثال لا الحصر – رسوم الحجز أو السحب أو النقل أو التخزين أو أي التزامات مالية أخرى تنتج عن تلك المخالفات، دون أدنى مسؤولية قانونية أو مالية على جهة العمل أو أي طرف آخر. وقد صدر هذا الإقرار والتعهد مني بإرادتي الحرة دون أي إكراه أو ضغط أو تأثير، وبعد اطلاعي الكامل على الأنظمة والتعليمات الصادرة من الهيئة العامة للنقل والجهات المختصة، وإدراكي التام لما يترتب عليه من آثار نظامية وقانونية ملزمة.</p>
+${sigAr(false)}
+<div style="height:4mm"></div><div class="en b" style="text-align:left;line-height:1.7;margin-bottom:2mm">I, the undersigned: ${F_(esc(S.name_en||fullAr()))}<br>Iqama No.: ${F_(v('iqama'))}<br>Nationality: ${F_(v('nationality'))} - date: ${F_(v('doc_date'))}</div>
+<p class="en b" style="font-size:11pt">I acknowledge that I bear full legal and financial responsibility for any violation or fine caused by me during the course of my work and issued against me by the Public Transport Authority in the Kingdom of Saudi Arabia, as a result of violating any applicable laws, regulations, or instructions. I further undertake to pay all fines, financial amounts, and costs resulting from such violations, including but not limited to impound fees, towing charges, transportation costs, storage fees, or any other financial obligations arising from such violations, without any legal or financial liability upon the employer or any other party. This acknowledgment and undertaking have been made voluntarily and of my own free will, without any coercion, pressure, or influence, after fully reviewing the regulations and instructions issued by the Public Transport Authority and the competent authorities, and with full awareness of the binding legal and regulatory consequences arising therefrom.</p>
+${sigEn(false)}`)}
+
+function p7(){return LH(`<p class="t-title">تعهد وإقرار بتحمل تكاليف إصدار رخصة قيادة متوافقة مع هيئة النقل</p>
+<div style="font-weight:700;line-height:1.8;margin-bottom:3mm">أقر أنا الاسم: ${F_(nm())}<br>رقم الإقامة: ${F_('<span class="ltr">'+v('iqama')+'</span>')}<br>الجنسية: ${F_(v('nationality'))}</div>
+<p class="p" style="font-weight:700;font-size:11.5pt;line-height:2.1">أقر وأتعهد أنا المذكور بياناتي أعلاه بأنني قد اتفقت مع مؤسسة الدعم المطور للخدمات اللوجستية على تحملي الكامل لجميع الرسوم والمبالغ المالية المتعلقة بإصدار رخصة قيادة متوافقة مع قوانين ولوائح هيئة النقل السعودية وعلى حسب متطلبات سوق العمل وحسب المهنة في الإقامة.</p>
+<p class="p" style="font-weight:700;font-size:11.5pt">وأقر بأن هذا التعهد صدر مني بكامل إرادتي دون أي إكراه أو ضغط، وأنا مسؤول عن صحة ما ورد فيه.</p>
+${sigAr(false)}
+<p class="t-en" style="margin-top:8mm"><u>Undertaking to Bear Driving License Costs</u></p>
+<div class="en b" style="text-align:left;line-height:1.7;margin-bottom:2mm">I, the undersigned: Name: ${F_(esc(S.name_en||fullAr()))}<br>Iqama No.: ${F_(v('iqama'))}<br>Nationality: ${F_(v('nationality'))}</div>
+<p class="en b" style="font-size:11pt">Hereby acknowledge and undertake that I have agreed with Al-Daam Al-Mutawer Logistics Services Establishment to fully bear all fees and financial amounts related to issuing a driving license compliant with the laws and regulations of the Saudi Transport Authority, in accordance with labor market requirements and the profession stated on my Iqama.</p>
+<p class="en b" style="font-size:11pt">I further acknowledge that this undertaking has been made voluntarily and of my own free will, without any coercion or pressure, and I am fully responsible for the accuracy of the information stated herein.</p>
+${sigEn(false)}`)}
+
+function note(toOrg){const ORG='مؤسسة الدعم المطور للخدمات اللوجستية';const payee=toOrg?ORG:esc(S.note_owner||'');const payeeLine=toOrg?ORG+'.':`${F_(payee)}${S.note_owner_id?' – هوية رقم: '+F_('<span class="ltr">'+esc(S.note_owner_id)+'</span>'):''}.`;const amt=num(S.note_amount);const IQ=EXT.iqama||EXT.b_iqama||{};const iv=k=>esc(IQ[k]||S[k]||'');const inm=IQ.first_ar?esc([IQ.first_ar,IQ.father_ar,IQ.grand_ar,IQ.family_ar].filter(Boolean).join(' ')):nm();
+ return `<section class="page"><div class="body nolh" style="font-size:13pt;font-family:'IBM Plex Sans Arabic',sans-serif;line-height:2">
+<div style="background:#e9e9ef;text-align:center;font-size:17pt;padding:1mm;margin:6mm 8mm 8mm">سنـــد لأمـــر</div>
+<div style="display:flex;justify-content:space-between;padding:0 8mm"><span>حُرر هذا السند في محافظة: ${F_(v('note_city')||v('city'))}</span><span>بتاريخ: ${F_('<span class="ltr">'+v('doc_date')+'</span>م')}${!MANUAL.has('doc_date')&&todayH()?' الموافق '+F_('<span class="ltr">'+todayH()+'</span>هـ'):''}</span></div>
+<div style="display:flex;justify-content:space-between;padding:0 8mm"><span>أتعهد أنا: ${F_(inm)}</span><span>هوية رقم: ${F_('<span class="ltr">'+iv('iqama')+'</span>')}</span></div>
+<div style="padding:0 8mm">الجنسية: ${F_(iv('nationality'))}</div>
+<div style="padding:0 8mm">بأن أدفع بموجب هذا السند لأمـر: ${payeeLine}</div>
+<div style="background:#e9e9ef;margin:3mm 8mm 3mm 8mm;padding:1.5mm 4mm">مبلغ وقدره: ${F_(amt?`( ${fmt(amt)} ريال ) ${tafqit(amt)} فقط لا غير`:'')}</div>
+<div style="text-align:center;margin:6mm 0 4mm;font-weight:600">يستحق تحت الطلب</div>
+<div style="padding:0 8mm">الاسم: ${F_(inm)}</div>
+<div style="padding:0 8mm;margin-bottom:4mm">التوقيع: ______________________ &nbsp;&nbsp;&nbsp; البصمة: ____________</div>
+<div class="note-box" style="font-size:11pt;line-height:1.7"><div>بموجب هذا السند يسقط المدين والكفيل الغارم كافة حقوق التقديم والمطالبة والاحتجاج والأخطار بالامتناع عن الوفاء والمتعلقة بهذا السند كما يجوز ${toOrg?'لمؤسسة الدعم المطور للخدمات اللوجستية':'للمستفيد ('+payee+')'} بموجب هذا السند الرجوع إلى المدين أو الكفيل الغارم منفردين أو مجتمعين دون مراعاة أي ترتيب.</div><div>هذا السند لأمر واجب الدفع دون الرجوع بلا مصروفات وبدون احتجاج، هذا السند لأمر واجب الدفع بدون تعطيل بموجب قرار مجلس الوزراء رقم 692 بتاريخ 1383/09/26هـ والمتوج بالمرسوم الملكي الكريم رقم 37 بتاريخ 1383/10/11هـ نظام الأوراق التجارية.</div></div>
+</div></section>`}
+
+function p10(){const m=S.adv_method;const box=(lbl,key)=>`<div style="display:grid;justify-items:center;gap:1mm;font-size:8.5pt;text-align:center"><span>${lbl}</span><span class="sq">${m===key?'✓':''}</span></div>`;
+ return LH(`<div style="display:flex;justify-content:center;gap:16mm;align-items:baseline;margin-bottom:2mm"><span style="font-size:16pt;font-weight:700">نموذج طلب سلفة</span><span style="font-size:16pt;font-weight:700;font-family:'IBM Plex Sans Arabic',sans-serif">Advance Request Form</span></div>
+<div style="font-weight:700;margin-bottom:1mm">التاريخ: ${F_('<span class="ltr">'+v('doc_date')+'</span>')}</div>
+<table class="grid tight" style="font-size:9pt"><tr><th colspan="4" style="text-align:center;font-size:11pt">خــاص بالمــوظف &nbsp; <span class="e">employee information</span></th></tr>
+<tr><th style="width:20%">اسم الموظف:<br><span class="e">Employee Name</span></th><td class="fill" style="width:32%">${nm()}<br><span class="ltr">${v('iqama')}</span></td><th style="width:20%">الوظيفة</th><td class="fill">${v('job_title')}</td></tr>
+<tr><th>المدير المباشر:<br><span class="e">Direct manager</span></th><td class="fill">${v('direct_manager')}</td><th>مبلغ السلفة المطلوب:<br><span class="e">Required advance amount</span></th><td class="fill">${num(S.adv_amount)?fmt(num(S.adv_amount))+' ريال':''}</td></tr>
+<tr><th>عدد الأقساط:<br><span class="e">number of installments</span></th><td class="fill">${v('adv_inst_count')}</td><th>قيمة القسط:<br><span class="e">The value of the installment</span></th><td class="fill">${num(S.adv_inst_value)?fmt(num(S.adv_inst_value))+' ريال':''}</td></tr>
+<tr><th>بداية القسط:<br><span class="e">Installment start</span></th><td class="fill">${v('adv_start')}</td><th>توقيع الموظف<br><span class="e">employee signature</span></th><td></td></tr></table>
+<p style="text-align:center;font-weight:700;margin:1mm 0 1mm">توقيع مسؤول التشغيل &nbsp; <span class="ltr">Operator's signature</span></p><div style="border-bottom:.3mm solid #444;margin-bottom:2mm;height:3mm"></div>
+<table class="grid tight" style="font-size:9pt"><tr><th style="text-align:center">خاص بالشؤون الإدارية <span class="e">Administrative affairs</span></th><th style="text-align:center">خاص بالمدير العام <span class="e">For the general manager</span></th></tr>
+<tr><td style="height:9mm"></td><td></td></tr><tr><td style="text-align:center">التوقيع</td><td style="text-align:center">التوقيع</td></tr></table>
+<table class="grid tight" style="font-size:9pt"><tr><th style="text-align:center">خاص بالإدارة المالية <span class="e">financial management special</span></th></tr>
+<tr><td><div style="text-align:center;font-size:9pt;margin-bottom:2mm">بعد الاطلاع وموافقة كافة الأقسام يتم صرف السلفة عن طريق: <span class="ltr">After review and approval of all departments, the advance is disbursed through:</span></div>
+<div style="display:flex;justify-content:space-around;align-items:end">${box('نقداً<br>cash','نقداً')}${box('اس تي سي<br>STC PAY','STC Pay')}${box('حوالة بنكية<br>Bank transfer','حوالة بنكية')}${box('تصرف مع الراتب<br>Deal with salary','تصرف مع الراتب')}${box('تسوية','تسوية')}</div>
+<div style="font-size:9pt;margin-top:2mm">ملاحظات:</div></td></tr>
+<tr><td style="text-align:center;padding:2mm"><div style="font-weight:700;font-size:13pt;margin-bottom:1.5mm">Bank Iban: <span class="fill">${S.bank_name?esc(S.bank_name):''}</span></div><div style="display:flex;justify-content:center">${ibanBoxes()}</div></td></tr>
+<tr><td><div style="display:flex;justify-content:space-between;align-items:center;height:11mm;padding:0 6mm"><span><b>بصمة</b> <span class="ltr">Finger Print</span></span><span><b>توقيع مقدم الطلب</b> <span class="ltr">Signature of Applicant:</span></span></div></td></tr>
+<tr><td><div style="display:flex;justify-content:space-around;font-size:9pt;font-weight:700"><span>الحسابات accountant</span><span>الصندوق cashier</span><span>المدير المالي account manager</span></div><div style="direction:ltr;font-size:8.5pt;line-height:1.5;margin-top:1mm">NOTE: ...<br>ID: ${v('iqama')}<br>ORDERS: ${S.target?esc(S.target):''}</div></td></tr></table>`)}
+
+function attPages(){
+ const out=[];const TN={iqama:'الإقامة',iban:'الآيبان',passport:'جواز السفر',license:'رخصة القيادة',other:'مستند'};
+ for(const d of DOCS){const a=ATT[d.id];if(!a||!a.pages)continue;
+  a.pages.forEach((p,i)=>out.push(`<section class="page"><div class="body nolh"><p class="att-title">مرفق: ${d.id==='bundle'?(TN[p.type]||'مستند')+' ('+(i+1)+')':d.t}${a.pages.length>1&&d.id!=='bundle'?' ('+(i+1)+')':''} — ${nm()}</p><img class="att-img" src="${p.url}" alt=""></div></section>`))}
+ return out.join('');
+}
+function allPages(){
+ const nc=S.note_copies==='1'?'org':S.note_copies;const notes=nc==='org'?note(true):nc==='owner'?note(false):note(true)+note(false);
+ return p1()+p2()+p3()+p4()+p5()+p6()+p7()+notes+p10()+attPages();
+}
+let tm;function schedule(){clearTimeout(tm);tm=setTimeout(render,120)}
+function render(){const h=allPages();$('#pages').innerHTML=h;$('#pgCount').textContent=$('#pages').children.length}
+
+/* ---------- exports ---------- */
+let dl=null;(window.claude&&window.claude.use?window.claude.use('downloads').catch(()=>null):Promise.resolve(null)).then(d=>{dl=d});
+const fname=ext=>`طلب_توظيف_${(fullAr()||S.name_en||'موظف').replace(/\s+/g,'_')}.${ext}`;
+let armed=0;
+function guard(){const errs=allIssues().filter(x=>x.lv==='err').length;if(!errs||Date.now()-armed<8000){armed=0;return true}armed=Date.now();toast(`يوجد ${cnt(errs)} لم يُحل. اضغط التحميل مرة أخرى خلال 8 ثوانٍ للمتابعة.`);$('#checksCard').scrollIntoView({behavior:'smooth',block:'start'});return false}
+async function offer(filename,data){
+ if(!dl){if(window.claude){toast('التحميل غير متاح في هذا العرض');return}
+  const blob=data instanceof Blob?data:new Blob([data],{type:/\.html$/.test(filename)?'text/html':'application/octet-stream'});const u=URL.createObjectURL(blob);const lk=document.createElement('a');lk.href=u;lk.download=filename;document.body.append(lk);lk.click();lk.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('تم تحميل الملف');return}
+ try{await dl.save({filename,data});toast('تم تجهيز الملف')}catch(e){if(e&&e.code==='declined')return;toast(e&&e.code==='rate_limited'?'انتظر لحظة ثم حاول مرة أخرى':'تعذّر حفظ الملف')}
+}
+$('#btnHtml').addEventListener('click',()=>{if(!guard())return;
+ const css=$('#pageCss').textContent;
+ const doc=`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>${esc(fullAr()||'طلب توظيف')}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap">
+<style>@page{size:A4;margin:0}body{margin:0;background:#888}.page{margin:8mm auto;box-shadow:0 2px 10px rgba(0,0,0,.3);page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@media print{body{background:#fff}.page{margin:0;box-shadow:none}.noprint{display:none}}
+.noprint{position:fixed;top:10px;left:10px;z-index:9;font:600 15px sans-serif;background:#f28a1a;border:0;border-radius:8px;padding:10px 18px;cursor:pointer}${css}</style></head>
+<body><button class="noprint" onclick="print()">طباعة</button>${allPages()}<script>window.addEventListener('load',function(){setTimeout(function(){window.print()},800)})<\/script></body></html>`;
+ offer(fname('html'),doc);
+});
+$('#btnPdf').addEventListener('click',async()=>{if(!guard())return;
+ const b=$('#btnPdf');if(!window.html2canvas||!window.jspdf){toast('أداة PDF لم تتحمّل، استخدم ملف الطباعة');return}
+ b.disabled=true;const old=b.textContent;
+ try{
+  await document.fonts.ready;
+  const box=$('#renderBox');box.innerHTML=allPages();
+  const pages=[...box.querySelectorAll('.page')];
+  const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true});
+  for(let i=0;i<pages.length;i++){
+   b.textContent=`جارٍ التجهيز ${i+1}/${pages.length}`;
+   const c=await html2canvas(pages[i],{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
+   if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',.9),'JPEG',0,0,210,297);
+  }
+  box.innerHTML='';
+  await offer(fname('pdf'),pdf.output('blob'));
+ }catch(e){toast('تعذّر إنشاء PDF، استخدم ملف الطباعة')}
+ b.disabled=false;b.textContent=old;
+});
+$('#btnClear').addEventListener('click',()=>{
+ if(!$('#btnClear').dataset.arm){$('#btnClear').dataset.arm=1;$('#btnClear').textContent='اضغط للتأكيد';setTimeout(()=>{delete $('#btnClear').dataset.arm;$('#btnClear').textContent='مسح البيانات'},3000);return}
+ delete $('#btnClear').dataset.arm;$('#btnClear').textContent='مسح البيانات';
+ S={...DEF};AUTO.clear();MANUAL.clear();EXT={};AIREV={issues:[],spelling:[]};for(const k in ATT)delete ATT[k];save();buildFields();buildDrops();render();renderChecks();$('#aiMsg').textContent='';toast('تم مسح البيانات');
+});
+$('#zoom').addEventListener('input',e=>{$('#pages').style.setProperty('--z',e.target.value)});
+function fitZoom(){const w=$('.preview').clientWidth-30;const z=Math.max(.35,Math.min(1,w/800));$('#zoom').value=z.toFixed(2);$('#pages').style.setProperty('--z',z)}
+buildFields();buildDrops();if(Object.keys(EXT).length)applyExt();render();fitZoom();renderChecks();
+$('#btnReview').addEventListener('click',()=>aiReview(true));
+$('#apiKey').value=apiKey()?'••••••••••••':'';
+$('#apiSt').textContent=apiKey()?'مفتاح محفوظ':'';
+$('#apiSave').addEventListener('click',async()=>{const k=$('#apiKey').value.trim();if(!k||k.startsWith('•')){$('#apiSt').textContent='اكتب المفتاح أولاً';return}
+ $('#apiSt').textContent='جارٍ الاختبار…';API_MODEL=null;try{const m=await apiModel(k);try{localStorage.setItem('dm-api-key',k)}catch(e){}$('#apiKey').value='••••••••••••';$('#apiSt').textContent='✓ المفتاح يعمل ('+m+')'}catch(e){$('#apiSt').textContent=e&&e.code==='bad_key'?'المفتاح غير صحيح':'تعذّر الاتصال'}});
+$('#apiDel').addEventListener('click',()=>{try{localStorage.removeItem('dm-api-key')}catch(e){}API_MODEL=null;$('#apiKey').value='';$('#apiSt').textContent='تم الحذف'});
+})();
+</script>
+
+</body></html>
