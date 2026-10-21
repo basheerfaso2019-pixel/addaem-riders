@@ -34,11 +34,12 @@ css+='''
 '''
 # light sidebar tint (fadhel 2026-10-21 asked for a soft colour for the menu); dark mode keeps its navy
 css+='''
-.side{background:linear-gradient(180deg,#fff6ea 0%,#fde7cf 100%);border-inline-end-color:#f3d2ad}
-.side hr{border-color:#f3d2ad}
-.side button:hover,.side .navlink:hover{background:#fbdcba}
+.side{background:linear-gradient(180deg,#c4d3eb 0%,#aec1e1 100%);border-inline-end-color:#93aad3}
+.side button small,.side .navlink small{color:#33406b}.side .co small{color:#33406b}
+.side hr{border-color:#93aad3}
+.side button:hover,.side .navlink:hover{background:#9fb4da}
 .side button[aria-current="true"]{background:#ffffff}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{background:var(--surface);border-inline-end-color:var(--line)}:root:not([data-theme="light"]) .side button[aria-current="true"]{background:var(--menu-sel)}:root:not([data-theme="light"]) .side button:hover{background:var(--sunk)}}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{background:var(--surface);border-inline-end-color:var(--line)}:root:not([data-theme="light"]) .side button[aria-current="true"]{background:var(--menu-sel)}:root:not([data-theme="light"]) .side button:hover{background:var(--sunk)}:root:not([data-theme="light"]) .side button small{color:var(--muted)}}
 @media print{.side{background:none}}
 '''
 css=css.replace("var(--card,#fff)","var(--surface)");js=js.replace("var(--card,#fff)","var(--surface)")
