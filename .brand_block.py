@@ -50,6 +50,8 @@ body{background:#141414 url(bg.jpg) center/cover fixed no-repeat}
 @media print{body{background:#fff!important}.content{background:none}}
 .fhint{display:table;margin:-4px auto 0;background:rgba(255,255,255,.94);padding:4px 12px;border-radius:8px}
 .rpcnt{background:rgba(255,255,255,.94);color:var(--fg);padding:4px 10px;border-radius:8px}
+.splash{background:#111 url(bg.jpg) left top/cover no-repeat}
+.splash>div{background:rgba(8,29,61,.82);backdrop-filter:blur(2px)}
 '''
 js=rep(js,'''<span class="hint">'+RP.rows.length+' مندوب</span>''','''<span class="hint rpcnt">'+RP.rows.length+' مندوب</span>''')
 css=css.replace("var(--card,#fff)","var(--surface)");js=js.replace("var(--card,#fff)","var(--surface)")
