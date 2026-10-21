@@ -6,22 +6,22 @@
 <style>body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif}[hidden]{display:none!important}
 /* Layout: report-style shell. Side menu on the start edge (right in RTL), cyan title bar, filter cards, brown-headed data tables */
 :root{
-  --bg:#f3f6f7; --surface:#ffffff; --sunk:#eef3f4; --fg:#13232b; --muted:#5b6b75; --line:#dbe4e7;
-  --bar:#e3f2f0; --bar-fg:#0d3b47; --head:#0d3b47; --head-fg:#ffffff; --menu-sel:#d3ebe7;
-  --hint:#c2561a; --accent:#14968a; --gold:#e8a33d; --cofg:#0d3b47;
+  --bg:#eef1f7; --surface:#ffffff; --sunk:#f3f5fa; --fg:#141a33; --muted:#5b6386; --line:#d9deeb;
+  --bar:#e8ebf8; --bar-fg:#20386b; --head:#20386b; --head-fg:#ffffff; --menu-sel:#e3e6f6;
+  --hint:#c26a0a; --accent:#2b3192; --gold:#f28a1a; --cofg:#2b3192;
   --good:#2b7a4b; --good-soft:#ddf0e4; --warn:#9b5d08; --warn-soft:#f7e8cd; --bad:#b5362f; --bad-soft:#f8dedc; --mid-soft:#ececea;
   --f-display:"Noto Kufi Arabic","IBM Plex Sans Arabic",Tahoma,sans-serif;
   --f-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e1518; --surface:#162026; --sunk:#121b20; --fg:#e4edf0; --muted:#92a3ac; --line:#25323a;
-  --bar:#12343c; --bar-fg:#bfe9e3; --head:#0b333e; --head-fg:#f1fbf9; --menu-sel:#1d3a40;
-  --hint:#ff9a5c; --accent:#3cc2b3; --gold:#f0b860; --cofg:#f0b860;
+  --bg:#0e1124; --surface:#171b36; --sunk:#12152c; --fg:#eceffd; --muted:#a3a9cf; --line:#2a2f57;
+  --bar:#1b2147; --bar-fg:#c9cdff; --head:#1a2350; --head-fg:#f3f4ff; --menu-sel:#262d5e;
+  --hint:#ffa04d; --accent:#9ea4ff; --gold:#ff9b33; --cofg:#ff9b33;
   --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#262a30; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0e1518; --surface:#162026; --sunk:#121b20; --fg:#e4edf0; --muted:#92a3ac; --line:#25323a;
-  --bar:#12343c; --bar-fg:#bfe9e3; --head:#0b333e; --head-fg:#f1fbf9; --menu-sel:#1d3a40;
-  --hint:#ff9a5c; --accent:#3cc2b3; --gold:#f0b860; --cofg:#f0b860;
+  --bg:#0e1124; --surface:#171b36; --sunk:#12152c; --fg:#eceffd; --muted:#a3a9cf; --line:#2a2f57;
+  --bar:#1b2147; --bar-fg:#c9cdff; --head:#1a2350; --head-fg:#f3f4ff; --menu-sel:#262d5e;
+  --hint:#ffa04d; --accent:#9ea4ff; --gold:#ff9b33; --cofg:#ff9b33;
   --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#262a30; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14.5px;line-height:1.55;direction:rtl}
@@ -199,6 +199,17 @@ html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 @media (prefers-reduced-motion:reduce){.splash>div{animation:none}.splash{transition:none}}
 @media print{.splash,.langbtn{display:none!important}}
 
+.coband{background:var(--surface);overflow:hidden;padding-block:20px 16px;padding-inline:150px;border-bottom:5px solid var(--gold);min-height:92px;align-items:center}
+.coband::before{content:"";position:absolute;top:8px;left:0;right:64px;height:4px;background:linear-gradient(90deg,#e6ecf5,#2f4e86 70%,#20386b)}
+.coband::after{content:"";position:absolute;top:0;right:0;width:58px;height:50px;background:linear-gradient(135deg,#f6a133,#f28a1a);clip-path:polygon(18% 0,100% 0,100% 100%)}
+.colog{position:absolute;left:18px;top:50%;transform:translateY(-45%);height:52px;background:#fff;padding:4px 8px;border-radius:10px}
+.coband .coname{color:var(--accent)}
+.coband .cosub{color:var(--muted);opacity:1}
+.coband .coby{right:72px;color:var(--fg)}.coband .coby b{color:var(--gold)}
+.side button[aria-current="true"]{box-shadow:inset -4px 0 0 var(--gold);color:var(--accent)}
+@media (max-width:860px){.coband{padding-inline:16px;padding-top:22px}.colog{position:static;transform:none;height:42px;margin-bottom:4px}}
+.splash .slogo{display:block;height:64px;margin:0 auto 14px;background:#fff;padding:6px 12px;border-radius:12px}
+
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
 .ticker{position:fixed;left:0;right:0;bottom:0;height:32px;overflow:hidden;background:var(--head);color:var(--head-fg);border-top:2px solid var(--gold);z-index:50;font:600 14px/32px var(--f-body,system-ui)}
@@ -213,7 +224,7 @@ body{padding-bottom:34px}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head><body><div id="root"></div>
 <div class="ticker" role="note" aria-live="off"><span id="tickerTxt">سبحان الله</span></div>
-<div class="splash" id="splash" hidden role="status"><div><span class="ssl">اللهم صلِّ على سيدنا محمد</span><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">تصميم المهندس / <b>فاضل العميسي</b></span></div></div>
+<div class="splash" id="splash" hidden role="status"><div><img class="slogo" src="logo.png" alt="DM"><span class="ssl">اللهم صلِّ على سيدنا محمد</span><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">تصميم المهندس / <b>فاضل العميسي</b></span></div></div>
 <script>
 (function(){
 "use strict";
@@ -298,7 +309,7 @@ function side(){
   return '<nav class="side">'+co+items.filter(function(m){return !m[3]}).map(mb).join("")+extra+'</nav>';
 }
 TITLES.perm="الصلاحيات";TITLES.sheet="شيت الأداء اليومي";TITLES.cards="بطاقات المناديب";TITLES.hire="طلب توظيف مندوب";
-function bar(){var ld=lastDay();return '<div class="coband"><span class="coname">'+esc(data.company||"شركة التشغيل")+'</span><span class="coby">تصميم المهندس / <b>فاضل العميسي</b></span><span class="cosub">بوابة أداء مناديب هنقرستيشن</span></div><header class="bar"><h1>'+esc((isAdmin||staff)?TITLES[view]:"بوابة المندوب")+'</h1><span class="chip">آخر يوم متاح: '+(ld?dl(ld):"—")+'</span>'+(roleName()?'<span class="chip">'+esc(roleName())+'</span>':"")+'<button class="chip langbtn noi18n" id="langBtn" type="button">'+(LANG==="en"?"العربية":"English")+'</button></header>'}
+function bar(){var ld=lastDay();return '<div class="coband"><img class="colog" src="logo.png" alt="DM"><span class="coname">'+esc(data.company||"شركة التشغيل")+'</span><span class="coby">تصميم المهندس / <b>فاضل العميسي</b></span><span class="cosub">بوابة أداء مناديب هنقرستيشن</span></div><header class="bar"><h1>'+esc((isAdmin||staff)?TITLES[view]:"بوابة المندوب")+'</h1><span class="chip">آخر يوم متاح: '+(ld?dl(ld):"—")+'</span>'+(roleName()?'<span class="chip">'+esc(roleName())+'</span>':"")+'<button class="chip langbtn noi18n" id="langBtn" type="button">'+(LANG==="en"?"العربية":"English")+'</button></header>'}
 function sampleNote(){return false?'<div class="note">هذه بيانات تجريبية للعرض فقط. ارفع ملف هنقرستيشن من «رفع البيانات» لتظهر بياناتك الحقيقية.</div>':""}
 
 /* first name and family name: "مازن صالح مسعد ناصر الطلقي" -> "مازن الطلقي" */
@@ -665,7 +676,7 @@ function wDoc(L,m){var tot=0,th='background:#0f4c4a;color:#fff;font-weight:700;p
     '<div style="text-align:left;font-size:12px;color:#4a6261">تاريخ التصدير <span dir="ltr">'+new Date().toISOString().slice(0,10)+'</span></div></div>'+
     '<div style="display:flex;gap:10px;margin-bottom:12px">'+[["عدد المناديب",L.length],["الحد",fmt(m,2)+" ر.س فأكثر"],[wOwe()?"المبلغ المستحق عليهم":"إجمالي أرصدتهم",fmt(Math.abs(tot),2)+" ر.س"]].map(function(x){return '<div style="flex:1;border:1px solid #d5dedd;border-radius:8px;padding:7px 10px"><div style="font-size:10.5px;color:#4a6261">'+x[0]+'</div><div style="font-size:15px;font-weight:700;color:#0f4c4a">'+x[1]+'</div></div>'}).join("")+'</div>'+
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+[5,10,25,10,7,13,11,10,9].map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+["#","Rider ID","الاسم","المدينة","الفئة","الجوال","رصيد المحفظة","النقد المحصّل","بتاريخ"].map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody>'+
-    '<tfoot><tr><td colspan="6" style="'+td+';font-weight:700;background:#eef3f4">الإجمالي</td><td style="'+td+';font-weight:700;background:#eef3f4">'+fmt(tot,2)+'</td><td colspan="2" style="'+td+';background:#eef3f4"></td></tr></tfoot></table>'+
+    '<tfoot><tr><td colspan="6" style="'+td+';font-weight:700;background:#eef1f7">الإجمالي</td><td style="'+td+';font-weight:700;background:#eef1f7">'+fmt(tot,2)+'</td><td colspan="2" style="'+td+';background:#eef1f7"></td></tr></tfoot></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:flex-end;font-size:10.5px;color:#6b7f7e"><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function wPdf(){var L=wList(),m=wMin();if(!L.length)return;W_BUSY=true;render();
   loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=wDoc(L,m);var el=w.firstChild;ovWords(el);
@@ -984,15 +995,15 @@ function stmtDoc(id,st){
   var SC={A:"#2b7a4b",B:"#3f9a62",C:"#d99a0b",D:"#e07b28",E:"#c4472f",F:"#8f2d22"},seg=st.seg?'<span class="seg" style="background:'+(SC[st.seg]||"#777")+'">'+esc(st.seg)+'</span>':'—';
   var d=new Date(),today=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   var row=function(c,l,q,r,v){return '<tr class="'+c+'"><td>'+l+'</td><td>'+q+'</td><td>'+r+'</td><td class="amt">'+n2(v)+'</td></tr>'};
-  var css='@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;background:#eef3f4;color:#13232b;font:14px/1.45 "IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
+  var css='@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;background:#eef1f7;color:#141a33;font:14px/1.45 "IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
     '.sheet{max-width:720px;margin:16px auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(60,30,20,.10)}'+
-    '.top{background:#0d3b47;color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.top h1{margin:0;font-size:18px}.top .co{font-size:12.5px;color:#cfe9e5}.mon{background:#e8a33d;color:#0d3b47;font-weight:700;padding:3px 12px;border-radius:999px;font-size:13px;white-space:nowrap}'+
-    '.band{height:4px;background:#14968a}.info{display:grid;grid-template-columns:repeat(4,1fr);background:#f7fbfd;border-bottom:1px solid #e3eef3}.info div{padding:8px 14px;border-inline-start:1px solid #e3eef3}.info div:first-child{border:0}.info>div>span{display:block;font-size:11px;color:#6f8791}.info b{font-size:14px}'+
-    'table{width:100%;border-collapse:collapse}th{background:#14968a;color:#fff;font-size:12.5px;font-weight:600;padding:7px 12px;text-align:right}td{padding:9px 12px;border-bottom:1px solid #e6edef}th:last-child,td.amt{text-align:left;white-space:nowrap}td.amt{font-weight:600}'+
-    'tr.r1 td:first-child{border-inline-start:4px solid #14968a}tr.r2 td:first-child{border-inline-start:4px solid #0d3b47}tr.r3 td:first-child{border-inline-start:4px solid #e8a33d}'+
-    'tr.tot td{background:#fdf3e1;font-weight:700;font-size:17px;border-top:2px solid #e8a33d;border-bottom:0}tr.tot td.amt{color:#0d3b47}'+
+    '.top{background:#20386b;color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.top h1{margin:0;font-size:18px}.top .co{font-size:12.5px;color:#d9ddf3}.mon{background:#f28a1a;color:#20386b;font-weight:700;padding:3px 12px;border-radius:999px;font-size:13px;white-space:nowrap}'+
+    '.band{height:4px;background:#2b3192}.info{display:grid;grid-template-columns:repeat(4,1fr);background:#f7fbfd;border-bottom:1px solid #e3eef3}.info div{padding:8px 14px;border-inline-start:1px solid #e3eef3}.info div:first-child{border:0}.info>div>span{display:block;font-size:11px;color:#6f8791}.info b{font-size:14px}'+
+    'table{width:100%;border-collapse:collapse}th{background:#2b3192;color:#fff;font-size:12.5px;font-weight:600;padding:7px 12px;text-align:right}td{padding:9px 12px;border-bottom:1px solid #e6e9f3}th:last-child,td.amt{text-align:left;white-space:nowrap}td.amt{font-weight:600}'+
+    'tr.r1 td:first-child{border-inline-start:4px solid #2b3192}tr.r2 td:first-child{border-inline-start:4px solid #20386b}tr.r3 td:first-child{border-inline-start:4px solid #f28a1a}'+
+    'tr.tot td{background:#fdf3e1;font-weight:700;font-size:17px;border-top:2px solid #f28a1a;border-bottom:0}tr.tot td.amt{color:#20386b}'+
     '.seg{display:inline-block;min-width:22px;text-align:center;padding:0 8px;border-radius:999px;color:#fff;font-weight:700;font-size:12.5px}'+
-    '.foot{padding:8px 14px;font-size:11px;color:#6b7b84;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #e6edef}'+
+    '.foot{padding:8px 14px;font-size:11px;color:#5b6386;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #e6e9f3}'+
     '@media print{body{background:#fff}.sheet{box-shadow:none;margin:0;max-width:none;border-radius:0}}@media(max-width:560px){.info{grid-template-columns:1fr 1fr}.info div:nth-child(3){border:0}th,td{padding:7px 8px}}';
   return '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ملخص أداء '+esc(cname(id))+' - '+monTxt(st.mon)+'</title>'+
     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap"><style>'+css+'</style></head><body><div class="sheet">'+
@@ -1011,7 +1022,7 @@ function stmtPrint(id){var st=!stmtBlock(id)&&stmtCalc(id);if(!st)return;var f=d
 function normCat(v){var s=String(v||"").trim().replace(/[إآا]/g,"أ");return s==="أ"||s.toUpperCase()==="A"?"أ":s==="ب"||s.toUpperCase()==="B"?"ب":s==="خ"?"خ":s}
 function stmtBlock(id){var c=data.couriers[id]&&data.couriers[id].cat;if(c==="ب"||c==="خ")return "";
   return c==="أ"?"لا يوجد ملخص أداء للمناديب العاملين بالتارقت.":"لا يوجد ملخص أداء لهذا المندوب لأن فئته غير محددة في شيت المناديب."}
-function stmtBlockedHtml(id,m){return '<section class="panel stmt"><h2>ملخص أداء المندوب</h2><div class="note" style="margin:8px 0 0;padding:12px 14px;border-radius:8px;background:#fdf3e1;border-inline-start:4px solid #e8a33d;color:#0d3b47;font-weight:600">'+esc(m)+'</div></section>'}
+function stmtBlockedHtml(id,m){return '<section class="panel stmt"><h2>ملخص أداء المندوب</h2><div class="note" style="margin:8px 0 0;padding:12px 14px;border-radius:8px;background:#fdf3e1;border-inline-start:4px solid #f28a1a;color:#20386b;font-weight:600">'+esc(m)+'</div></section>'}
 /* ---------- daily performance sheet ---------- */
 var SH_MON="",SHX={},SHIQ=null,SH_MSG="";
 var JSZIP_URL="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";

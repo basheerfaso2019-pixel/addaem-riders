@@ -500,6 +500,7 @@ js=js.replace("fill=\"'+(last?'var(--head)':'var(--bar)')+'\"","fill=\"'+(last?'
 for _a,_b in (("تصدير كشف الحساب","تصدير ملخص الأداء"),("كشف حساب المندوب","ملخص أداء المندوب"),("لا يوجد كشف حساب","لا يوجد ملخص أداء"),("كشف حساب ","ملخص أداء "),("كشف الحساب","ملخص الأداء"),('"kashf-"','"performance-"')):
     js=js.replace(_a,_b)
 exec(open('finhide_block.py',encoding='utf8').read())
+exec(open('brand_block.py',encoding='utf8').read())
 css+='''
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
@@ -521,7 +522,7 @@ html='''<!doctype html>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head><body><div id="root"></div>
 <div class="ticker" role="note" aria-live="off"><span id="tickerTxt">سبحان الله</span></div>
-<div class="splash" id="splash" hidden role="status"><div><span class="ssl">اللهم صلِّ على سيدنا محمد</span><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div></div>
+<div class="splash" id="splash" hidden role="status"><div><img class="slogo" src="logo.png" alt="DM"><span class="ssl">اللهم صلِّ على سيدنا محمد</span><span class="sco" id="splashCo">الدعم المطور للخدمات اللوجستية</span><span class="sby" id="splashTxt">إعداد المهندس / <b>فاضل العميسي</b></span></div></div>
 <script>'''+js+'''</script>
 <script>/* bottom bar: adhkar following each other closely, seamless loop (fadhel 2026-10-18) */
 (function(){var L=["سبحان الله","الحمد لله","لا إله إلا الله","الله أكبر","اللهم صلِّ وسلم على سيدنا محمد وعلى آله وصحبه وسلم"],el=document.getElementById("tickerTxt");if(!el)return;
