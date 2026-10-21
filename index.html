@@ -233,6 +233,10 @@ body{background:#141414 url(bg.jpg) center/cover fixed no-repeat}
 .splash{background:#111 url(bg.jpg) left top/cover no-repeat}
 .splash>div{background:rgba(8,29,61,.82);backdrop-filter:blur(2px)}
 
+:root{--surface:#fbf6ea;--sunk:#f3ecda;--line:#e4d8bd;--bar:#f2ead6;--mid-soft:#ede5d2}
+.fhint,.rpcnt{background:rgba(251,246,234,.95)}
+@media print{:root{--surface:#fff;--sunk:#f6f6f6;--bar:#fff;--line:#ddd}}
+
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
 .ticker{position:fixed;left:0;right:0;bottom:0;height:32px;overflow:hidden;background:var(--head);color:var(--head-fg);border-top:2px solid var(--gold);z-index:50;font:600 14px/32px var(--f-body,system-ui)}

@@ -54,4 +54,10 @@ body{background:#141414 url(bg.jpg) center/cover fixed no-repeat}
 .splash>div{background:rgba(8,29,61,.82);backdrop-filter:blur(2px)}
 '''
 js=rep(js,'''<span class="hint">'+RP.rows.length+' مندوب</span>''','''<span class="hint rpcnt">'+RP.rows.length+' مندوب</span>''')
+# soft ivory instead of plain white for panels/tables/fields (fadhel 2026-10-21); dark mode keeps its own rule (higher specificity); print stays white
+css+='''
+:root{--surface:#fbf6ea;--sunk:#f3ecda;--line:#e4d8bd;--bar:#f2ead6;--mid-soft:#ede5d2}
+.fhint,.rpcnt{background:rgba(251,246,234,.95)}
+@media print{:root{--surface:#fff;--sunk:#f6f6f6;--bar:#fff;--line:#ddd}}
+'''
 css=css.replace("var(--card,#fff)","var(--surface)");js=js.replace("var(--card,#fff)","var(--surface)")
