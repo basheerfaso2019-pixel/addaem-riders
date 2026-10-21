@@ -42,4 +42,14 @@ css+='''
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .side{background:var(--surface);border-inline-end-color:var(--line)}:root:not([data-theme="light"]) .side button[aria-current="true"]{background:var(--menu-sel)}:root:not([data-theme="light"]) .side button:hover{background:var(--sunk)}:root:not([data-theme="light"]) .side button small{color:var(--muted)}}
 @media print{.side{background:none}}
 '''
+# page background = fadhel's delivery-city picture with the DM logo painted over the HS badge (bg.jpg, 2026-10-21);
+# header and sidebar stay as they are. Light mode only behind the content; print stays white.
+css+='''
+body{background:#141414 url(bg.jpg) center/cover fixed no-repeat}
+.content{background:linear-gradient(rgba(10,12,20,.18),rgba(10,12,20,.18))}
+@media print{body{background:#fff!important}.content{background:none}}
+.fhint{display:table;margin:-4px auto 0;background:rgba(255,255,255,.94);padding:4px 12px;border-radius:8px}
+.rpcnt{background:rgba(255,255,255,.94);color:var(--fg);padding:4px 10px;border-radius:8px}
+'''
+js=rep(js,'''<span class="hint">'+RP.rows.length+' مندوب</span>''','''<span class="hint rpcnt">'+RP.rows.length+' مندوب</span>''')
 css=css.replace("var(--card,#fff)","var(--surface)");js=js.replace("var(--card,#fff)","var(--surface)")
