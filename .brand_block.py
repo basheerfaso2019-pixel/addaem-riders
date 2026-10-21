@@ -23,19 +23,13 @@ css+='''
 @media (max-width:860px){.coband{padding-inline:16px;padding-top:22px}.colog{position:static;transform:none;height:42px;margin-bottom:4px}}
 .splash .slogo{display:block;height:64px;margin:0 auto 14px;background:#fff;padding:6px 12px;border-radius:12px}
 '''
-# ocean background (fadhel 2026-10-21, from the company profile cover): deep sea-blue page in both modes, navy panels,
-# white text and orange accents. Print keeps the light letterhead colours.
-_OC="""  --bg:#0a2a55; --surface:#0f2b55; --sunk:#0c2449; --fg:#eef3ff; --muted:#a9bbd8; --line:#23457a;
-  --bar:#0c3166; --bar-fg:#ffffff; --head:#081d3d; --head-fg:#ffffff; --menu-sel:#173f74;
-  --hint:#ffa04d; --accent:#8fb4ff; --gold:#f7941d; --cofg:#f7941d;"""
-_LG="  --good:#2b7a4b; --good-soft:#ddf0e4; --warn:#9b5d08; --warn-soft:#f7e8cd; --bad:#b5362f; --bad-soft:#f8dedc; --mid-soft:#ececea;"
-_DG="  --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#262a30; color-scheme:dark"
-assert css.count(_L3)==1 and css.count(_D3)==2 and css.count(_LG)==1 and css.count(_DG)==2
-css=css.replace(_L3,_OC).replace(_D3,_OC).replace(_LG,_DG.replace("#262a30","#1a3561")+";").replace("--mid-soft:#262a30","--mid-soft:#1a3561")
+# ocean header band only (fadhel 2026-10-21: the sea-blue from the company profile cover is for the header, not the whole page)
 css+='''
-body{background:radial-gradient(ellipse at 15% 0%,#14589c 0%,transparent 55%),linear-gradient(160deg,#0b3a72 0%,#0a2a55 45%,#071a3a 100%) fixed #0a2a55}
+.coband{background:radial-gradient(ellipse at 12% 0%,#1a64ad 0%,transparent 60%),linear-gradient(160deg,#0b3a72 0%,#0a2a55 50%,#071a3a 100%)}
 .coband::before{background:linear-gradient(90deg,#3a64a8,#8fb4ff 70%,#ffffff)}
-.side{background:color-mix(in srgb,var(--surface) 88%,transparent)}
-@media print{:root{'''+_L3.replace("\n"," ")+_LG+''' color-scheme:light}body{background:#fff!important}}
+.coband .coname{color:#ffffff}
+.coband .cosub{color:#c9d6ee}
+.coband .coby{color:#ffffff}.coband .coby b{color:#f7941d}
+@media print{.coband{background:#fff}.coband .coname{color:#2b3192}}
 '''
 css=css.replace("var(--card,#fff)","var(--surface)");js=js.replace("var(--card,#fff)","var(--surface)")

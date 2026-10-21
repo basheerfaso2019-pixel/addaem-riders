@@ -6,23 +6,23 @@
 <style>body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif}[hidden]{display:none!important}
 /* Layout: report-style shell. Side menu on the start edge (right in RTL), cyan title bar, filter cards, brown-headed data tables */
 :root{
-  --bg:#0a2a55; --surface:#0f2b55; --sunk:#0c2449; --fg:#eef3ff; --muted:#a9bbd8; --line:#23457a;
-  --bar:#0c3166; --bar-fg:#ffffff; --head:#081d3d; --head-fg:#ffffff; --menu-sel:#173f74;
-  --hint:#ffa04d; --accent:#8fb4ff; --gold:#f7941d; --cofg:#f7941d;
-  --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#1a3561; color-scheme:dark;
+  --bg:#eef1f7; --surface:#ffffff; --sunk:#f3f5fa; --fg:#141a33; --muted:#5b6386; --line:#d9deeb;
+  --bar:#e8ebf8; --bar-fg:#20386b; --head:#20386b; --head-fg:#ffffff; --menu-sel:#e3e6f6;
+  --hint:#c26a0a; --accent:#2b3192; --gold:#f28a1a; --cofg:#2b3192;
+  --good:#2b7a4b; --good-soft:#ddf0e4; --warn:#9b5d08; --warn-soft:#f7e8cd; --bad:#b5362f; --bad-soft:#f8dedc; --mid-soft:#ececea;
   --f-display:"Noto Kufi Arabic","IBM Plex Sans Arabic",Tahoma,sans-serif;
   --f-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0a2a55; --surface:#0f2b55; --sunk:#0c2449; --fg:#eef3ff; --muted:#a9bbd8; --line:#23457a;
-  --bar:#0c3166; --bar-fg:#ffffff; --head:#081d3d; --head-fg:#ffffff; --menu-sel:#173f74;
-  --hint:#ffa04d; --accent:#8fb4ff; --gold:#f7941d; --cofg:#f7941d;
-  --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#1a3561; color-scheme:dark}}
+  --bg:#0e1124; --surface:#171b36; --sunk:#12152c; --fg:#eceffd; --muted:#a3a9cf; --line:#2a2f57;
+  --bar:#1b2147; --bar-fg:#c9cdff; --head:#1a2350; --head-fg:#f3f4ff; --menu-sel:#262d5e;
+  --hint:#ffa04d; --accent:#9ea4ff; --gold:#ff9b33; --cofg:#ff9b33;
+  --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#262a30; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0a2a55; --surface:#0f2b55; --sunk:#0c2449; --fg:#eef3ff; --muted:#a9bbd8; --line:#23457a;
-  --bar:#0c3166; --bar-fg:#ffffff; --head:#081d3d; --head-fg:#ffffff; --menu-sel:#173f74;
-  --hint:#ffa04d; --accent:#8fb4ff; --gold:#f7941d; --cofg:#f7941d;
-  --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#1a3561; color-scheme:dark}
+  --bg:#0e1124; --surface:#171b36; --sunk:#12152c; --fg:#eceffd; --muted:#a3a9cf; --line:#2a2f57;
+  --bar:#1b2147; --bar-fg:#c9cdff; --head:#1a2350; --head-fg:#f3f4ff; --menu-sel:#262d5e;
+  --hint:#ffa04d; --accent:#9ea4ff; --gold:#ff9b33; --cofg:#ff9b33;
+  --good:#64c48e; --good-soft:#18301f; --warn:#e6a64e; --warn-soft:#3a2b14; --bad:#ef7d75; --bad-soft:#3d1d1b; --mid-soft:#262a30; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14.5px;line-height:1.55;direction:rtl}
 .num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
@@ -210,10 +210,12 @@ html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 @media (max-width:860px){.coband{padding-inline:16px;padding-top:22px}.colog{position:static;transform:none;height:42px;margin-bottom:4px}}
 .splash .slogo{display:block;height:64px;margin:0 auto 14px;background:#fff;padding:6px 12px;border-radius:12px}
 
-body{background:radial-gradient(ellipse at 15% 0%,#14589c 0%,transparent 55%),linear-gradient(160deg,#0b3a72 0%,#0a2a55 45%,#071a3a 100%) fixed #0a2a55}
+.coband{background:radial-gradient(ellipse at 12% 0%,#1a64ad 0%,transparent 60%),linear-gradient(160deg,#0b3a72 0%,#0a2a55 50%,#071a3a 100%)}
 .coband::before{background:linear-gradient(90deg,#3a64a8,#8fb4ff 70%,#ffffff)}
-.side{background:color-mix(in srgb,var(--surface) 88%,transparent)}
-@media print{:root{  --bg:#eef1f7; --surface:#ffffff; --sunk:#f3f5fa; --fg:#141a33; --muted:#5b6386; --line:#d9deeb;   --bar:#e8ebf8; --bar-fg:#20386b; --head:#20386b; --head-fg:#ffffff; --menu-sel:#e3e6f6;   --hint:#c26a0a; --accent:#2b3192; --gold:#f28a1a; --cofg:#2b3192;  --good:#2b7a4b; --good-soft:#ddf0e4; --warn:#9b5d08; --warn-soft:#f7e8cd; --bad:#b5362f; --bad-soft:#f8dedc; --mid-soft:#ececea; color-scheme:light}body{background:#fff!important}}
+.coband .coname{color:#ffffff}
+.coband .cosub{color:#c9d6ee}
+.coband .coby{color:#ffffff}.coband .coby b{color:#f7941d}
+@media print{.coband{background:#fff}.coband .coname{color:#2b3192}}
 
 body{padding-bottom:34px}
 .side{padding-bottom:40px}
