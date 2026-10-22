@@ -188,6 +188,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 .waop select,.waop input[type=number]{padding:4px 8px;font-size:13.5px}.waop input[type=number]{width:80px}
 .wag{display:inline-flex;align-items:center;gap:2px;font-weight:600}
 
+tr.qmdone td{background:rgba(46,160,90,.07)}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -412,7 +414,7 @@ function vOverall(){
   var byCity={};rec(ld).forEach(function(o){var c=o.x[CI]||"—";(byCity[c]||(byCity[c]=[])).push(o)});
   var cityT=Object.keys(byCity).map(function(c){var a=agg(byCity[c]);return '<tr><td>'+esc(c)+'</td><td>'+N(a.riders,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+P(a.ar)+'</td><td>'+N(a.ac,1)+'</td></tr>'}).join("");
   return sampleNote()+k+'<div class="grid2"><section class="panel"><h2>الطلبات المكتملة يومياً</h2><p class="hint">آخر <span class="num">'+ser.length+'</span> يوم.</p>'+bars(ser,{label:"الطلبات المكتملة يومياً"})+'</section>'+
-    '<section class="panel"><h2>حسب المدينة</h2><p class="hint">'+dl(ld)+'</p><div class="tbl" style="box-shadow:none"><table><thead><tr><th>المدينة</th><th>المناديب</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+cityT+'</tbody></table></div></section></div>'+ovPanel()+waPanel();
+    '<section class="panel"><h2>حسب المدينة</h2><p class="hint">'+dl(ld)+'</p><div class="tbl" style="box-shadow:none"><table><thead><tr><th>المدينة</th><th>المناديب</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+cityT+'</tbody></table></div></section></div>'+ovPanel()+waPanel()+qmPanel();
 }
 /* ---------- overall: tier PDFs ---------- */
 var H2P_URL="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",OV_BUSY="";
@@ -971,6 +973,46 @@ function waPdf(){var ds=waDays();if(!ds.length)return;var day=ui0.wad&&ds.indexO
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:"متابعة "+waCatTxt()+" - "+day+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
+/* ---------- quality WhatsApp messages: category أ, grade E/F ---------- */
+var QM_EN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function qmMonths(){var m={};Object.keys(data.couriers||{}).forEach(function(id){var q=data.couriers[id].q;if(q)for(var k in q)m[k]=1});return Object.keys(m).sort().reverse()}
+function qmSent(){try{return JSON.parse(localStorage.getItem("hs_qm_sent")||"{}")}catch(e){return {}}}
+function qmMark(k){var s=qmSent();s[k]=Date.now();try{localStorage.setItem("hs_qm_sent",JSON.stringify(s))}catch(e){}}
+function qmProblems(q){var n=function(v){return Math.round(+v||0)},p=function(v){return v==null||isNaN(v)?null:v*100},P=[];
+  if(p(q.ot)!=null)P.push({v:p(q.ot),sh:"التوصيل في الوقت "+fmt(p(q.ot),1)+"%",ar:"التوصيل في الوقت المحدد ("+fmt(p(q.ot),1)+"%): عندك "+n(Math.max(0,(+q.cp||0)-(+q.it||0)))+" طلب متأخر من "+n(q.cp)+" طلب مكتمل. حاول توصل الطلبات في وقتها.",
+    en:"On-time delivery ("+fmt(p(q.ot),1)+"%): "+n(Math.max(0,(+q.cp||0)-(+q.it||0)))+" late orders out of "+n(q.cp)+" completed. Please deliver orders on time."});
+  if(p(q.fr)!=null)P.push({v:p(q.fr),sh:"درجة الفشل "+fmt(p(q.fr),1)+"%",ar:"درجة الفشل ("+fmt(p(q.fr),1)+"%): عندك "+n(q.f)+" طلب فشل بسبب المندوب من "+n(q.g)+" طلب. تواصل مع العميل قبل أي إلغاء وتجنب فشل الطلبات.",
+    en:"Failed orders ("+fmt(p(q.fr),1)+"%): "+n(q.f)+" orders failed because of the rider out of "+n(q.g)+". Contact the customer before any cancellation."});
+  if(p(q.vr)!=null&&q.vt)P.push({v:p(q.vr),sh:"نجاح التحقق "+fmt(p(q.vr),1)+"%",ar:"نجاح التحقق ("+fmt(p(q.vr),1)+"%): "+n(Math.max(0,(+q.vt||0)-(+q.vs||0)))+" طلب لم ينجح فيه التحقق من "+n(q.vt)+". تأكد من إدخال رمز التحقق عند التسليم.",
+    en:"Verification ("+fmt(p(q.vr),1)+"%): "+n(Math.max(0,(+q.vt||0)-(+q.vs||0)))+" orders failed verification out of "+n(q.vt)+". Enter the verification code at every delivery."});
+  var low=P.filter(function(x){return x.v<100}).sort(function(a,b){return a.v-b.v});
+  if(!low.length)low=[{sh:"درجة الجودة "+fmt(p(q.sc),1)+"%",ar:"درجة الجودة النهائية "+fmt(p(q.sc),1)+"% وعدد الطلبات المكتملة قليل. زد عدد طلباتك.",en:"Final quality score "+fmt(p(q.sc),1)+"% with few completed orders. Please complete more orders."}];
+  return low}
+function qmText(id,m,q){var nm=cname(id),g=String(q.s||"").trim().toUpperCase(),L=qmProblems(q),mi=+m.slice(5,7)-1;
+  return "السلام عليكم يا "+nm+"\n"+
+    "فئتك: أ\n"+
+    "تصنيف جودة التوصيل لشهر "+monTxt(m)+": "+g+"\n"+
+    "المشكلة لديك في:\n"+L.map(function(x,i){return (i+1)+"- "+x.ar}).join("\n")+"\n"+
+    "نرجو منك تحسين أدائك، وفقك الله.\n"+
+    "الدعم المطور للخدمات اللوجستية\n\n"+
+    "Hello "+nm+"\n"+
+    "Your category: A\n"+
+    "Delivery quality grade for "+QM_EN[mi]+" "+m.slice(0,4)+": "+g+"\n"+
+    "Your problem is in:\n"+L.map(function(x,i){return (i+1)+"- "+x.en}).join("\n")+"\n"+
+    "Please improve your performance. Thank you."}
+function qmRows(m){var out=[],ld=lastDay()||new Date().toISOString().slice(0,10);
+  Object.keys(data.couriers||{}).forEach(function(id){var c=data.couriers[id];if(catOf(id)!=="أ")return;var q=c.q&&c.q[m];if(!q)return;
+    var g=String(q.s||"").trim().toUpperCase();if(g!=="E"&&g!=="F")return;if(waOff(c,ld))return;out.push({id:id,q:q,g:g,ph:c.ph||""})});
+  return out.sort(function(a,b){return a.g===b.g?(+a.q.sc||0)-(+b.q.sc||0):a.g<b.g?1:-1})}
+function qmPanel(){var ms=qmMonths();if(!ms.length)return "";var m=ui0.qmm&&ms.indexOf(ui0.qmm)>=0?ui0.qmm:ms[0],R=qmRows(m),S=qmSent(),done=0;
+  var rows=R.map(function(r,i){var k=m+":"+r.id,sent=S[k],txt=qmText(r.id,m,r.q),L=qmProblems(r.q);if(sent)done++;
+    var q="phone="+r.ph+"&text="+encodeURIComponent(txt),btn=!r.ph?'<span class="hint" style="font-size:12.5px">لا يوجد رقم جوال</span>':
+      IS_MOBILE?'<a class="btn wa" style="text-decoration:none" data-qmwa="'+esc(k)+'" href="whatsapp://send?'+q+'">'+(sent?"إعادة إرسال":"واتساب")+'</a>':
+      '<button class="btn wa" data-qmwa="'+esc(k)+'" data-qmurl="'+esc("https://web.whatsapp.com/send?"+q)+'" title="+'+esc(r.ph)+'">'+(sent?"إعادة إرسال":"واتساب ويب")+'</button>';
+    return '<tr'+(sent?' class="qmdone"':'')+'><td class="num">'+(i+1)+'</td><td class="num">'+esc(r.id)+'</td><td>'+esc(cname(r.id))+'</td><td>'+segPill(r.g)+'</td><td style="font-size:13px">'+esc(L[0].sh)+(L.length>1?' <span class="hint">(+'+(L.length-1)+')</span>':'')+'</td><td>'+(sent?'<span style="color:var(--good);font-weight:700">✓ أُرسلت</span>':'—')+'</td><td>'+btn+'</td></tr>'}).join("");
+  return '<section class="panel"><div class="stmthead"><h2>رسائل جودة التوصيل · فئة أ (E / F)</h2><div class="stmttools"><select id="qmMon" aria-label="الشهر">'+ms.map(function(x){return '<option value="'+x+'"'+(x===m?" selected":"")+'>'+monTxt(x)+'</option>'}).join("")+'</select></div></div>'+
+    '<p class="hint" style="margin:0 0 8px">رسالة عربي وإنجليزي لكل مندوب: فئته، تصنيفه، والمشكلة حسب أسباب التصنيف. اضغط «واتساب» لكل مندوب ثم «إرسال» في واتساب. أُرسلت <b class="num">'+done+'</b> من <b class="num">'+R.length+'</b>.</p>'+
+    (R.length?'<div class="tbl"><table><thead><tr><th>#</th><th>Rider ID</th><th>الاسم</th><th>الجودة</th><th>المشكلة الرئيسية</th><th>الحالة</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<p class="hint">لا يوجد مندوب من الفئة أ بجودة E أو F في هذا الشهر.</p>')+'</section>'}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -1530,6 +1572,7 @@ root.addEventListener("click",function(e){
   if(t.id==="rpPdf"){rpPdf();return}
   if(t.dataset.qclr){ui0[QK[t.dataset.qclr]]=[];render();return}
   if(t.dataset.qdone){ui0.qopen=null;render();return}
+  if(t.dataset.qmwa){qmMark(t.dataset.qmwa);if(!IS_MOBILE){var w2=window.open(t.dataset.qmurl,WA_TAB);if(w2)w2.focus()}render();return}
   if(t.dataset.waweb){var w=window.open(t.dataset.waweb,WA_TAB);if(w)w.focus();return}
   if(t.id==="stmtPrint"){document.body.classList.add("pst");window.print();setTimeout(function(){document.body.classList.remove("pst")},500);return}
   if(t.id==="langBtn"){setLang(LANG==="en"?"ar":"en");return}
@@ -1573,6 +1616,8 @@ root.addEventListener("change",function(e){
   if(t.id==="aMon"){ui0.am=t.value;render()}
   if(t.id==="ovMon"){ui0.ovm=t.value;render()}
   if(t.id==="waDay"){ui0.wad=t.value;render()}
+  if(t.id==="qmMon"){ui0.qmm=t.value;render()}
+  if(t.id==="qmAll"){ui0.qmall=t.checked?1:0;render()}
   if(t.id==="waCat"){WA.k=t.value;waSave()}
   if(t.id==="waQ"){WA.q=t.checked?1:0;waSave()}
   if(t.id==="waW"){WA.w=t.checked?1:0;waSave()}
