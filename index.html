@@ -1454,7 +1454,7 @@ function loadStaffData(){
   var jobs=[
     sb.from("settings").select("key,value").then(function(r){(r.data||[]).forEach(function(s){if(s.key==="company")d.company=s.value;if(s.key==="last_upload")LASTUP=s.value})}),
     all("riders","id,name,vehicle,tga,phone,category,sheet_pos,region,st,st_from,st_until,st_note","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.st)c.st={t:r.st,f:r.st_from,u:r.st_until,n:r.st_note||""};if(r.sheet_pos!=null)c.sp=r.sheet_pos;if(r.region)c.rg=r.region;if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.category)c.cat=r.category;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
-    all("daily","*",["day","rider_id"]).then(function(rs){rs.forEach(function(r){(d.days[r.day]||(d.days[r.day]={}))[r.rider_id]=rowToRec(r)})}),
+    all("daily","*",["day","rider_id"]).then(function(rs){rs.forEach(function(r){if(r.city==null&&r.completed==null&&r.actual_hours==null&&r.planned_hours==null&&r.shifts==null&&!(+r.distance_km||+r.payable_km||+r.completed_dist))return;(d.days[r.day]||(d.days[r.day]={}))[r.rider_id]=rowToRec(r)})}),
     sb.rpc("riders_with_login").then(function(r){(r.data||[]).forEach(function(id){C(typeof id==="string"?id:id.riders_with_login).h=true})})];
   if(canSee("quality"))jobs.push(all("quality","*",["month","rider_id"]).then(function(rs){rs.forEach(function(q){var c=C(q.rider_id);(c.q||(c.q={}))[q.month]=qToObj(q)})}));
   if(canSee("wallet"))jobs.push(all("wallet","*",["rider_id","rider_id"]).then(function(rs){rs.forEach(function(w){C(w.rider_id).w={b:num(w.balance),c:null,d:w.as_of}})}));
@@ -1489,11 +1489,20 @@ function enterStaff(user,name){
 
 function batches(list,n){var out=[];for(var i=0;i<list.length;i+=n)out.push(list.slice(i,i+n));return out}
 function upDays(rows){var m={};rows.forEach(function(r){m[r.day]=1});return Object.keys(m)}
+/* a day uploaded with both files is deleted completely first (fadhel 2026-10-23) */
+function dayWipe(daily){var p={};upDays(daily.perf).forEach(function(d){p[d]=1});var ds=upDays(daily.dist).filter(function(d){return p[d]});if(!ds.length)return null;
+  return sb.from("daily").delete().in("day",ds).then(function(r){if(r.error)throw r.error})}
+/* distance rows with 0 km and 0 orders for a rider who has no performance row that day carry nothing: not saved */
+function distKeep(daily){var has={};daily.perf.forEach(function(r){has[r.day+"|"+r.rider_id]=1});var o=(data&&data.days)||{};
+  return daily.dist.filter(function(r){if(+r.distance_km||+r.payable_km||+r.completed_dist)return true;if(has[r.day+"|"+r.rider_id])return true;
+    if(upDays(daily.perf).indexOf(r.day)>=0)return false;var x=o[r.day]&&o[r.day][r.rider_id];return !!(x&&x[AC]!=null)})}
 function dayClear(rows,cols){var ds=upDays(rows);if(!ds.length)return null;var o={};cols.forEach(function(k){o[k]=null});
   return sb.from("daily").update(o).in("day",ds).then(function(r){if(r.error)throw r.error})}
-function dayPurge(rows){var ds=upDays(rows);if(!ds.length)return null;var q=sb.from("daily").delete().in("day",ds);
-  ["completed","actual_hours","planned_hours","shifts","distance_km","payable_km","completed_dist"].forEach(function(k){q=q.is(k,null)});
-  return q.then(function(r){if(r.error)throw r.error})}
+function dayPurge(rows){var ds=upDays(rows);if(!ds.length)return null;var q=sb.from("daily").select("day,rider_id,distance_km,payable_km,completed_dist").in("day",ds);
+  ["completed","actual_hours","planned_hours","shifts","city"].forEach(function(k){q=q.is(k,null)});
+  /* no performance data and no distance (null or 0) = empty row */
+  return q.then(function(r){if(r.error)throw r.error;var by={};(r.data||[]).forEach(function(x){if(!(+x.distance_km||+x.payable_km||+x.completed_dist))(by[x.day]||(by[x.day]=[])).push(x.rider_id)});
+    return Object.keys(by).reduce(function(p,d){return p.then(function(){return sb.from("daily").delete().eq("day",d).in("rider_id",by[d]).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})}
 function upsertAll(table,rows,conflict){return batches(rows,500).reduce(function(p,b){return p.then(function(){return sb.from(table).upsert(b,{onConflict:conflict}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())}
 function round2(v){return v==null?null:Math.round(v*100)/100}
 /* write parsed files to the database */
@@ -1514,8 +1523,10 @@ function applyUpload(list){
   return (ros.length?batches(ros,200).reduce(function(p,b){return p.then(function(){return sb.rpc("set_riders",{p_rows:b}).then(function(r){if(r.error)throw r.error})})},Promise.resolve()):Promise.resolve())
     .then(function(){return ids.length?batches(ids.map(function(id){return{id:id}}),500).reduce(function(p,b){return p.then(function(){return sb.from("riders").upsert(b,{onConflict:"id",ignoreDuplicates:true}).then(function(r){if(r.error)throw r.error})})},Promise.resolve()):null})
     .then(function(){var m=Object.keys(meta).map(function(k){return meta[k]});return m.length?upsertAll("riders",m.map(function(o){var r={id:o.id};if(o.vehicle)r.vehicle=o.vehicle;if(o.tga)r.tga=o.tga;return r}).filter(function(r){return r.vehicle&&r.tga}),"id"):null})
+    .then(function(){return dayWipe(daily)})
     .then(function(){return dayClear(daily.perf,PERF_COLS.concat(["error_codes"]))})
     .then(function(){return dayClear(daily.dist,["distance_km","payable_km","completed_dist"])})
+    .then(function(){daily.dist=distKeep(daily)})
     .then(function(){return upsertAll("daily",daily.perf,"day,rider_id")})
     .then(function(){return upsertAll("daily",daily.dist,"day,rider_id")})
     .then(function(){return dayPurge(daily.perf.concat(daily.dist))})
