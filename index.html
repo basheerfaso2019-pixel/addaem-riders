@@ -410,7 +410,7 @@ function vOverall(){
   var k='<div class="kpis">'+kpi("عدد المناديب",N(courierIds().length,0),'عمل منهم <span class="num">'+t.riders+'</span> في '+wd(ld))+
     kpi("الطلبات المكتملة",N(t.cp,0),delta==null?dl(ld):'<span class="'+(delta>=0?"up":"down")+'"><span class="num">'+(delta>=0?"+":"")+fmt(delta,1)+'%</span></span> عن اليوم السابق')+
     kpi("نسبة القبول",P(t.ar),dl(ld))+kpi("ساعات العمل الفعلية",N(t.ac,1),'من <span class="num">'+fmt(t.pl,0)+'</span> ساعة مخططة')+
-    kpi("عدم الحضور",N(t.ns,0),"في آخر يوم")+kpi("إجمالي المكتملة",N(all.cp,0),'من <span class="num">'+ds[0]+'</span>')+'</div>';
+    kpi("عدم الحضور",N(t.ns,0),"في آخر يوم")+kpi("إجمالي المكتملة",N(ocmSum(),0),ocmLbl())+'</div>'+ocmPanel();
   var ser=ds.slice(-30).map(function(d){return{d:d,v:agg(rec(d)).cp}});
   var byCity={};rec(ld).forEach(function(o){var c=o.x[CI]||"—";(byCity[c]||(byCity[c]=[])).push(o)});
   var cityT=Object.keys(byCity).map(function(c){var a=agg(byCity[c]);return '<tr><td>'+esc(c)+'</td><td>'+N(a.riders,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+P(a.ar)+'</td><td>'+N(a.ac,1)+'</td></tr>'}).join("");
@@ -420,6 +420,18 @@ function vOverall(){
 /* ---------- overall: tier PDFs ---------- */
 var H2P_URL="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",OV_BUSY="";
 function loadH2P(){return window.html2pdf?Promise.resolve(window.html2pdf):new Promise(function(ok,no){var s=document.createElement("script");s.src=H2P_URL;s.onload=function(){ok(window.html2pdf)};s.onerror=function(){no(new Error("lib"))};document.head.appendChild(s)})}
+function ocmSel(){var ms=ovMonths(),s=(ui0.ocm||[]).filter(function(m){return ms.indexOf(m)>=0});return s.length?s.sort().reverse():ms.slice(0,1)}
+function ocmStat(m){var ds=days().filter(function(d){return d.slice(0,7)===m}),L=[],wd=0,rid={};ds.forEach(function(d){var r=data.days[d],c=0;for(var id in r){L.push({d:d,id:id,x:r[id]});var v=+r[id][CP]||0;c+=v;if(v>0)rid[id]=1}if(c>0)wd++});
+  var a=agg(L);return {m:m,cp:a.cp||0,wd:wd,r:Object.keys(rid).length,av:wd?(a.cp||0)/wd:0}}
+function ocmSum(){return ocmSel().reduce(function(s,m){return s+ocmStat(m).cp},0)}
+function ocmLbl(){var s=ocmSel();return s.length===1?monLabel(s[0]):'<span class="num">'+s.length+'</span> أشهر'}
+function ocmPanel(){var ms=ovMonths();if(!ms.length)return "";var sel=ocmSel(),S=sel.map(ocmStat),tot=S.reduce(function(a,x){return {cp:a.cp+x.cp,wd:a.wd+x.wd}},{cp:0,wd:0});
+  return '<section class="panel"><div class="stmthead"><h2>إجمالي المكتملة حسب الشهر</h2></div><div class="waop wacats" style="margin-bottom:10px">'+
+    (ms.length>1?'<button type="button" class="wacb" data-ocm="*" aria-pressed="'+(sel.length===ms.length)+'">كل الأشهر</button>':'')+
+    ms.map(function(m){return '<button type="button" class="wacb" data-ocm="'+m+'" aria-pressed="'+(sel.indexOf(m)>=0)+'">'+monTxt(m)+'</button>'}).join("")+'</div>'+
+    '<div class="tbl" style="box-shadow:none"><table><thead><tr><th>الشهر</th><th>الطلبات المكتملة</th><th>أيام العمل</th><th>المناديب</th><th>المعدل اليومي</th></tr></thead><tbody>'+
+    S.map(function(x){return '<tr><td>'+monLabel(x.m)+'</td><td class="num"><b>'+N(x.cp,0)+'</b></td><td class="num">'+N(x.wd,0)+'</td><td class="num">'+N(x.r,0)+'</td><td class="num">'+N(x.av,0)+'</td></tr>'}).join("")+
+    (S.length>1?'<tr style="font-weight:700;background:var(--sunk)"><td>الإجمالي</td><td class="num">'+N(tot.cp,0)+'</td><td class="num">'+N(tot.wd,0)+'</td><td>—</td><td class="num">'+N(tot.wd?tot.cp/tot.wd:0,0)+'</td></tr>':'')+'</tbody></table></div></section>'}
 function ovMonths(){var m={};days().forEach(function(d){m[d.slice(0,7)]=1});return Object.keys(m).sort().reverse()}
 function ovMon(){var ms=ovMonths();return ui0.ovm&&ms.indexOf(ui0.ovm)>=0?ui0.ovm:ms[0]}
 /* riders with completed orders in the month, highest first, split into three near-equal groups */
@@ -1471,6 +1483,12 @@ function enterStaff(user,name){
 }
 
 function batches(list,n){var out=[];for(var i=0;i<list.length;i+=n)out.push(list.slice(i,i+n));return out}
+function upDays(rows){var m={};rows.forEach(function(r){m[r.day]=1});return Object.keys(m)}
+function dayClear(rows,cols){var ds=upDays(rows);if(!ds.length)return null;var o={};cols.forEach(function(k){o[k]=null});
+  return sb.from("daily").update(o).in("day",ds).then(function(r){if(r.error)throw r.error})}
+function dayPurge(rows){var ds=upDays(rows);if(!ds.length)return null;var q=sb.from("daily").delete().in("day",ds);
+  ["completed","actual_hours","planned_hours","shifts","distance_km","payable_km","completed_dist"].forEach(function(k){q=q.is(k,null)});
+  return q.then(function(r){if(r.error)throw r.error})}
 function upsertAll(table,rows,conflict){return batches(rows,500).reduce(function(p,b){return p.then(function(){return sb.from(table).upsert(b,{onConflict:conflict}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())}
 function round2(v){return v==null?null:Math.round(v*100)/100}
 /* write parsed files to the database */
@@ -1491,8 +1509,11 @@ function applyUpload(list){
   return (ros.length?batches(ros,200).reduce(function(p,b){return p.then(function(){return sb.rpc("set_riders",{p_rows:b}).then(function(r){if(r.error)throw r.error})})},Promise.resolve()):Promise.resolve())
     .then(function(){return ids.length?batches(ids.map(function(id){return{id:id}}),500).reduce(function(p,b){return p.then(function(){return sb.from("riders").upsert(b,{onConflict:"id",ignoreDuplicates:true}).then(function(r){if(r.error)throw r.error})})},Promise.resolve()):null})
     .then(function(){var m=Object.keys(meta).map(function(k){return meta[k]});return m.length?upsertAll("riders",m.map(function(o){var r={id:o.id};if(o.vehicle)r.vehicle=o.vehicle;if(o.tga)r.tga=o.tga;return r}).filter(function(r){return r.vehicle&&r.tga}),"id"):null})
+    .then(function(){return dayClear(daily.perf,PERF_COLS.concat(["error_codes"]))})
+    .then(function(){return dayClear(daily.dist,["distance_km","payable_km","completed_dist"])})
     .then(function(){return upsertAll("daily",daily.perf,"day,rider_id")})
     .then(function(){return upsertAll("daily",daily.dist,"day,rider_id")})
+    .then(function(){return dayPurge(daily.perf.concat(daily.dist))})
     .then(function(){return upsertAll("quality",qual,"month,rider_id")})
     .then(function(){return upsertAll("wallet",Object.keys(wal).map(function(k){return wal[k]}),"rider_id")})
     .then(function(){return fuelApply(list)})
@@ -1522,6 +1543,7 @@ root.addEventListener("click",function(e){
    if(t.id==="stmtHtml"){stmtDownload(me);return}
   if(t.dataset.sdl){stmtDownload(t.dataset.sdl);return}
   if(t.dataset.sp){stmtPrint(t.dataset.sp);return}
+  if(t.dataset&&t.dataset.ocm!=null){var om=t.dataset.ocm,cur=ocmSel();if(om==="*")ui0.ocm=ovMonths().slice();else{cur=cur.filter(function(x){return x!==om});if(t.getAttribute("aria-pressed")!=="true")cur.push(om);if(!cur.length)return;ui0.ocm=cur}render();return}
   if(t.id==="shXlsx"){shExport();return}
   if(t.id==="waPdf"){waPdf();return}
   if(t.dataset&&t.dataset.wak!=null){var k=t.dataset.wak;if(k==="*")WA.ks=[];else{WA.ks=WA.ks.filter(function(x){return x!==k});if(t.getAttribute("aria-pressed")!=="true")WA.ks.push(k)}waSave();return}
