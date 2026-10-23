@@ -1330,7 +1330,9 @@ function render(){
   if(view!=="courier"&&view!=="data"&&view!=="perm"&&view!=="sheet"&&view!=="cards"&&view!=="hire"&&view!=="watch"&&!canSee(view))V=staff?function(){return '<div class="panel"><p class="hint" style="margin:0">لم يحدد لك المدير أي قسم بعد.</p></div>'}:vCourier;else if(!V)V=(view==="data"||view==="perm"||view==="sheet"||view==="cards"||view==="hire"||view==="watch")?vCourier:vSoon;
   var html='<div class="shell'+(isAdmin||staff?"":" solo")+'">'+side()+'<div style="min-width:0">'+bar()+'<main class="content">'+V()+'</main></div></div>';
   var a=document.activeElement,f=a&&a.id,pos=null;try{pos=a.selectionStart}catch(e){}
+  var sd0=root.querySelector(".side"),sdT=sd0?sd0.scrollTop:0,sdL=sd0?sd0.scrollLeft:0;
   root.innerHTML=html;trTree(root);
+  var sd1=root.querySelector(".side");if(sd1){sd1.scrollTop=sdT;sd1.scrollLeft=sdL}
   var isIn=!!(me||isAdmin||staff);if(WAS_IN===false&&isIn)showSplash(2200);WAS_IN=isIn;
   if(f){var el=document.getElementById(f);if(el){el.focus();try{if(pos!=null)el.setSelectionRange(pos,pos)}catch(e){}}}
 }
