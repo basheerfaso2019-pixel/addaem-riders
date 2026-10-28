@@ -563,7 +563,7 @@ function cardPhoto(id){var p=CARD.photos[id];if(p&&p!=="loading")return Promise.
 function cardIqLoad(){if(!SHIQ){SHIQ="loading";all("rider_private","rider_id,iqama","rider_id").then(function(rs){SHIQ={};rs.forEach(function(r){SHIQ[r.rider_id]=r.iqama});render()},function(){SHIQ={};render()})}}
 function cardIq(id){return SHIQ&&SHIQ!=="loading"&&SHIQ[id]?String(SHIQ[id]):""}
 function cardPh(id){var p=String((data.couriers[id]&&data.couriers[id].ph)||"");return /^9665\d{8}$/.test(p)?"0"+p.slice(3):p}
-function cardCatOf(id){var c=data.couriers[id]||{};return c.rg?"ر":normCat(c.cat)||"—"}
+function cardCatOf(id){var c=data.couriers[id]||{};return c.rg==="الرياض"?"ر":normCat(c.cat)||"—"}
 function cardRiders(){return Object.keys(data.couriers).filter(function(id){return data.couriers[id].n}).sort(function(a,b){return data.couriers[a].n.localeCompare(data.couriers[b].n,"ar")})}
 function cardList(){var q=CARD.q.trim().toLowerCase();return cardRiders().filter(function(id){var c=data.couriers[id];
   if(CARD.cat&&cardCatOf(id)!==CARD.cat)return false;if(q&&String(c.n).toLowerCase().indexOf(q)<0&&id.indexOf(q)<0&&cardIq(id).indexOf(q)<0)return false;return true})}
@@ -709,7 +709,7 @@ function wHit(b){var m=wMin();return wOwe()?b<=-m:b>=m}
 QK.wc="wcs";QK.wk="wks";
 /* rider city = city on his latest day of data, else his region */
 function wCity(id){var ds=days();for(var i=ds.length-1;i>=0;i--){var x=data.days[ds[i]][id];if(x&&x[CI])return String(x[CI])}var c=data.couriers[id];return c&&c.rg||"—"}
-function wKat(id){var c=data.couriers[id]||{};return c.rg?"الرياض":normCat(c.cat)||"—"}
+function wKat(id){var c=data.couriers[id]||{};return c.rg==="الرياض"?"الرياض":normCat(c.cat)||"—"}
 var WK_ORDER=["أ","ب","خ","الرياض","—"],WK_TXT={"أ":"فئة أ","ب":"فئة ب","خ":"فئة خ","الرياض":"مناديب الرياض","—":"بدون فئة"};
 function wFiltTxt(){var a=[];if((ui0.wcs||[]).length)a.push(ui0.wcs.map(function(c){return c==="—"?"غير محدد":c}).join("، "));if((ui0.wks||[]).length)a.push(ui0.wks.map(function(k){return WK_TXT[k]}).join("، "));return a.join(" · ")}
 function wList(){var m=wMin();if(m==null)return [];var cs=ui0.wcs||[],ks=ui0.wks||[];return courierIds().filter(function(id){var w=data.couriers[id]&&data.couriers[id].w;return w&&wHit(+w.b||0)&&(!cs.length||cs.indexOf(wCity(id))>=0)&&(!ks.length||ks.indexOf(wKat(id))>=0)}).sort(function(a,b){return wOwe()?data.couriers[a].w.b-data.couriers[b].w.b:data.couriers[b].w.b-data.couriers[a].w.b})}
@@ -796,7 +796,7 @@ function rgPanel(id,mine,ld){if(!ld)return "";var ms={};mine.forEach(function(d)
     '<div class="hero"><span class="hero-num num">'+fmt(sum,0)+'</span><span>طلب مكتمل من <span class="num">'+f+'</span> إلى <span class="num">'+t+'</span></span></div>'+
     '<div class="kpis" style="margin-top:12px">'+kpi("أيام العمل",N(ins.length,0),"")+kpi("متوسط يومي",N(ins.length?sum/ins.length:0,1),"")+'</div>'+
     '<p class="hint">كل شهر يُحسب لوحده. البيانات متاحة حتى <span class="num">'+ld+'</span>.</p></section>'}
-function catOf(id){var c=data.couriers&&data.couriers[id];if(!c)return "";if(c.rg)return "الرياض";return normCat(c.cat)||""}
+function catOf(id){var c=data.couriers&&data.couriers[id];if(!c)return "";if(c.rg==="الرياض")return "الرياض";return normCat(c.cat)||""}
 function addCatCols(){if(view==="courier")return;var root=document.getElementById("root");if(!root)return;
   [].forEach.call(root.querySelectorAll("table"),function(tb){if(tb.closest(".shtbl")||tb.dataset.catdone)return;var hr=tb.querySelector("thead tr:last-child");if(!hr)return;
     var ths=[].slice.call(hr.children),txt=ths.map(function(th){return th.textContent.trim()});
