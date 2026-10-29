@@ -383,14 +383,14 @@ function riderRows(f){var list=recs(f),g={};list.forEach(function(o){(g[o.id]||(
 function status(a,avg){if(a.ns&&!a.cp)return['p-off','لم يحضر'];if(!avg)return['p-mid','—'];var x=(a.cp/a.days)/avg;if(x>=1.15)return['p-good','أعلى من المتوسط'];if(x<.85)return['p-low','أقل من المتوسط'];return['p-mid','ضمن المتوسط']}
 function vRiders(){
   var f=F(),rows=riderRows(f).sort(function(a,b){return b.cp-a.cp}),all=agg(recs(f)),avg=all.riders&&all.days?all.cp/ (rows.reduce(function(s,a){return s+a.days},0)||1):0;rows=rpFilter(rows,avg);
-  var body=rows.map(function(a){var s=status(a,avg);return '<tr class="click'+(ui.sel===a.id?" sel":"")+'" data-sel="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+'</td><td>'+esc(a.city||"—")+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.sh,0)+'</td><td>'+N(a.pl)+'</td><td>'+N(a.ac)+'</td><td>'+N(a.br)+'</td><td>'+P(a.ar)+'</td><td>'+P(a.cr)+'</td><td>'+N(a.ns,0)+'</td><td>'+N(a.nt,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+N(a.ad,0)+'</td><td>'+N(a.st,0)+'</td><td>'+N(a.de||0,0)+'</td><td>'+N(a.di,1)+'</td><td><span class="pill '+s[0]+'">'+s[1]+'</span></td></tr>'}).join("");
+  var body=rows.map(function(a){var s=status(a,avg);return '<tr class="click'+(ui.sel===a.id?" sel":"")+'" data-sel="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+(LOWD[a.id]?' <span class="lowb">أداء منخفض</span>':'')+'</td><td>'+esc(a.city||"—")+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.sh,0)+'</td><td>'+N(a.pl)+'</td><td>'+N(a.ac)+'</td><td>'+N(a.br)+'</td><td>'+P(a.ar)+'</td><td>'+P(a.cr)+'</td><td>'+N(a.ns,0)+'</td><td>'+N(a.nt,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+N(a.ad,0)+'</td><td>'+N(a.st,0)+'</td><td>'+N(a.de||0,0)+'</td><td>'+N(a.di,1)+'</td><td><span class="pill '+s[0]+'">'+s[1]+'</span></td></tr>'}).join("");
   var det="";
   if(ui.sel){var id=ui.sel,rms=rdMonths(id),rm=ui0.rdm&&rms.indexOf(ui0.rdm)>=0?ui0.rdm:rms[0],mdays=days().filter(function(d){return d.slice(0,7)===rm}),ds=mdays,ser=ds.map(function(d){var v=data.days[d][id];return{d:d,v:v?+v[CP]||0:0}}),tot=agg(mdays.filter(function(d){return data.days[d][id]}).map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
     var mtot=rms.map(function(m){var t=0;days().forEach(function(d){if(d.slice(0,7)===m&&data.days[d][id])t+=+data.days[d][id][CP]||0});return '<button class="mchip'+(m===rm?" on":"")+'" data-rdm="'+m+'">'+monTxt(m)+' <b class="num">'+fmt(t,0)+'</b></button>'}).join("");
     det='<section class="panel"><div class="who"><div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row"><button class="btn" data-sel="">إغلاق</button></div></div>'+
       '<div class="mchips"><span class="hint">الطلبات المكتملة حسب الشهر:</span>'+mtot+'</div>'+
       '<div class="kpis" style="margin-block:12px">'+kpi("الطلبات المكتملة · "+(rm?monTxt(rm):""),N(tot.cp,0),'خلال <span class="num">'+tot.days+'</span> يوم عمل')+kpi("متوسط يومي",N(tot.days?tot.cp/tot.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(tot.ar),"")+kpi("عدم الحضور",N(tot.ns,0),"")+kpi("المرفوضة المسجلة",N(tot.de||0,0),"ما زاد عن طلبين يومياً")+'</div>'+bars(ser,{h:170,label:"الطلبات المكتملة يومياً"})+'</section>'+rdQuality(id);}
-  return sampleNote()+filters()+rpBar()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المرفوضة المسجلة<br>Declined &gt;2</th><th>المسافة كم<br>Distance</th><th>الحالة</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="18">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
+  return sampleNote()+filters()+rpBar()+lowPanel()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المرفوضة المسجلة<br>Declined &gt;2</th><th>المسافة كم<br>Distance</th><th>الحالة</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="18">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
 }
 function vTop(){
   var f=F(),rows=riderRows(f).sort(function(a,b){return b.cp-a.cp}).slice(0,15),max=rows.length?rows[0].cp||1:1;
@@ -880,16 +880,16 @@ function rpCat(id){return catOf(id)||"—"}
 function rpPh(id){var c=data.couriers[id],p=c&&c.ph?String(c.ph).replace(/\D/g,"").replace(/^966/,""):"";return p?(/^5/.test(p)?"0"+p:p):""}
 function rpCatName(k){return k==="—"?"بدون فئة":k==="الرياض"?"مناديب الرياض":"فئة "+k}
 var RP_ST=["أعلى من المتوسط","ضمن المتوسط","أقل من المتوسط","لم يحضر"];
-function rpFilter(rows,avg){rows.forEach(function(a){a.stt=status(a,avg)[1]});var cc={},kc={},sc={};rows.forEach(function(a){var c=a.city||"—",k=rpCat(a.id);cc[c]=(cc[c]||0)+1;kc[k]=(kc[k]||0)+1;sc[a.stt]=(sc[a.stt]||0)+1});
+function rpFilter(rows,avg){lowCalc();rows.forEach(function(a){a.stt=status(a,avg)[1]});var cc={},kc={},sc={};rows.forEach(function(a){var c=a.city||"—",k=rpCat(a.id);cc[c]=(cc[c]||0)+1;kc[k]=(kc[k]||0)+1;sc[a.stt]=(sc[a.stt]||0)+1});
   var sts=RP_ST.filter(function(x){return sc[x]});ui0.rss=(ui0.rss||[]).filter(function(x){return sts.indexOf(x)>=0});
   var cities=Object.keys(cc).sort(),kats=Object.keys(kc).sort(function(a,b){return shCatOrder(a)-shCatOrder(b)});
   ui0.rcs=(ui0.rcs||[]).filter(function(c){return cities.indexOf(c)>=0});ui0.rks=(ui0.rks||[]).filter(function(k){return kats.indexOf(k)>=0});
-  var out=rows.filter(function(a){return (!ui0.rcs.length||ui0.rcs.indexOf(a.city||"—")>=0)&&(!ui0.rks.length||ui0.rks.indexOf(rpCat(a.id))>=0)&&(!ui0.rss.length||ui0.rss.indexOf(a.stt)>=0)});
+  var out=rows.filter(function(a){return (!ui0.rcs.length||ui0.rcs.indexOf(a.city||"—")>=0)&&(!ui0.rks.length||ui0.rks.indexOf(rpCat(a.id))>=0)&&(!ui0.rss.length||ui0.rss.indexOf(a.stt)>=0)&&(!ui0.rlow||LOWD[a.id])});
   RP={f:F(),rows:out,cities:cities.map(function(c){return [c,c+" ("+cc[c]+")"]}),kats:kats.map(function(k){return [k,rpCatName(k)+" ("+kc[k]+")"]}),sts:sts.map(function(x){return [x,x+" ("+sc[x]+")"]})};return out}
-function rpSelTxt(){var k=(ui0.rks||[]).map(rpCatName).join(" + "),c=(ui0.rcs||[]).join(" + "),t=(ui0.rss||[]).join(" + ");return (k?" - "+k:"")+(c?" - "+c:"")+(t?" - "+t:"")}
+function rpSelTxt(){var k=(ui0.rks||[]).map(rpCatName).join(" + "),c=(ui0.rcs||[]).join(" + "),t=(ui0.rss||[]).join(" + ");return (ui0.rlow?" - أداء منخفض":"")+(k?" - "+k:"")+(c?" - "+c:"")+(t?" - "+t:"")}
 function rpBar(){if(!RP)return "";
   return '<div class="filters rpbar">'+qMsel("rk","فئة المندوب",RP.kats,ui0.rks||[])+qMsel("rc","المدينة",RP.cities,ui0.rcs||[])+qMsel("rs","الحالة",RP.sts,ui0.rss||[])+
-    '<div class="row" style="gap:8px;align-self:flex-end"><button class="btn pri" id="rpPdf"'+(RP.rows.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="rp"?"جارٍ التجهيز…":"⬇ تحميل PDF")+'</button><span class="hint rpcnt">'+RP.rows.length+' مندوب</span></div></div>'}
+    '<div class="row" style="gap:8px;align-self:flex-end"><button class="btn lowbtn" id="rpLow" aria-pressed="'+(!!ui0.rlow)+'">⚠ أداء منخفض <span class="num">('+Object.keys(LOWD).length+')</span></button><button class="btn pri" id="rpPdf"'+(RP.rows.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="rp"?"جارٍ التجهيز…":"⬇ تحميل PDF")+'</button><span class="hint rpcnt">'+RP.rows.length+' مندوب</span></div></div>'}
 function rpVals(a,i){return [i+1,a.id,cname(a.id),rpPh(a.id),rpCat(a.id)==="—"?"":rpCat(a.id),a.city||"",fmt(a.days,0),fmt(a.sh,0),fmt(a.pl,1),fmt(a.ac,1),fmt(a.br,1),a.ar==null||isNaN(a.ar)?"—":fmt(a.ar*100,0)+"%",fmt(a.ns,0),fmt(a.cp,0),fmt(a.de||0,0),a.di==null?"—":fmt(a.di,1),a.stt||""]}
 function rpDoc(Q){var th='background:#0f4c4a;color:#fff;font-weight:700;padding:6px 3px;border:1px solid #0f4c4a;font-size:9.5px;line-height:1.35',td='padding:5px 3px;border:1px solid #d5dedd;font-size:10px;text-align:center;overflow:hidden';
   var tot=Q.rows.reduce(function(s,a){s.cp+=a.cp||0;s.days+=a.days||0;s.ac+=a.ac||0;return s},{cp:0,days:0,ac:0});
@@ -906,18 +906,16 @@ function rpPdf(){if(!RP||!RP.rows.length)return;var Q={f:RP.f,rows:RP.rows.slice
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:"أداء المناديب"+rpSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
-/* ---------- low performance (watch tab filter): > LOW_N days absent or LOW_S+ days under LOW_H actual hours ---------- */
+/* ---------- low performance: > LOW_N days under LOW_H actual hours ---------- */
 var LOW_H=8,LOW_N=4,LOW_S=4,LOWD={};
-function lowCalc(f){var ds=waDays().filter(function(d){return d>=f.from&&d<=f.to}).sort(),first={},seen={};LOWD={};
+function lowCalc(){var f=F(),ds=waDays().filter(function(d){return d>=f.from&&d<=f.to}).sort(),first={},seen={};LOWD={};
   days().forEach(function(d){for(var id in data.days[d])if(!first[id]||d<first[id])first[id]=d});
   recs({from:f.from,to:f.to}).forEach(function(o){seen[o.id]=1});
   Object.keys(seen).forEach(function(id){var c=data.couriers[id]||{},L=[];ds.forEach(function(d){if(d<first[id]||waOff(c,d))return;var x=data.days[d][id],h=x&&x[AC]!=null?+x[AC]:0;if(h<LOW_H)L.push([d,h])});
     var ab=L.filter(function(x){return !(x[1]>0)}).length,sh=L.length-ab;if(ab>LOW_N||sh>=LOW_S){L.ab=ab;L.sh=sh;LOWD[id]=L}})}
-function lowFrom(day){return day.slice(0,8)+"01"}
-function lowWhy(L){var t=[];if(L.ab)t.push("لم يعمل "+L.ab+" أيام");if(L.sh)t.push("أقل من "+LOW_H+" س في "+L.sh+" أيام");return "أداء منخفض ("+t.join(" · ")+")"}
-function lowPanel(day,ids){ids=ids.slice().sort(function(a,b){return LOWD[b].length-LOWD[a].length});
+function lowPanel(){if(!ui0.rlow)return "";var ids=Object.keys(LOWD).filter(function(id){return !RP||RP.rows.some(function(a){return a.id===id})}).sort(function(a,b){return LOWD[b].length-LOWD[a].length});
   var body=ids.map(function(id,i){var c=data.couriers[id]||{},L=LOWD[id];return '<tr><td>'+(i+1)+'</td><td class="num">'+esc(id)+'</td><td class="s">'+esc(cname(id))+'</td><td class="num" dir="ltr">'+(rpPh(id)||"—")+'</td><td>'+esc(catOf(id)||"—")+'</td><td>'+esc(wCity(id))+'</td><td class="num"'+(L.ab>LOW_N?' style="color:var(--bad);font-weight:700"':'')+'>'+L.ab+'</td><td class="num"'+(L.sh>=LOW_S?' style="color:var(--bad);font-weight:700"':'')+'>'+L.sh+'</td><td class="s" style="font-size:12px;line-height:1.9;white-space:normal;min-width:280px;max-width:520px">'+L.map(function(x){return '<span class="lowd"><span dir="ltr">'+x[0].slice(8)+'/'+x[0].slice(5,7)+'</span> · '+(x[1]>0?fmt(x[1],1)+' س':'لم يعمل')+'</span>'}).join(" ")+'</td></tr>'}).join("");
-  return '<section class="panel"><h2 style="margin:0 0 4px">المناديب ذوو الأداء المنخفض</h2><p class="hint" style="margin:0 0 10px">المندوب اللي ما اشتغل أكثر من '+LOW_N+' أيام، أو اشتغل أقل من '+LOW_H+' ساعات في '+LOW_S+' أيام أو أكثر، من <span class="num" dir="ltr">'+lowFrom(day)+'</span> إلى <span class="num" dir="ltr">'+day+'</span>. ما تنحسب أيام الإجازة (مرضية أو سنوية) أو الإيقاف أو ما قبل أول يوم عمل له.</p>'+
+  return '<section class="panel"><h2 style="margin:0 0 4px">المناديب ذوو الأداء المنخفض</h2><p class="hint" style="margin:0 0 10px">المندوب اللي ما اشتغل أكثر من '+LOW_N+' أيام، أو اشتغل أقل من '+LOW_H+' ساعات في '+LOW_S+' أيام أو أكثر، خلال الفترة المختارة. ما تنحسب أيام الإجازة (مرضية أو سنوية) أو الإيقاف أو ما قبل أول يوم عمل له.</p>'+
     (ids.length?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>#</th><th>Rider Id</th><th>الاسم</th><th>الجوال</th><th>الفئة</th><th>المدينة</th><th>أيام لم يعمل</th><th>أيام أقل من '+LOW_H+' س</th><th>الأيام (اليوم/الشهر · الساعات)</th></tr></thead><tbody>'+body+'</tbody></table></div>':'<p class="hint">لا يوجد مناديب بأداء منخفض في هذه الفترة.</p>')+'</section>'}
 /* ---------- rider: rejected-orders notice after login ---------- */
 var DEN_T=null,DEN_M={low:["⚠️ تنبيه الأداء","شغلك ضعيف، شد حيلك الله يرضى عليك 🤲","your performance is weak. Please work harder, may God be pleased with you 🤲"],
@@ -967,20 +965,19 @@ function hirePos(){var s=document.getElementById("hireSlot"),f=HIRE.fr;
 setInterval(hirePos,200);window.addEventListener("resize",hirePos);
 function vHire(){hireLoad();setTimeout(hirePos,0);return '<div id="hireSlot" class="hires"><p class="hint" style="padding:16px">جارٍ فتح النموذج…</p></div>'}
 /* ---------- daily watch list: category أ ---------- */
-var WA_DEF={ks:["أ"],q:1,w:1,h:1,lp:0,g:["E","F"],wv:300,hv:8},WA=(function(){var o={};try{o=JSON.parse(localStorage.getItem("hs_wa")||"{}")||{}}catch(e){}var r={};for(var k in WA_DEF)r[k]=o[k]!=null?o[k]:WA_DEF[k];if(o.ks==null&&o.k)r.ks=o.k==="*"?[]:[o.k];return JSON.parse(JSON.stringify(r))})(),WA_WAL=-Math.abs(+WA.wv||300),WA_HRS=+WA.hv||8;
+var WA_DEF={ks:["أ"],q:1,w:1,h:1,g:["E","F"],wv:300,hv:8},WA=(function(){var o={};try{o=JSON.parse(localStorage.getItem("hs_wa")||"{}")||{}}catch(e){}var r={};for(var k in WA_DEF)r[k]=o[k]!=null?o[k]:WA_DEF[k];if(o.ks==null&&o.k)r.ks=o.k==="*"?[]:[o.k];return JSON.parse(JSON.stringify(r))})(),WA_WAL=-Math.abs(+WA.wv||300),WA_HRS=+WA.hv||8;
 function waSave(){WA_WAL=-Math.abs(+WA.wv||0);WA_HRS=+WA.hv||0;try{localStorage.setItem("hs_wa",JSON.stringify(WA))}catch(e){}setTimeout(render,0)}
 var WA_CATS=[["أ","فئة أ"],["ب","فئة ب"],["خ","فئة خ"],["الرياض","مناديب الرياض"],["","بدون فئة"]];
 function waCatTxt(){if(!WA.ks.length)return "كل المناديب";return WA_CATS.filter(function(x){return WA.ks.indexOf(x[0])>=0}).map(function(x){return x[1]}).join(" و ")}
 function waDays(){return Object.keys(data.days||{}).filter(function(d){var o=data.days[d];return Object.keys(o).some(function(id){return o[id][AC]!=null})}).sort().reverse()}
 function waQ(c,day){var q=c&&c.q;if(!q)return null;var ms=Object.keys(q).filter(function(m){return m<=day.slice(0,7)}).sort();return ms.length?{m:ms[ms.length-1],s:q[ms[ms.length-1]].s}:null}
 function waOff(c,day){var s=c&&c.st;if(!s||!s.t)return false;if(s.t==="ended")return !s.f||s.f<=day;if(s.t==="leave"||s.t==="susp")return (!s.f||s.f<=day)&&(!s.u||s.u>=day);return false}
-function waRows(day){var out=[],o=data.days[day]||{};if(WA.lp)lowCalc({from:lowFrom(day),to:day});
+function waRows(day){var out=[],o=data.days[day]||{};
   Object.keys(data.couriers||{}).forEach(function(id){if(WA.ks.length&&WA.ks.indexOf(catOf(id))<0)return;var c=data.couriers[id];if(waOff(c,day))return;
     var x=o[id],ac=x&&x[AC]!=null?+x[AC]:null,pl=x&&x[PL]!=null?+x[PL]:null,cp=x&&x[CP]!=null?+x[CP]:null,q=waQ(c,day),w=c.w&&c.w.b!=null?+c.w.b:null,why=[];
     if(WA.q&&q&&WA.g.indexOf(q.s)>=0)why.push("جودة التوصيل "+q.s);
     if(WA.w&&w!=null&&w<=WA_WAL)why.push("المحفظة "+fmt(w,2));
     if(!WA.h);else if(ac==null)why.push("لم يعمل هذا اليوم");else if(ac<WA_HRS)why.push("ساعات العمل "+fmt(ac,2));
-    if(WA.lp&&LOWD[id])why.push(lowWhy(LOWD[id]));
     if(why.length)out.push({id:id,cp:cp,city:x&&x[CI]||"",q:q,w:w,ac:ac,pl:pl,why:why})});
   return out.sort(function(a,b){return b.why.length-a.why.length||(a.w==null?0:a.w)-(b.w==null?0:b.w)})}
 function vWatch(){return waPanel(1)||'<section class="panel"><p class="hint">لا توجد بيانات أداء يومية بعد.</p></section>'}
@@ -989,14 +986,12 @@ function waPanel(full){var ds=waDays();if(!ds.length)return "";var day=ui0.wad&&
   var body=(full?R:R.slice(0,12)).map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="num">'+esc(r.id)+'</td><td class="s">'+esc(cname(r.id))+'</td><td class="num" dir="ltr">'+(rpPh(r.id)||"—")+'</td><td class="num">'+(r.cp==null?"0":fmt(r.cp,0))+'</td>'+(WA.q?'<td>'+(r.q?segPill(r.q.s):"—")+'</td>':'')+(WA.w?'<td class="num"'+(r.w!=null&&r.w<=WA_WAL?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.w==null?"—":fmt(r.w,2))+'</td>':'')+(WA.h?'<td class="num"'+(r.ac==null||r.ac<WA_HRS?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.ac==null?"0":fmt(r.ac,2))+'</td>':'')+'<td class="s" style="font-size:12.5px">'+esc(r.why.join("، "))+'</td></tr>'}).join("");
   return '<section class="panel"><div class="stmthead"><h2>'+esc(waName())+'</h2><div class="stmttools"><select id="waDay" aria-label="اليوم">'+ds.map(function(d){return '<option value="'+d+'"'+(d===day?" selected":"")+'>'+wd(d)+' '+d+'</option>'}).join("")+'</select>'+
     '<button class="btn pri" id="waPdf"'+(R.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="wa"?"جارٍ التصدير…":"⬇ PDF")+' <span class="num">('+R.length+')</span></button></div></div>'+
-    waOpts()+'<p class="hint">جودة: <b class="num">'+cnt(/^جودة/)+'</b> · المحفظة: <b class="num">'+cnt(/^المحفظة/)+'</b> · الساعات: <b class="num">'+cnt(/^ساعات|^لم يعمل/)+'</b>'+(WA.lp?' · الأداء المنخفض: <b class="num">'+cnt(/^أداء منخفض/)+'</b>':'')+'</p>'+
-    (R.length?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>#</th><th>Rider Id</th><th>الاسم</th><th>الجوال</th><th>الطلبات</th>'+(WA.q?'<th>الجودة</th>':'')+(WA.w?'<th>المحفظة</th>':'')+(WA.h?'<th>الساعات الفعلية</th>':'')+'<th>السبب</th></tr></thead><tbody>'+body+'</tbody></table></div>'+(!full&&R.length>12?'<p class="hint">يظهر أول 12 هنا، والقائمة كاملة في ملف PDF.</p>':''):'<p class="hint">لا يوجد مناديب تنطبق عليهم الشروط في هذا اليوم.</p>')+'</section>'+
-    (WA.lp&&full?lowPanel(day,R.filter(function(r){return LOWD[r.id]}).map(function(r){return r.id})):'')}
+    waOpts()+'<p class="hint">جودة: <b class="num">'+cnt(/^جودة/)+'</b> · المحفظة: <b class="num">'+cnt(/^المحفظة/)+'</b> · الساعات: <b class="num">'+cnt(/ساعات|لم يعمل/)+'</b></p>'+
+    (R.length?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>#</th><th>Rider Id</th><th>الاسم</th><th>الجوال</th><th>الطلبات</th>'+(WA.q?'<th>الجودة</th>':'')+(WA.w?'<th>المحفظة</th>':'')+(WA.h?'<th>الساعات الفعلية</th>':'')+'<th>السبب</th></tr></thead><tbody>'+body+'</tbody></table></div>'+(!full&&R.length>12?'<p class="hint">يظهر أول 12 هنا، والقائمة كاملة في ملف PDF.</p>':''):'<p class="hint">لا يوجد مناديب تنطبق عليهم الشروط في هذا اليوم.</p>')+'</section>'}
 function waOpts(){var ck=function(id,on,txt){return '<label class="waop"><input type="checkbox" id="'+id+'"'+(on?" checked":"")+'> '+txt+'</label>'};
   return '<div class="waopts"><div class="waop wacats"><span>الفئة</span><button type="button" class="wacb" data-wak="*" aria-pressed="'+(!WA.ks.length)+'">الكل</button>'+WA_CATS.map(function(c){return '<button type="button" class="wacb" data-wak="'+c[0]+'" aria-pressed="'+(WA.ks.indexOf(c[0])>=0)+'">'+c[1]+'</button>'}).join("")+'</div>'+
     '<div class="waop">'+ck("waQ",WA.q,"جودة التوصيل")+' '+["A","B","C","D","E","F"].map(function(g){return '<label class="wag"><input type="checkbox" data-wag="'+g+'"'+(WA.g.indexOf(g)>=0?" checked":"")+(WA.q?"":" disabled")+'> '+g+'</label>'}).join("")+'</div>'+
     '<div class="waop">'+ck("waW",WA.w,"محفظة هنقرستيشن")+' أقل من أو يساوي <input type="number" id="waWv" min="0" step="50" value="'+Math.abs(+WA.wv||0)+'"'+(WA.w?"":" disabled")+'> ريال بالسالب</div>'+
-    '<div class="waop">'+ck("waLp",WA.lp,"الأداء المنخفض")+' <span class="hint" style="margin:0">من بداية الشهر حتى اليوم المختار</span></div>'+
     '<div class="waop">'+ck("waH",WA.h,"ساعات العمل الفعلية")+' أقل من <input type="number" id="waHv" min="0" max="24" step="0.5" value="'+(+WA.hv||0)+'"'+(WA.h?"":" disabled")+'> ساعة (أو لم يعمل)</div>'+
     '<button class="btn" id="waReset" type="button">الافتراضي</button></div>'}
 function waDoc(day,R){var th='background:#20386b;color:#fff;font-weight:700;padding:6px 4px;border:1px solid #20386b;font-size:10.5px',td='padding:5px 4px;border:1px solid #d9deeb;font-size:10.5px;text-align:center',bad=';color:#b5362f;font-weight:700';
@@ -1009,10 +1004,10 @@ function waDoc(day,R){var th='background:#20386b;color:#fff;font-weight:700;padd
     '<div style="height:4px;background:linear-gradient(90deg,#e6ecf5,#2f4e86 70%,#20386b);margin-bottom:10px"></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #f28a1a;padding-bottom:10px;margin-bottom:12px"><div><div style="font-size:19px;font-weight:700;color:#20386b">'+esc(waName())+'</div><div style="font-size:12.5px;color:#5b6386;margin-top:2px">'+esc(data.company||"")+'</div></div>'+
     '<div style="text-align:center;font-size:12px;color:#5b6386"><div style="font-size:15px;font-weight:700;color:#20386b">'+esc(wd(day))+' <span dir="ltr">'+esc(day)+'</span></div><div>اليوم</div></div><img src="logo.png" style="height:42px"></div>'+
-    '<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">'+box("عدد المناديب",R.length)+(WA.q?box("جودة "+WA.g.join(" / "),cnt(/^جودة/)):"")+(WA.w?box("المحفظة "+WA_WAL+" أو أقل",cnt(/^المحفظة/)):"")+(WA.h?box("ساعات أقل من "+WA_HRS,cnt(/^ساعات|^لم يعمل/)):"")+(WA.lp?box("أداء منخفض",cnt(/^أداء منخفض/)):"")+'</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">'+box("عدد المناديب",R.length)+(WA.q?box("جودة "+WA.g.join(" / "),cnt(/^جودة/)):"")+(WA.w?box("المحفظة "+WA_WAL+" أو أقل",cnt(/^المحفظة/)):"")+(WA.h?box("ساعات أقل من "+WA_HRS,cnt(/ساعات|لم يعمل/)):"")+'</div>'+
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+waCols().w.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+waCols().h.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
-function waName(){var c=[];if(WA.w)c.push("المحفظة");if(WA.h)c.push("ساعات العمل");if(WA.q)c.push("جودة التوصيل");if(WA.lp)c.push("الأداء المنخفض");return (c.join(" و ")||"متابعة المناديب")+" "+waCatTxt()}
+function waName(){var c=[];if(WA.w)c.push("المحفظة");if(WA.h)c.push("ساعات العمل");if(WA.q)c.push("جودة التوصيل");return (c.join(" و ")||"متابعة المناديب")+" "+waCatTxt()}
 function waCols(){var h=["#","Rider ID","الاسم","الجوال","المدينة","الطلبات"],w=[4,9,21,11,8,7];if(WA.q){h.push("الجودة");w.push(7)}if(WA.w){h.push("المحفظة");w.push(10)}if(WA.h){h.push("الساعات الفعلية","المخططة");w.push(9,8)}
   h.push("السبب");w.push(100-w.reduce(function(a,b){return a+b},0));return {h:h,w:w}}
 function waPdf(){var ds=waDays();if(!ds.length)return;var day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0],R=waRows(day);if(!R.length)return;OV_BUSY="wa";render();var sy=window.scrollY;window.scrollTo(0,0);
@@ -1601,6 +1596,7 @@ root.addEventListener("click",function(e){
   if(t.id==="qXlsx"){qExcel();return}
   if(t.id==="qPdf"){qPdf();return}
   if(t.id==="rpPdf"){rpPdf();return}
+  if(t.closest&&t.closest("#rpLow")){ui0.rlow=!ui0.rlow;render();return}
   if(t.dataset.qclr){ui0[QK[t.dataset.qclr]]=[];render();return}
   if(t.dataset.qdone){ui0.qopen=null;render();return}
   if(t.dataset.waweb){var w=window.open(t.dataset.waweb,WA_TAB);if(w)w.focus();return}
@@ -1649,7 +1645,6 @@ root.addEventListener("change",function(e){
   if(t.id==="waQ"){WA.q=t.checked?1:0;waSave()}
   if(t.id==="waW"){WA.w=t.checked?1:0;waSave()}
   if(t.id==="waH"){WA.h=t.checked?1:0;waSave()}
-  if(t.id==="waLp"){WA.lp=t.checked?1:0;waSave()}
   if(t.id==="waWv"){WA.wv=Math.abs(+digits(t.value)||0);waSave()}
   if(t.id==="waHv"){WA.hv=+digits(t.value)||0;waSave()}
   if(t.dataset&&t.dataset.wag){var g=t.dataset.wag;WA.g=WA.g.filter(function(x){return x!==g});if(t.checked)WA.g.push(g);WA.g.sort();waSave()}
