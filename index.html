@@ -172,6 +172,10 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .rpbar{margin-top:-4px}
 
+.lowb{display:inline-block;background:#fde8e6;color:#b5362f;border:1px solid #f1b8b2;border-radius:999px;padding:0 8px;font-size:11.5px;font-weight:700;margin-inline-start:4px;white-space:nowrap}
+.lowbtn[aria-pressed=true]{background:#b5362f;border-color:#b5362f;color:#fff}
+.lowd{display:inline-block;background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:0 6px;margin:1px 2px;white-space:nowrap}
+
 .den{position:fixed;z-index:200;top:16px;left:50%;transform:translateX(-50%);width:min(92vw,460px);background:#fff4f2;color:#5a1010;border:2px solid #c62828;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.25);padding:14px 16px 10px;direction:rtl;font-size:15px;animation:denIn .3s ease-out}
 .den p{margin:6px 0}.den hr{border:0;border-top:1px solid #f3c5c0;margin:8px 0}.denw{font-size:16.5px}.den-mid{background:#fff8e6;border-color:#c9a24a;color:#5a4210}.den-mid .denh{color:#9a7414}.den-mid .denbar{background:#f1e2b8}.den-mid .denbar i{background:#c9a24a}.den-mid .dene,.den-mid .denx{color:#7a5a10}.den-high{background:#ecf8f1;border-color:#1f8a4c;color:#0f4c2a}.den-high .denh{color:#1f8a4c}.den-high .denbar{background:#c4e8d3}.den-high .denbar i{background:#1f8a4c}.den-high .dene,.den-high .denx{color:#1f6a3c}.dene{text-align:left;font-size:14px;color:#7a2a2a;margin-top:2px!important}.den ul{margin:4px 0 8px;padding-right:20px;max-height:40vh;overflow:auto}.den li{margin:3px 0}
 .denh{font-weight:700;font-size:17px;color:#c62828}
@@ -379,14 +383,14 @@ function riderRows(f){var list=recs(f),g={};list.forEach(function(o){(g[o.id]||(
 function status(a,avg){if(a.ns&&!a.cp)return['p-off','لم يحضر'];if(!avg)return['p-mid','—'];var x=(a.cp/a.days)/avg;if(x>=1.15)return['p-good','أعلى من المتوسط'];if(x<.85)return['p-low','أقل من المتوسط'];return['p-mid','ضمن المتوسط']}
 function vRiders(){
   var f=F(),rows=riderRows(f).sort(function(a,b){return b.cp-a.cp}),all=agg(recs(f)),avg=all.riders&&all.days?all.cp/ (rows.reduce(function(s,a){return s+a.days},0)||1):0;rows=rpFilter(rows,avg);
-  var body=rows.map(function(a){var s=status(a,avg);return '<tr class="click'+(ui.sel===a.id?" sel":"")+'" data-sel="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+'</td><td>'+esc(a.city||"—")+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.sh,0)+'</td><td>'+N(a.pl)+'</td><td>'+N(a.ac)+'</td><td>'+N(a.br)+'</td><td>'+P(a.ar)+'</td><td>'+P(a.cr)+'</td><td>'+N(a.ns,0)+'</td><td>'+N(a.nt,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+N(a.ad,0)+'</td><td>'+N(a.st,0)+'</td><td>'+N(a.de||0,0)+'</td><td>'+N(a.di,1)+'</td><td><span class="pill '+s[0]+'">'+s[1]+'</span></td></tr>'}).join("");
+  var body=rows.map(function(a){var s=status(a,avg);return '<tr class="click'+(ui.sel===a.id?" sel":"")+'" data-sel="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+(LOWD[a.id]?' <span class="lowb">أداء منخفض</span>':'')+'</td><td>'+esc(a.city||"—")+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.sh,0)+'</td><td>'+N(a.pl)+'</td><td>'+N(a.ac)+'</td><td>'+N(a.br)+'</td><td>'+P(a.ar)+'</td><td>'+P(a.cr)+'</td><td>'+N(a.ns,0)+'</td><td>'+N(a.nt,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+N(a.ad,0)+'</td><td>'+N(a.st,0)+'</td><td>'+N(a.de||0,0)+'</td><td>'+N(a.di,1)+'</td><td><span class="pill '+s[0]+'">'+s[1]+'</span></td></tr>'}).join("");
   var det="";
   if(ui.sel){var id=ui.sel,rms=rdMonths(id),rm=ui0.rdm&&rms.indexOf(ui0.rdm)>=0?ui0.rdm:rms[0],mdays=days().filter(function(d){return d.slice(0,7)===rm}),ds=mdays,ser=ds.map(function(d){var v=data.days[d][id];return{d:d,v:v?+v[CP]||0:0}}),tot=agg(mdays.filter(function(d){return data.days[d][id]}).map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
     var mtot=rms.map(function(m){var t=0;days().forEach(function(d){if(d.slice(0,7)===m&&data.days[d][id])t+=+data.days[d][id][CP]||0});return '<button class="mchip'+(m===rm?" on":"")+'" data-rdm="'+m+'">'+monTxt(m)+' <b class="num">'+fmt(t,0)+'</b></button>'}).join("");
     det='<section class="panel"><div class="who"><div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row"><button class="btn" data-sel="">إغلاق</button></div></div>'+
       '<div class="mchips"><span class="hint">الطلبات المكتملة حسب الشهر:</span>'+mtot+'</div>'+
       '<div class="kpis" style="margin-block:12px">'+kpi("الطلبات المكتملة · "+(rm?monTxt(rm):""),N(tot.cp,0),'خلال <span class="num">'+tot.days+'</span> يوم عمل')+kpi("متوسط يومي",N(tot.days?tot.cp/tot.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(tot.ar),"")+kpi("عدم الحضور",N(tot.ns,0),"")+kpi("المرفوضة المسجلة",N(tot.de||0,0),"ما زاد عن طلبين يومياً")+'</div>'+bars(ser,{h:170,label:"الطلبات المكتملة يومياً"})+'</section>'+rdQuality(id);}
-  return sampleNote()+filters()+rpBar()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المرفوضة المسجلة<br>Declined &gt;2</th><th>المسافة كم<br>Distance</th><th>الحالة</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="18">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
+  return sampleNote()+filters()+rpBar()+lowPanel()+det+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم<br>Name</th><th>المدينة<br>City</th><th>أيام العمل<br>Days</th><th>الورديات<br>Shifts Done</th><th>المخططة<br>Planned Hours</th><th>الفعلية<br>Actual Hours</th><th>الاستراحة<br>Break Hours</th><th>القبول<br>Acceptance</th><th>التواصل<br>Contact</th><th>عدم الحضور<br>No Shows</th><th>المُبلّغة<br>Notified</th><th>المكتملة<br>Completed</th><th>المقبولة<br>Accepted</th><th>المجمّعة<br>Stacked</th><th>المرفوضة المسجلة<br>Declined &gt;2</th><th>المسافة كم<br>Distance</th><th>الحالة</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="18">لا توجد بيانات في هذه الفترة.</td></tr>')+'</tbody></table></div>';
 }
 function vTop(){
   var f=F(),rows=riderRows(f).sort(function(a,b){return b.cp-a.cp}).slice(0,15),max=rows.length?rows[0].cp||1:1;
@@ -876,16 +880,16 @@ function rpCat(id){return catOf(id)||"—"}
 function rpPh(id){var c=data.couriers[id],p=c&&c.ph?String(c.ph).replace(/\D/g,"").replace(/^966/,""):"";return p?(/^5/.test(p)?"0"+p:p):""}
 function rpCatName(k){return k==="—"?"بدون فئة":k==="الرياض"?"مناديب الرياض":"فئة "+k}
 var RP_ST=["أعلى من المتوسط","ضمن المتوسط","أقل من المتوسط","لم يحضر"];
-function rpFilter(rows,avg){rows.forEach(function(a){a.stt=status(a,avg)[1]});var cc={},kc={},sc={};rows.forEach(function(a){var c=a.city||"—",k=rpCat(a.id);cc[c]=(cc[c]||0)+1;kc[k]=(kc[k]||0)+1;sc[a.stt]=(sc[a.stt]||0)+1});
+function rpFilter(rows,avg){lowCalc();rows.forEach(function(a){a.stt=status(a,avg)[1]});var cc={},kc={},sc={};rows.forEach(function(a){var c=a.city||"—",k=rpCat(a.id);cc[c]=(cc[c]||0)+1;kc[k]=(kc[k]||0)+1;sc[a.stt]=(sc[a.stt]||0)+1});
   var sts=RP_ST.filter(function(x){return sc[x]});ui0.rss=(ui0.rss||[]).filter(function(x){return sts.indexOf(x)>=0});
   var cities=Object.keys(cc).sort(),kats=Object.keys(kc).sort(function(a,b){return shCatOrder(a)-shCatOrder(b)});
   ui0.rcs=(ui0.rcs||[]).filter(function(c){return cities.indexOf(c)>=0});ui0.rks=(ui0.rks||[]).filter(function(k){return kats.indexOf(k)>=0});
-  var out=rows.filter(function(a){return (!ui0.rcs.length||ui0.rcs.indexOf(a.city||"—")>=0)&&(!ui0.rks.length||ui0.rks.indexOf(rpCat(a.id))>=0)&&(!ui0.rss.length||ui0.rss.indexOf(a.stt)>=0)});
+  var out=rows.filter(function(a){return (!ui0.rcs.length||ui0.rcs.indexOf(a.city||"—")>=0)&&(!ui0.rks.length||ui0.rks.indexOf(rpCat(a.id))>=0)&&(!ui0.rss.length||ui0.rss.indexOf(a.stt)>=0)&&(!ui0.rlow||LOWD[a.id])});
   RP={f:F(),rows:out,cities:cities.map(function(c){return [c,c+" ("+cc[c]+")"]}),kats:kats.map(function(k){return [k,rpCatName(k)+" ("+kc[k]+")"]}),sts:sts.map(function(x){return [x,x+" ("+sc[x]+")"]})};return out}
-function rpSelTxt(){var k=(ui0.rks||[]).map(rpCatName).join(" + "),c=(ui0.rcs||[]).join(" + "),t=(ui0.rss||[]).join(" + ");return (k?" - "+k:"")+(c?" - "+c:"")+(t?" - "+t:"")}
+function rpSelTxt(){var k=(ui0.rks||[]).map(rpCatName).join(" + "),c=(ui0.rcs||[]).join(" + "),t=(ui0.rss||[]).join(" + ");return (ui0.rlow?" - أداء منخفض":"")+(k?" - "+k:"")+(c?" - "+c:"")+(t?" - "+t:"")}
 function rpBar(){if(!RP)return "";
   return '<div class="filters rpbar">'+qMsel("rk","فئة المندوب",RP.kats,ui0.rks||[])+qMsel("rc","المدينة",RP.cities,ui0.rcs||[])+qMsel("rs","الحالة",RP.sts,ui0.rss||[])+
-    '<div class="row" style="gap:8px;align-self:flex-end"><button class="btn pri" id="rpPdf"'+(RP.rows.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="rp"?"جارٍ التجهيز…":"⬇ تحميل PDF")+'</button><span class="hint rpcnt">'+RP.rows.length+' مندوب</span></div></div>'}
+    '<div class="row" style="gap:8px;align-self:flex-end"><button class="btn lowbtn" id="rpLow" aria-pressed="'+(!!ui0.rlow)+'">⚠ أداء منخفض <span class="num">('+Object.keys(LOWD).length+')</span></button><button class="btn pri" id="rpPdf"'+(RP.rows.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="rp"?"جارٍ التجهيز…":"⬇ تحميل PDF")+'</button><span class="hint rpcnt">'+RP.rows.length+' مندوب</span></div></div>'}
 function rpVals(a,i){return [i+1,a.id,cname(a.id),rpPh(a.id),rpCat(a.id)==="—"?"":rpCat(a.id),a.city||"",fmt(a.days,0),fmt(a.sh,0),fmt(a.pl,1),fmt(a.ac,1),fmt(a.br,1),a.ar==null||isNaN(a.ar)?"—":fmt(a.ar*100,0)+"%",fmt(a.ns,0),fmt(a.cp,0),fmt(a.de||0,0),a.di==null?"—":fmt(a.di,1),a.stt||""]}
 function rpDoc(Q){var th='background:#0f4c4a;color:#fff;font-weight:700;padding:6px 3px;border:1px solid #0f4c4a;font-size:9.5px;line-height:1.35',td='padding:5px 3px;border:1px solid #d5dedd;font-size:10px;text-align:center;overflow:hidden';
   var tot=Q.rows.reduce(function(s,a){s.cp+=a.cp||0;s.days+=a.days||0;s.ac+=a.ac||0;return s},{cp:0,days:0,ac:0});
@@ -902,6 +906,14 @@ function rpPdf(){if(!RP||!RP.rows.length)return;var Q={f:RP.f,rows:RP.rows.slice
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:"أداء المناديب"+rpSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
+/* ---------- low performance: > LOW_N days under LOW_H actual hours ---------- */
+var LOW_H=8,LOW_N=4,LOWD={};
+function lowCalc(){var f=F(),m={};LOWD={};recs({from:f.from,to:f.to}).forEach(function(o){var h=o.x[AC];if(h==null||!(+h>0)||+h>=LOW_H)return;(m[o.id]||(m[o.id]=[])).push([o.d,+h])});
+  for(var id in m)if(m[id].length>LOW_N)LOWD[id]=m[id].sort(function(a,b){return a[0]<b[0]?-1:1})}
+function lowPanel(){if(!ui0.rlow)return "";var ids=Object.keys(LOWD).filter(function(id){return !RP||RP.rows.some(function(a){return a.id===id})}).sort(function(a,b){return LOWD[b].length-LOWD[a].length});
+  var body=ids.map(function(id,i){var c=data.couriers[id]||{},L=LOWD[id];return '<tr><td>'+(i+1)+'</td><td class="num">'+esc(id)+'</td><td class="s">'+esc(cname(id))+'</td><td class="num" dir="ltr">'+(rpPh(id)||"—")+'</td><td>'+esc(catOf(id)||"—")+'</td><td>'+esc(wCity(id))+'</td><td class="num" style="color:var(--bad);font-weight:700">'+L.length+'</td><td class="s" style="font-size:12px;line-height:1.9;white-space:normal;min-width:280px;max-width:520px">'+L.map(function(x){return '<span class="lowd"><span dir="ltr">'+x[0].slice(8)+'/'+x[0].slice(5,7)+'</span> · '+fmt(x[1],1)+' س</span>'}).join(" ")+'</td></tr>'}).join("");
+  return '<section class="panel"><h2 style="margin:0 0 4px">المناديب ذوو الأداء المنخفض</h2><p class="hint" style="margin:0 0 10px">مندوب عمل أقل من '+LOW_H+' ساعات فعلية في أكثر من '+LOW_N+' أيام خلال الفترة المختارة (الأيام اللي ما حضر فيها ما تنحسب).</p>'+
+    (ids.length?'<div class="tbl" style="box-shadow:none"><table><thead><tr><th>#</th><th>Rider Id</th><th>الاسم</th><th>الجوال</th><th>الفئة</th><th>المدينة</th><th>أيام أقل من '+LOW_H+' س</th><th>الأيام (اليوم/الشهر · الساعات)</th></tr></thead><tbody>'+body+'</tbody></table></div>':'<p class="hint">لا يوجد مناديب بأداء منخفض في هذه الفترة.</p>')+'</section>'}
 /* ---------- rider: rejected-orders notice after login ---------- */
 var DEN_T=null,DEN_M={low:["⚠️ تنبيه الأداء","شغلك ضعيف، شد حيلك الله يرضى عليك 🤲","your performance is weak. Please work harder, may God be pleased with you 🤲"],
   mid:["💪 أداؤك متوسط","شغلك متوسط، شد حيلك شوي، أنت ذيبان 💪","your performance is average. Push a little harder, you are a wolf 💪"],
@@ -1581,6 +1593,7 @@ root.addEventListener("click",function(e){
   if(t.id==="qXlsx"){qExcel();return}
   if(t.id==="qPdf"){qPdf();return}
   if(t.id==="rpPdf"){rpPdf();return}
+  if(t.closest&&t.closest("#rpLow")){ui0.rlow=!ui0.rlow;render();return}
   if(t.dataset.qclr){ui0[QK[t.dataset.qclr]]=[];render();return}
   if(t.dataset.qdone){ui0.qopen=null;render();return}
   if(t.dataset.waweb){var w=window.open(t.dataset.waweb,WA_TAB);if(w)w.focus();return}
