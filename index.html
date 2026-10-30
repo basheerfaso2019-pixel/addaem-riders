@@ -879,12 +879,12 @@ var RP_ST=["أعلى من المتوسط","ضمن المتوسط","أقل من �
 function rpFilter(rows,avg){rows.forEach(function(a){a.stt=status(a,avg)[1]});var cc={},kc={},sc={};rows.forEach(function(a){var c=a.city||"—",k=rpCat(a.id);cc[c]=(cc[c]||0)+1;kc[k]=(kc[k]||0)+1;sc[a.stt]=(sc[a.stt]||0)+1});
   var sts=RP_ST.filter(function(x){return sc[x]});ui0.rss=(ui0.rss||[]).filter(function(x){return sts.indexOf(x)>=0});
   var cities=Object.keys(cc).sort(),kats=Object.keys(kc).sort(function(a,b){return shCatOrder(a)-shCatOrder(b)});
-  ui0.rcs=(ui0.rcs||[]).filter(function(c){return cities.indexOf(c)>=0});ui0.rks=(ui0.rks||[]).filter(function(k){return kats.indexOf(k)>=0});
+  ui0.rcs=[];ui0.rks=(ui0.rks||[]).filter(function(k){return kats.indexOf(k)>=0});
   var out=rows.filter(function(a){return (!ui0.rcs.length||ui0.rcs.indexOf(a.city||"—")>=0)&&(!ui0.rks.length||ui0.rks.indexOf(rpCat(a.id))>=0)&&(!ui0.rss.length||ui0.rss.indexOf(a.stt)>=0)});
   RP={f:F(),rows:out,cities:cities.map(function(c){return [c,c+" ("+cc[c]+")"]}),kats:kats.map(function(k){return [k,rpCatName(k)+" ("+kc[k]+")"]}),sts:sts.map(function(x){return [x,x+" ("+sc[x]+")"]})};return out}
-function rpSelTxt(){var k=(ui0.rks||[]).map(rpCatName).join(" + "),c=(ui0.rcs||[]).join(" + "),t=(ui0.rss||[]).join(" + ");return (k?" - "+k:"")+(c?" - "+c:"")+(t?" - "+t:"")}
+function rpSelTxt(){var k=(ui0.rks||[]).map(rpCatName).join(" + "),c=F().city||"",t=(ui0.rss||[]).join(" + ");return (k?" - "+k:"")+(c?" - "+c:"")+(t?" - "+t:"")}
 function rpBar(){if(!RP)return "";
-  return '<div class="filters rpbar">'+qMsel("rk","فئة المندوب",RP.kats,ui0.rks||[])+qMsel("rc","المدينة",RP.cities,ui0.rcs||[])+qMsel("rs","الحالة",RP.sts,ui0.rss||[])+
+  return '<div class="filters rpbar">'+qMsel("rk","فئة المندوب",RP.kats,ui0.rks||[])+qMsel("rs","الحالة",RP.sts,ui0.rss||[])+
     '<div class="row" style="gap:8px;align-self:flex-end"><button class="btn pri" id="rpPdf"'+(RP.rows.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="rp"?"جارٍ التجهيز…":"⬇ تحميل PDF")+'</button><span class="hint rpcnt">'+RP.rows.length+' مندوب</span></div></div>'}
 function rpVals(a,i){return [i+1,a.id,cname(a.id),rpPh(a.id),rpCat(a.id)==="—"?"":rpCat(a.id),a.city||"",fmt(a.days,0),fmt(a.sh,0),fmt(a.pl,1),fmt(a.ac,1),fmt(a.br,1),a.ar==null||isNaN(a.ar)?"—":fmt(a.ar*100,0)+"%",fmt(a.ns,0),fmt(a.cp,0),fmt(a.de||0,0),a.di==null?"—":fmt(a.di,1),a.stt||""]}
 function rpDoc(Q){var th='background:#0f4c4a;color:#fff;font-weight:700;padding:6px 3px;border:1px solid #0f4c4a;font-size:9.5px;line-height:1.35',td='padding:5px 3px;border:1px solid #d5dedd;font-size:10px;text-align:center;overflow:hidden';
