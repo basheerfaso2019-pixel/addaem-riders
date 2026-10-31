@@ -191,6 +191,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 .wacb[aria-pressed=true]{background:#20386b;border-color:#20386b;color:#fff}
 .wag{display:inline-flex;align-items:center;gap:2px;font-weight:600}
 
+.btn.rdel{color:var(--bad);border-color:var(--bad);padding:4px 12px}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -588,7 +590,7 @@ function vCards(){cardIqLoad();cardPhotosLoad();cardCfgLoad();
   var first=sel[0]||list[0];if(first&&ph[first]&&CARD.photos[first]===undefined)cardPhoto(first).then(render);
   var cats=[["","الكل"],["أ","فئة أ"],["ب","فئة ب"],["خ","فئة خ"],["ر","مناديب الرياض"],["—","بدون فئة"]];
   var rows=list.slice(0,400).map(function(id){var c=data.couriers[id],on=!!CARD.sel[id];return '<tr'+(on?' class="csel"':'')+'><td><input type="checkbox" data-csel="'+esc(id)+'"'+(on?" checked":"")+'></td><td class="num">'+esc(id)+'</td><td class="s">'+esc(c.n)+'</td><td>'+esc(cardCatOf(id)==="ر"?"الرياض":cardCatOf(id))+'</td><td class="num">'+esc(cardIq(id)||"—")+'</td><td class="num">'+esc(cardPh(id)||"—")+'</td>'+
-    '<td style="white-space:nowrap"><label class="btn cphoto'+(ph[id]?"":" pri")+'">'+(ph[id]?"✓ صورة":"+ صورة")+'<input type="file" accept="image/*" data-cphoto="'+esc(id)+'" hidden></label>'+(ph[id]?' <button class="btn cphoto" data-cedit="'+esc(id)+'">ضبط</button>':'')+'</td></tr>'}).join("");
+    '<td style="white-space:nowrap"><label class="btn cphoto'+(ph[id]?"":" pri")+'">'+(ph[id]?"✓ صورة":"+ صورة")+'<input type="file" accept="image/*" data-cphoto="'+esc(id)+'" hidden></label>'+(ph[id]?' <button class="btn cphoto" data-cedit="'+esc(id)+'">ضبط</button>':'')+'</td>'+(isAdmin?'<td><button class="btn rdel" data-rdel="'+esc(id)+'">حذف</button></td>':'')+'</tr>'}).join("");
   var noPhoto=sel.filter(function(id){return !ph[id]}).length,noIq=sel.filter(function(id){return !cardIq(id)}).length;
   var g=CARD.cfg&&CARD.cfg!=="loading"?CARD.cfg:CARD_DEF;
   return '<style>'+CARD_CSS+'</style><div class="cardsgrid"><section class="panel"><h2>معاينة البطاقة</h2><p class="hint">'+(first?esc(cname(first)):"اختر مندوباً")+'</p><div class="cprev">'+(first?cardFront(first,CARD.photos[first]||""):"")+cardBack()+'</div>'+
@@ -599,7 +601,7 @@ function vCards(){cardIqLoad();cardPhotosLoad();cardCfgLoad();
     '<button class="btn pri" id="cPrint"'+(nSel&&!CARD.busy?"":" disabled")+'>'+(CARD.busy?"جارٍ التجهيز…":'طباعة / PDF (<span class="num">'+nSel+'</span>)')+'</button></div>'+
     (nSel&&(noPhoto||noIq)?'<p class="hint" style="color:var(--bad)">'+(noPhoto?'<span class="num">'+noPhoto+'</span> بدون صورة. ':'')+(noIq?'<span class="num">'+noIq+'</span> بدون رقم إقامة.':'')+'</p>':'')+
     '<p class="hint" id="cMsg" style="min-height:1.4em;margin:0 0 6px">'+esc(CARD.msg)+'</p>'+
-    '<div class="tbl" style="box-shadow:none;max-height:560px;overflow:auto"><table><thead><tr><th></th><th>Rider Id</th><th>الاسم</th><th>الفئة</th><th>الإقامة</th><th>الجوال</th><th>الصورة</th></tr></thead><tbody>'+(rows||'<tr><td class="empty" colspan="7">لا يوجد مناديب بهذا البحث.</td></tr>')+'</tbody></table></div></section></div>'}
+    '<div class="tbl" style="box-shadow:none;max-height:560px;overflow:auto"><table><thead><tr><th></th><th>Rider Id</th><th>الاسم</th><th>الفئة</th><th>الإقامة</th><th>الجوال</th><th>الصورة</th>'+(isAdmin?'<th></th>':'')+'</tr></thead><tbody>'+(rows||'<tr><td class="empty" colspan="8">لا يوجد مناديب بهذا البحث.</td></tr>')+'</tbody></table></div></section></div>'}
 /* photo crop: the circle on the card shows exactly what the manager frames here (drag to move, slider to zoom) */
 var CROP=null,CROP_C=300;
 function cardPhotoUpload(id,file){var img=new Image(),u=URL.createObjectURL(file);img.onload=function(){cropOpen(id,img,file)};img.onerror=function(){URL.revokeObjectURL(u);CARD.msg="الملف ليس صورة.";render()};img.src=u}
@@ -1034,6 +1036,14 @@ function waPdf(){var ds=waDays();if(!ds.length)return;var day=ui0.wad&&ds.indexO
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:waName()+" - "+day+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
+function rDel(id){if(!isAdmin)return;var nd=days().filter(function(d){return data.days[d][id]}).length;
+  if(!confirm("حذف المندوب «"+cname(id)+"» ("+id+") نهائياً؟\n\nسيُحذف من النظام مع كل بياناته: الأداء اليومي (عدد الأيام "+nd+")، الجودة، المحفظة، الملاحظات، الإقامة والصورة. لا يمكن التراجع.\n\nإذا كان المندوب ترك العمل فالأفضل تسجيله «ترك العمل» من تبويب «المناديب الموقوفون» لتبقى بياناته السابقة."))return;
+  var nm=cname(id),T=["daily","quality","wallet","sheet_extra","fuel_map","tga_codes","rider_private"],p=Promise.resolve();CARD.msg="جارٍ حذف "+nm+"…";render();
+  T.forEach(function(t){p=p.then(function(){return sb.from(t).delete().eq("rider_id",id).then(function(r){if(r&&r.error)throw r.error})})});
+  p.then(function(){return sb.from("riders").delete().eq("id",id).then(function(r){if(r&&r.error)throw r.error})})
+   .then(function(){return sb.storage.from("rider-photos").remove([id+".jpg"]).catch(function(){})})
+   .then(function(){delete data.couriers[id];Object.keys(data.days).forEach(function(d){delete data.days[d][id]});delete CARD.sel[id];if(CARD.ph&&typeof CARD.ph==="object")delete CARD.ph[id];if(CARD.photos)delete CARD.photos[id];CARD.msg="تم حذف المندوب "+nm+" ("+id+") من النظام.";render()},
+     function(e){CARD.msg="تعذر حذف المندوب: "+(e&&e.message||e);render()})}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -1611,6 +1621,7 @@ root.addEventListener("click",function(e){
   if(t.dataset.rdm){ui0.rdm=t.dataset.rdm;render();return}
   if(t.id==="wPdf"){wPdf();return}
   if(t.dataset.cedit){cardPhotoEdit(t.dataset.cedit);return}
+  if(t.dataset.rdel!=null){rDel(t.dataset.rdel);return}
   if(t.dataset.call!=null){if(t.dataset.call==="1")cardList().forEach(function(id){CARD.sel[id]=true});else CARD.sel={};render();return}
   if(t.id==="cPrint"){cardPrint();return}
   if(t.id==="qXlsx"){qExcel();return}
