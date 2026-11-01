@@ -193,6 +193,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .btn.rdel{color:var(--bad);border-color:var(--bad);padding:4px 12px}
 
+.wadl{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;white-space:nowrap}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -992,7 +994,7 @@ function waRows(day){if(waAbs())return waStRows(day);var out=[],o=data.days[day]
     var lp=LP[id];if(lp)why.push("أداء منخفض"+(lp.ab>LOW_N?" (غياب "+lp.ab+")":"")+(lp.sh>=LOW_S?" (ساعات أقل "+lp.sh+")":""));
     if(why.length)out.push({id:id,lp:lp,cp:cp,city:x&&x[CI]||"",q:q,w:w,ac:ac,pl:pl,why:why})});
   return out.sort(function(a,b){return b.why.length-a.why.length||(a.w==null?0:a.w)-(b.w==null?0:b.w)})}
-function vWatch(){return waPanel(1)||'<section class="panel"><p class="hint">لا توجد بيانات أداء يومية بعد.</p></section>'}
+function vWatch(){var h=waPanel(1);if(h&&WA.lp&&!waAbs())h=h.replace(/<select id="waDay"[\s\S]*?<\/select>/,function(m){return '<label class="wadl">من تاريخ '+waFromSel()+'</label><label class="wadl">إلى تاريخ '+m+'</label>'});return h||'<section class="panel"><p class="hint">لا توجد بيانات أداء يومية بعد.</p></section>'}
 function waPanel(full){var ds=waDays();if(!ds.length)return "";var day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0],R=waRows(day);if(waAbs())return waStPanel(full,ds,day,R);
   var cnt=function(re){return R.filter(function(r){return r.why.some(function(w){return re.test(w)})}).length};
   var body=(full?R:R.slice(0,12)).map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="num">'+esc(r.id)+'</td><td class="s">'+esc(cname(r.id))+'</td><td class="num" dir="ltr">'+(rpPh(r.id)||"—")+'</td>'+(waCpOn()?'<td class="num">'+(r.cp==null?"0":fmt(r.cp,0))+'</td>':'')+(WA.q?'<td>'+(r.q?segPill(r.q.s):"—")+'</td>':'')+(WA.w?'<td class="num"'+(r.w!=null&&r.w<=WA_WAL?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.w==null?"—":fmt(r.w,2))+'</td>':'')+(WA.h?'<td class="num"'+(r.ac==null||r.ac<WA_HRS?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.ac==null?"0":fmt(r.ac,2))+'</td>':'')+(WA.lp?'<td class="num"'+(r.lp&&r.lp.ab>LOW_N?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.lp?r.lp.ab:"—")+'</td><td class="num"'+(r.lp&&r.lp.sh>=LOW_S?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.lp?r.lp.sh:"—")+'</td>':'')+'<td class="s" style="font-size:12.5px">'+esc(r.why.join("، "))+'</td></tr>'}).join("");
@@ -1007,12 +1009,12 @@ function waOpts(){var ck=function(id,on,txt){return '<label class="waop"><input 
     '<div class="waop">'+ck("waQ",WA.q,"جودة التوصيل")+' '+["A","B","C","D","E","F"].map(function(g){return '<label class="wag"><input type="checkbox" data-wag="'+g+'"'+(WA.g.indexOf(g)>=0?" checked":"")+(WA.q?"":" disabled")+'> '+g+'</label>'}).join("")+'</div>'+
     '<div class="waop">'+ck("waW",WA.w,"محفظة هنقرستيشن")+' أقل من أو يساوي <input type="number" id="waWv" min="0" step="50" value="'+Math.abs(+WA.wv||0)+'"'+(WA.w?"":" disabled")+'> ريال بالسالب</div>'+
     '<div class="waop">'+ck("waH",WA.h,"ساعات العمل الفعلية")+' أقل من <input type="number" id="waHv" min="0" max="24" step="0.5" value="'+(+WA.hv||0)+'"'+(WA.h?"":" disabled")+'> ساعة (أو لم يعمل)</div>'+
-    '<div class="waop">'+ck("waLp",WA.lp,"الأداء المنخفض")+' <span class="hint" style="font-size:12px">لم يعمل أكثر من '+LOW_N+' أيام، أو أقل من '+LOW_H+' س في '+LOW_S+' أيام أو أكثر، في الفترة من '+waFromSel()+' إلى اليوم المختار أعلاه، ولا تُحسب أيام الإجازة (عمرة، سنوية، مرضية)</span></div>'+
+    '<div class="waop">'+ck("waLp",WA.lp,"الأداء المنخفض")+' <span class="hint" style="font-size:12px">لم يعمل أكثر من '+LOW_N+' أيام، أو أقل من '+LOW_H+' س في '+LOW_S+' أيام أو أكثر، في الفترة المختارة أعلاه (من تاريخ إلى تاريخ، داخل نفس الشهر)، ولا تُحسب أيام الإجازة (عمرة، سنوية، مرضية)</span></div>'+
     '<button class="btn" id="waReset" type="button">الافتراضي</button></div>'}
 function waDoc(day,R){if(waAbs())return waStDoc(day,R);return waDoc0(day,R).replace('<div>اليوم</div>',WA.lp?'<div>اليوم · الأداء المنخفض من <span dir="ltr">'+waFrom(day)+'</span></div>':'<div>اليوم</div>')}
 function waFrom(day){var m0=day.slice(0,8)+"01",f=ui0.waf;return f&&f.slice(0,7)===day.slice(0,7)&&f<=day?f:m0}
 function waFromSel(){var ds=waDays(),day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0];if(!day)return "";var m0=day.slice(0,8)+"01",f=waFrom(day),o=ds.filter(function(d){return d.slice(0,7)===day.slice(0,7)&&d<=day}).sort();if(o.indexOf(m0)<0)o.unshift(m0);
-  return '<select id="waFrom" aria-label="من يوم"'+(WA.lp?"":" disabled")+'>'+o.map(function(d){return '<option value="'+d+'"'+(d===f?" selected":"")+'>'+d+'</option>'}).join("")+'</select>'}
+  return '<select id="waFrom" aria-label="من يوم"'+(WA.lp?"":" disabled")+'>'+o.map(function(d){return '<option value="'+d+'"'+(d===f?" selected":"")+'>'+d.split("-").reverse().join("-")+'</option>'}).join("")+'</select>'}
 function waDoc0(day,R){var th='background:#20386b;color:#fff;font-weight:700;padding:6px 4px;border:1px solid #20386b;font-size:10.5px',td='padding:5px 4px;border:1px solid #d9deeb;font-size:10.5px;text-align:center',bad=';color:#b5362f;font-weight:700';
   var rows=R.map(function(r,i){return '<tr style="page-break-inside:avoid;background:'+(i%2?"#f3f5fa":"#fff")+'"><td style="'+td+'">'+(i+1)+'</td><td style="'+td+'">'+esc(r.id)+'</td><td style="'+td+';text-align:right">'+esc(cname(r.id))+'</td><td style="'+td+'" dir="ltr">'+(rpPh(r.id)||"—")+'</td><td style="'+td+'">'+esc(r.city||"—")+'</td>'+(waCpOn()?'<td style="'+td+';font-weight:700">'+(r.cp==null?"0":fmt(r.cp,0))+'</td>':'')+
     (WA.q?'<td style="'+td+(r.q&&/[EF]/.test(r.q.s)?bad:'')+'">'+(r.q?esc(r.q.s):"—")+'</td>':'')+(WA.w?'<td style="'+td+(r.w!=null&&r.w<=WA_WAL?bad:'')+'" dir="ltr">'+(r.w==null?"—":fmt(r.w,2))+'</td>':'')+
