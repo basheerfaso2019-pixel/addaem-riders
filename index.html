@@ -195,6 +195,16 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .wadl{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;white-space:nowrap}
 
+.rrbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:4px 0 10px}
+.rrbar label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700}
+.rrbar .rrq{flex:1 1 280px}.rrbar .rrq input{width:100%}
+.rrqk{display:flex;gap:6px;flex-wrap:wrap}
+.rrts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:8px 0}
+.rrt{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.rrt span{font-size:12px;color:var(--muted)}.rrt b{font-size:18px}.rrt.bad b{color:var(--bad)}
+.rrv{padding:8px 12px;border-radius:8px;font-weight:700;margin:6px 0 10px}.rrv.bad{background:#fdecea;color:#b5362f}.rrv.ok{background:#eaf6ef;color:#1e7a46}
+tr.rr-bad td{background:#fdecea}tr.rr-warn td{background:#fff4e5}tr.rr-off td{color:var(--muted)}
+
 html[lang=en] body{direction:ltr}html[lang=en] .side small{display:none}
 .coband{flex-direction:column;align-items:center;gap:2px}
 .coband{position:relative}
@@ -994,7 +1004,8 @@ function waRows(day){if(waAbs())return waStRows(day);var out=[],o=data.days[day]
     var lp=LP[id];if(lp){if(lp.ab>LOW_N)why.push("أداء منخفض لعدم العمل "+lp.ab+" أيام");if(lp.sh>=LOW_S)why.push("أداء منخفض لعمله أقل من "+LOW_H+" ساعات في "+lp.sh+" أيام")};
     if(why.length)out.push({id:id,lp:lp,cp:cp,city:x&&x[CI]||"",q:q,w:w,ac:ac,pl:pl,why:why})});
   return out.sort(function(a,b){return b.why.length-a.why.length||(a.w==null?0:a.w)-(b.w==null?0:b.w)})}
-function vWatch(){var h=waPanel(1);if(h&&WA.lp&&!waAbs())h=h.replace(/<select id="waDay"[\s\S]*?<\/select>/,function(m){return '<label class="wadl">من تاريخ '+waFromSel()+'</label><label class="wadl">إلى تاريخ '+m+'</label>'});return h||'<section class="panel"><p class="hint">لا توجد بيانات أداء يومية بعد.</p></section>'}
+function vWatch(){return rrPanel()+vWatch0()}
+function vWatch0(){var h=waPanel(1);if(h&&WA.lp&&!waAbs())h=h.replace(/<select id="waDay"[\s\S]*?<\/select>/,function(m){return '<label class="wadl">من تاريخ '+waFromSel()+'</label><label class="wadl">إلى تاريخ '+m+'</label>'});return h||'<section class="panel"><p class="hint">لا توجد بيانات أداء يومية بعد.</p></section>'}
 function waPanel(full){var ds=waDays();if(!ds.length)return "";var day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0],R=waRows(day);if(waAbs())return waStPanel(full,ds,day,R);
   var cnt=function(re){return R.filter(function(r){return r.why.some(function(w){return re.test(w)})}).length};
   var body=(full?R:R.slice(0,12)).map(function(r,i){return '<tr><td>'+(i+1)+'</td><td class="num">'+esc(r.id)+'</td><td class="s">'+esc(cname(r.id))+'</td><td class="num" dir="ltr">'+(rpPh(r.id)||"—")+'</td>'+(waCpOn()?'<td class="num">'+(r.cp==null?"0":fmt(r.cp,0))+'</td>':'')+(WA.q?'<td>'+(r.q?segPill(r.q.s):"—")+'</td>':'')+(WA.w?'<td class="num"'+(r.w!=null&&r.w<=WA_WAL?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.w==null?"—":fmt(r.w,2))+'</td>':'')+(WA.h?'<td class="num"'+(r.ac==null||r.ac<WA_HRS?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.ac==null?"0":fmt(r.ac,2))+'</td>':'')+(WA.lp?'<td class="num"'+(r.lp&&r.lp.ab>LOW_N?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.lp?r.lp.ab:"—")+'</td><td class="num"'+(r.lp&&r.lp.sh>=LOW_S?' style="color:var(--bad);font-weight:700"':'')+'>'+(r.lp?r.lp.sh:"—")+'</td>':'')+'<td class="s" style="font-size:12.5px">'+r.why.map(esc).join("<br>")+'</td></tr>'}).join("");
@@ -1161,6 +1172,58 @@ function abPdf(){if(!AB.rows||!AB.rows.length)return;var Q={f:AB.f,rows:AB.rows.
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
+/* ---------- one rider report ---------- */
+function rrId(){var q=String(ui0.rrq||"").trim();if(!q)return "";var m=q.match(/^\s*(\d{4,})/);if(m&&data.couriers[m[1]])return m[1];
+  var ids=Object.keys(data.couriers).filter(function(id){return cname(id)===q});if(ids.length===1)return ids[0];
+  ids=Object.keys(data.couriers).filter(function(id){return cname(id).indexOf(q)>=0});return ids.length===1?ids[0]:""}
+function rrMatches(){var q=String(ui0.rrq||"").trim();if(!q)return [];return Object.keys(data.couriers).filter(function(id){return id.indexOf(q)>=0||cname(id).indexOf(q)>=0}).slice(0,8)}
+function rrRange(){var ds=waDays().slice().sort(),last=ds[ds.length-1]||"",t=ui0.rrt||last,f=ui0.rrf||(t?t.slice(0,8)+"01":"");if(f>t){var x=f;f=t;t=x}return {f:f,t:t,last:last}}
+function rrQuick(k){var r=rrRange(),L=r.last;if(!L)return;if(k==="d"){ui0.rrf=ui0.rrt=L}else if(k==="w"){var d=new Date(L+"T12:00:00Z");d.setUTCDate(d.getUTCDate()-6);ui0.rrf=d.toISOString().slice(0,10);ui0.rrt=L}
+  else if(k==="m"){ui0.rrf=L.slice(0,8)+"01";ui0.rrt=L}else if(k==="pm"){var e=new Date(L.slice(0,8)+"01T12:00:00Z");e.setUTCDate(0);ui0.rrt=e.toISOString().slice(0,10);ui0.rrf=ui0.rrt.slice(0,8)+"01"}render()}
+function rrCalc(id,f,t){var c=data.couriers[id]||{},first="";days().forEach(function(d){if(data.days[d][id]&&(!first||d<first))first=d});
+  var ds=waDays().filter(function(d){return d>=f&&d<=t}).sort(),rows=[],s={n:0,wk:0,ab:0,sh:0,ok:0,off:0,ac:0,pl:0,cp:0,ns:0,de:0};
+  ds.forEach(function(d){if(!first||d<first)return;var x=data.days[d][id],k=waStOf(c,d),h=x&&x[AC]!=null?+x[AC]:0,r={d:d,x:x,h:h,pl:x&&x[PL]!=null?+x[PL]:null,cp:x?+x[CP]||0:0,ns:x?+x[NS]||0:0,de:x?deX(x[DE]):0};
+    if(k!=="w"){r.st=waStTxt(k);r.c="off";s.off++}else{s.n++;if(!(h>0)){r.st="لم يعمل";r.c="bad";s.ab++}else{s.wk++;if(h<LOW_H){r.st="أقل من "+LOW_H+" ساعات";r.c="warn";s.sh++}else{r.st="مكتمل";r.c="ok";s.ok++}}}
+    s.ac+=h;s.pl+=r.pl||0;s.cp+=r.cp;s.ns+=r.ns;s.de+=r.de;rows.push(r)});
+  s.low=s.ab>LOW_N||s.sh>=LOW_S;return {id:id,c:c,first:first,rows:rows,s:s,f:f,t:t}}
+function rrVerdict(s){var v=[];if(s.ab>LOW_N)v.push("لم يعمل "+s.ab+" أيام (أكثر من "+LOW_N+")");if(s.sh>=LOW_S)v.push("عمل أقل من "+LOW_H+" ساعات في "+s.sh+" أيام ("+LOW_S+" أو أكثر)");return v}
+function rrPanel(){var ds=waDays();if(!ds.length)return "";var r=rrRange(),id=rrId(),M=id?[]:rrMatches();
+  var opts=Object.keys(data.couriers).sort(function(a,b){return cname(a)<cname(b)?-1:1}).map(function(i){return '<option value="'+esc(i+" - "+cname(i))+'">'}).join("");
+  var h='<section class="panel rrp"><div class="stmthead"><h2>تقرير مندوب</h2>'+(id?'<button class="btn pri" id="rrPdf"'+(OV_BUSY?" disabled":"")+'>'+(OV_BUSY==="rr"?"جارٍ التجهيز…":"⬇ PDF التقرير")+'</button>':'')+'</div>'+
+    '<div class="rrbar"><label class="rrq">المندوب<input id="rrQ" list="rrList" autocomplete="off" placeholder="اكتب الاسم أو Rider ID أو اختر من القائمة" value="'+esc(ui0.rrq||"")+'"><datalist id="rrList">'+opts+'</datalist></label>'+(ui0.rrq?'<button class="btn" id="rrClr" type="button">مسح</button>':'')+
+    '<label>من تاريخ<input type="date" id="rrF" value="'+esc(r.f)+'"></label><label>إلى تاريخ<input type="date" id="rrT" value="'+esc(r.t)+'"></label>'+
+    '<div class="rrqk"><button class="wacb" data-rrp="d" type="button">آخر يوم</button><button class="wacb" data-rrp="w" type="button">آخر 7 أيام</button><button class="wacb" data-rrp="m" type="button">الشهر الحالي</button><button class="wacb" data-rrp="pm" type="button">الشهر الماضي</button></div></div>';
+  if(!id){h+=ui0.rrq?(M.length?'<p class="hint">اختر المندوب من القائمة: '+M.map(function(i){return esc(cname(i))+' ('+esc(i)+')'}).join("، ")+'</p>':'<p class="hint" style="color:var(--bad)">لا يوجد مندوب بهذا الاسم أو الرقم.</p>'):'<p class="hint">اختر مندوباً لعرض تقريره اليومي للفترة المختارة.</p>';return h+'</section>'}
+  var R=rrCalc(id,r.f,r.t),s=R.s,c=R.c,v=rrVerdict(s),q=waQ(c,r.t),w=c.w&&c.w.b!=null?+c.w.b:null;
+  var tile=function(l,x,bad){return '<div class="rrt'+(bad?" bad":"")+'"><span>'+l+'</span><b class="num">'+x+'</b></div>'};
+  h+='<p class="hint"><b>'+esc(cname(id))+'</b> · <span class="num">'+esc(id)+'</span> · '+esc(rpCatName(rpCat(id)))+' · <span class="num" dir="ltr">'+(rpPh(id)||"—")+'</span> · الفترة <span class="num">'+esc(r.f)+'</span> إلى <span class="num">'+esc(r.t)+'</span>'+(R.first&&R.first>r.f?' · أول يوم عمل له <span class="num">'+esc(R.first)+'</span>':'')+'</p>'+
+    '<div class="rrts">'+tile("أيام الفترة المحسوبة",s.n)+tile("أيام عمل",s.wk)+tile("أيام لم يعمل",s.ab,s.ab>LOW_N)+tile("أيام أقل من "+LOW_H+" ساعات",s.sh,s.sh>=LOW_S)+tile("أيام إجازة / موقوف",s.off)+tile("ساعات العمل الفعلية",fmt(s.ac,1))+tile("متوسط الساعات لليوم",s.wk?fmt(s.ac/s.wk,1):"—")+tile("الطلبات المكتملة",fmt(s.cp,0))+tile("متوسط الطلبات لليوم",s.wk?fmt(s.cp/s.wk,1):"—")+tile("المحفظة",w==null?"—":fmt(w,2),w!=null&&w<=WA_WAL)+tile("جودة التوصيل",q?q.s:"—",q&&/[EF]/.test(q.s))+'</div>'+
+    '<p class="'+(s.low?'rrv bad':'rrv ok')+'">'+(s.low?'أداء منخفض: '+esc(v.join("، و")):'الأداء ضمن المطلوب في هذه الفترة (لم يعمل '+s.ab+' أيام، وأقل من '+LOW_H+' ساعات في '+s.sh+' أيام).')+'</p>'+
+    (R.rows.length?'<div class="tbl" style="box-shadow:none;max-height:520px;overflow:auto"><table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الساعات المخططة</th><th>الساعات الفعلية</th><th>الطلبات المكتملة</th><th>عدم الحضور</th><th>المرفوضة الزائدة</th></tr></thead><tbody>'+
+      R.rows.map(function(x){return '<tr class="rr-'+x.c+'"><td class="num">'+x.d+'</td><td>'+wd(x.d)+'</td><td><b>'+esc(x.st)+'</b></td><td class="num">'+(x.pl==null?"—":fmt(x.pl,1))+'</td><td class="num">'+fmt(x.h,2)+'</td><td class="num">'+fmt(x.cp,0)+'</td><td class="num">'+fmt(x.ns,0)+'</td><td class="num">'+fmt(x.de,0)+'</td></tr>'}).join("")+
+      '</tbody><tfoot><tr><td colspan="3">الإجمالي</td><td>'+fmt(s.pl,1)+'</td><td>'+fmt(s.ac,1)+'</td><td>'+fmt(s.cp,0)+'</td><td>'+fmt(s.ns,0)+'</td><td>'+fmt(s.de,0)+'</td></tr></tfoot></table></div>':'<p class="hint">لا توجد أيام عمل له في هذه الفترة.</p>');
+  return h+'</section>'}
+function rrDoc(R){var s=R.s,c=R.c,id=R.id,q=waQ(c,R.t),w=c.w&&c.w.b!=null?+c.w.b:null,v=rrVerdict(s),
+    th='background:#20386b;color:#fff;font-weight:700;padding:6px 3px;border:1px solid #20386b;font-size:10.5px',td='padding:5px 3px;border:1px solid #d9deeb;font-size:10.5px;text-align:center',
+    col={bad:"#fdecea",warn:"#fff4e5",off:"#eef1f6",ok:"#fff"},fc={bad:"#b5362f",warn:"#b86e00",off:"#5b6386",ok:"#1e7a46"};
+  var box=function(l,x,bad){return '<div style="border:1px solid #d9deeb;border-radius:8px;padding:6px 10px;font-size:10.5px;color:#5b6386;text-align:center;min-width:72px"><div>'+l+'</div><div style="font-size:15px;font-weight:700;color:'+(bad?"#b5362f":"#20386b")+'">'+x+'</div></div>'};
+  var dd=function(d){return '<b style="display:inline-block;direction:ltr">'+d.split("-").reverse().join("-")+'</b>'};
+  var rows=R.rows.map(function(x){return '<tr style="page-break-inside:avoid;background:'+col[x.c]+'"><td style="'+td+'"><span style="display:inline-block;direction:ltr">'+x.d.split("-").reverse().join("-")+'</span></td><td style="'+td+'">'+wd(x.d)+'</td><td style="'+td+';font-weight:700;color:'+fc[x.c]+'">'+esc(x.st)+'</td><td style="'+td+'">'+(x.pl==null?"—":fmt(x.pl,1))+'</td><td style="'+td+';font-weight:700">'+fmt(x.h,2)+'</td><td style="'+td+'">'+fmt(x.cp,0)+'</td><td style="'+td+'">'+fmt(x.ns,0)+'</td><td style="'+td+'">'+fmt(x.de,0)+'</td></tr>'}).join("");
+  return '<div class="noi18n" dir="rtl" style="box-sizing:border-box;width:100%;padding:14px 12px;background:#fff;color:#141a33;font-family:\'IBM Plex Sans Arabic\',Tahoma,sans-serif;direction:rtl">'+
+    '<div style="height:4px;background:linear-gradient(90deg,#e6ecf5,#2f4e86 70%,#20386b);margin-bottom:10px"></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #f28a1a;padding-bottom:10px;margin-bottom:12px"><div><div style="font-size:19px;font-weight:700;color:#20386b">تقرير المندوب</div><div style="font-size:15px;font-weight:700;margin-top:3px">'+esc(cname(id))+'</div><div style="font-size:11.5px;color:#5b6386;margin-top:2px">'+esc(data.company||"")+'</div></div>'+
+    '<div style="text-align:center;font-size:12px;color:#5b6386"><div style="font-weight:700;color:#20386b">الفترة</div><div style="display:flex;gap:14px;justify-content:center;margin-top:2px"><div>من<br>'+dd(R.f)+'</div><div>إلى<br>'+dd(R.t)+'</div></div></div><img src="logo.png" style="height:42px"></div>'+
+    '<table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11px"><tr><td style="'+td+'">Rider ID<br><b>'+esc(id)+'</b></td><td style="'+td+'">الجوال<br><b style="display:inline-block;direction:ltr">'+(rpPh(id)||"—")+'</b></td><td style="'+td+'">الفئة<br><b>'+esc(rpCatName(rpCat(id)))+'</b></td><td style="'+td+'">المدينة<br><b>'+esc(wCity(id)||"—")+'</b></td><td style="'+td+'">المحفظة<br><b style="display:inline-block;direction:ltr">'+(w==null?"—":fmt(w,2))+'</b></td><td style="'+td+'">جودة التوصيل<br><b>'+(q?esc(q.s):"—")+'</b></td></tr></table>'+
+    '<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">'+box("أيام الفترة المحسوبة",s.n)+box("أيام عمل",s.wk)+box("أيام لم يعمل",s.ab,s.ab>LOW_N)+box("أيام أقل من "+LOW_H+" ساعات",s.sh,s.sh>=LOW_S)+box("أيام إجازة / موقوف",s.off)+box("ساعات العمل",fmt(s.ac,1))+box("متوسط الساعات لليوم",s.wk?fmt(s.ac/s.wk,1):"—")+box("الطلبات",fmt(s.cp,0))+'</div>'+
+    '<div style="border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;font-weight:700;background:'+(s.low?"#fdecea":"#eaf6ef")+';color:'+(s.low?"#b5362f":"#1e7a46")+'">'+(s.low?'أداء منخفض<br>'+v.map(esc).join("<br>"):'الأداء ضمن المطلوب في هذه الفترة')+'</div>'+
+    '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+[13,11,18,11,11,12,12,12].map(function(x){return '<col style="width:'+x+'%">'}).join("")+'</colgroup><thead><tr>'+["التاريخ","اليوم","الحالة","الساعات المخططة","الساعات الفعلية","الطلبات المكتملة","عدم الحضور","المرفوضة الزائدة"].map(function(x){return '<th style="'+th+'">'+x+'</th>'}).join("")+'</tr></thead><tbody>'+rows+
+    '<tr style="background:#e6ecf5;font-weight:700"><td style="'+td+'" colspan="3">الإجمالي</td><td style="'+td+'">'+fmt(s.pl,1)+'</td><td style="'+td+'">'+fmt(s.ac,1)+'</td><td style="'+td+'">'+fmt(s.cp,0)+'</td><td style="'+td+'">'+fmt(s.ns,0)+'</td><td style="'+td+'">'+fmt(s.de,0)+'</td></tr></tbody></table>'+
+    '<div style="margin-top:12px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
+function rrPdf(){var id=rrId();if(!id)return;var r=rrRange(),R=rrCalc(id,r.f,r.t),nm="تقرير المندوب "+cname(id)+" "+id+" - "+r.f+" إلى "+r.t+".pdf";OV_BUSY="rr";render();var sy=window.scrollY;window.scrollTo(0,0);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=rrDoc(R);var el=w.firstChild;ovWords(el);
+    return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
+  .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
+  .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -1731,6 +1794,9 @@ root.addEventListener("click",function(e){
   if(t.dataset&&t.dataset.ocm!=null){var om=t.dataset.ocm,cur=ocmSel();if(om==="*")ui0.ocm=ovMonths().slice();else{cur=cur.filter(function(x){return x!==om});if(t.getAttribute("aria-pressed")!=="true")cur.push(om);if(!cur.length)return;ui0.ocm=cur}render();return}
   if(t.id==="shXlsx"){shExport();return}
   if(t.id==="waPdf"){waPdf();return}
+  if(t.id==="rrPdf"){rrPdf();return}
+  if(t.dataset&&t.dataset.rrp){rrQuick(t.dataset.rrp);return}
+  if(t.id==="rrClr"){ui0.rrq="";render();return}
   if(t.dataset&&t.dataset.wak!=null){var k=t.dataset.wak;if(k==="*")WA.ks=[];else{WA.ks=WA.ks.filter(function(x){return x!==k});if(t.getAttribute("aria-pressed")!=="true")WA.ks.push(k)}waSave();return}
   if(t.dataset&&t.dataset.was!=null){var k2=t.dataset.was;if(k2==="w")WA.sm=["w"];else{var on=WA.sm.indexOf(k2)>=0;WA.sm=WA.sm.filter(function(x){return x!=="w"&&x!==k2});if(!on)WA.sm.push(k2);if(!WA.sm.length)WA.sm=["w"]}waSave();return}
   if(t.id==="waReset"){WA=JSON.parse(JSON.stringify(WA_DEF));waSave();return}
@@ -1794,6 +1860,9 @@ root.addEventListener("change",function(e){
   if(t.id==="ovMon"){ui0.ovm=t.value;render()}
   if(t.id==="waDay"){ui0.wad=t.value;render()}
   if(t.id==="waFrom"){ui0.waf=t.value;render()}
+  if(t.id==="rrQ"){ui0.rrq=t.value;setTimeout(render,0)}
+  if(t.id==="rrF"){ui0.rrf=t.value;setTimeout(render,0)}
+  if(t.id==="rrT"){ui0.rrt=t.value;setTimeout(render,0)}
   if(t.id==="waQ"){WA.q=t.checked?1:0;waSave()}
   if(t.id==="waW"){WA.w=t.checked?1:0;waSave()}
   if(t.id==="waH"){WA.h=t.checked?1:0;waSave()}
