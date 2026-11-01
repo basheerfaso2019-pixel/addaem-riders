@@ -1007,9 +1007,13 @@ function waOpts(){var ck=function(id,on,txt){return '<label class="waop"><input 
     '<div class="waop">'+ck("waQ",WA.q,"جودة التوصيل")+' '+["A","B","C","D","E","F"].map(function(g){return '<label class="wag"><input type="checkbox" data-wag="'+g+'"'+(WA.g.indexOf(g)>=0?" checked":"")+(WA.q?"":" disabled")+'> '+g+'</label>'}).join("")+'</div>'+
     '<div class="waop">'+ck("waW",WA.w,"محفظة هنقرستيشن")+' أقل من أو يساوي <input type="number" id="waWv" min="0" step="50" value="'+Math.abs(+WA.wv||0)+'"'+(WA.w?"":" disabled")+'> ريال بالسالب</div>'+
     '<div class="waop">'+ck("waH",WA.h,"ساعات العمل الفعلية")+' أقل من <input type="number" id="waHv" min="0" max="24" step="0.5" value="'+(+WA.hv||0)+'"'+(WA.h?"":" disabled")+'> ساعة (أو لم يعمل)</div>'+
-    '<div class="waop">'+ck("waLp",WA.lp,"الأداء المنخفض")+' <span class="hint" style="font-size:12px">لم يعمل أكثر من '+LOW_N+' أيام، أو أقل من '+LOW_H+' س في '+LOW_S+' أيام أو أكثر، من بداية الشهر لليوم المختار، ولا تُحسب أيام الإجازة (عمرة، سنوية، مرضية)</span></div>'+
+    '<div class="waop">'+ck("waLp",WA.lp,"الأداء المنخفض")+' <span class="hint" style="font-size:12px">لم يعمل أكثر من '+LOW_N+' أيام، أو أقل من '+LOW_H+' س في '+LOW_S+' أيام أو أكثر، في الفترة من '+waFromSel()+' إلى اليوم المختار أعلاه، ولا تُحسب أيام الإجازة (عمرة، سنوية، مرضية)</span></div>'+
     '<button class="btn" id="waReset" type="button">الافتراضي</button></div>'}
-function waDoc(day,R){if(waAbs())return waStDoc(day,R);var th='background:#20386b;color:#fff;font-weight:700;padding:6px 4px;border:1px solid #20386b;font-size:10.5px',td='padding:5px 4px;border:1px solid #d9deeb;font-size:10.5px;text-align:center',bad=';color:#b5362f;font-weight:700';
+function waDoc(day,R){if(waAbs())return waStDoc(day,R);return waDoc0(day,R).replace('<div>اليوم</div>',WA.lp?'<div>اليوم · الأداء المنخفض من <span dir="ltr">'+waFrom(day)+'</span></div>':'<div>اليوم</div>')}
+function waFrom(day){var m0=day.slice(0,8)+"01",f=ui0.waf;return f&&f.slice(0,7)===day.slice(0,7)&&f<=day?f:m0}
+function waFromSel(){var ds=waDays(),day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0];if(!day)return "";var m0=day.slice(0,8)+"01",f=waFrom(day),o=ds.filter(function(d){return d.slice(0,7)===day.slice(0,7)&&d<=day}).sort();if(o.indexOf(m0)<0)o.unshift(m0);
+  return '<select id="waFrom" aria-label="من يوم"'+(WA.lp?"":" disabled")+'>'+o.map(function(d){return '<option value="'+d+'"'+(d===f?" selected":"")+'>'+d+'</option>'}).join("")+'</select>'}
+function waDoc0(day,R){var th='background:#20386b;color:#fff;font-weight:700;padding:6px 4px;border:1px solid #20386b;font-size:10.5px',td='padding:5px 4px;border:1px solid #d9deeb;font-size:10.5px;text-align:center',bad=';color:#b5362f;font-weight:700';
   var rows=R.map(function(r,i){return '<tr style="page-break-inside:avoid;background:'+(i%2?"#f3f5fa":"#fff")+'"><td style="'+td+'">'+(i+1)+'</td><td style="'+td+'">'+esc(r.id)+'</td><td style="'+td+';text-align:right">'+esc(cname(r.id))+'</td><td style="'+td+'" dir="ltr">'+(rpPh(r.id)||"—")+'</td><td style="'+td+'">'+esc(r.city||"—")+'</td>'+(waCpOn()?'<td style="'+td+';font-weight:700">'+(r.cp==null?"0":fmt(r.cp,0))+'</td>':'')+
     (WA.q?'<td style="'+td+(r.q&&/[EF]/.test(r.q.s)?bad:'')+'">'+(r.q?esc(r.q.s):"—")+'</td>':'')+(WA.w?'<td style="'+td+(r.w!=null&&r.w<=WA_WAL?bad:'')+'" dir="ltr">'+(r.w==null?"—":fmt(r.w,2))+'</td>':'')+
     (WA.h?'<td style="'+td+(r.ac==null||r.ac<WA_HRS?bad:'')+'">'+(r.ac==null?"0":fmt(r.ac,2))+'</td><td style="'+td+'">'+(r.pl==null?"—":fmt(r.pl,2))+'</td>':'')+(WA.lp?'<td style="'+td+(r.lp&&r.lp.ab>LOW_N?bad:'')+'">'+(r.lp?r.lp.ab:"—")+'</td><td style="'+td+(r.lp&&r.lp.sh>=LOW_S?bad:'')+'">'+(r.lp?r.lp.sh:"—")+'</td>':'')+'<td style="'+td+';text-align:right;font-size:10px">'+esc(r.why.join("، "))+'</td></tr>'}).join("");
@@ -1024,7 +1028,7 @@ function waDoc(day,R){if(waAbs())return waStDoc(day,R);var th='background:#20386
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function waName(){if(waAbs())return WA.sm.map(waStTxt).join(" و ")+" "+waCatTxt();var c=[];if(WA.w)c.push("المحفظة");if(WA.h)c.push("ساعات العمل");if(WA.q)c.push("جودة التوصيل");if(WA.lp)c.push("الأداء المنخفض");return (c.join(" و ")||"متابعة المناديب")+" "+waCatTxt()}
 var LOW_H=8,LOW_N=4,LOW_S=4,WALOW={};
-function waLow(day){var kk=day+"|"+Object.keys(data.days).length;if(WALOW.k===kk)return WALOW.m;var m0=day.slice(0,8)+"01",ds=waDays().filter(function(d){return d>=m0&&d<=day}).sort(),first={},seen={},out={};
+function waLow(day){var kk=day+"|"+waFrom(day)+"|"+Object.keys(data.days).length;if(WALOW.k===kk)return WALOW.m;var m0=waFrom(day),ds=waDays().filter(function(d){return d>=m0&&d<=day}).sort(),first={},seen={},out={};
   days().forEach(function(d){for(var id in data.days[d]){if(!first[id]||d<first[id])first[id]=d;if(d>=m0&&d<=day)seen[id]=1}});
   Object.keys(seen).forEach(function(id){var c=data.couriers[id]||{},ab=0,sh=0;ds.forEach(function(d){if(d<first[id]||waOff(c,d))return;var x=data.days[d][id],h=x&&x[AC]!=null?+x[AC]:0;if(!(h>0))ab++;else if(h<LOW_H)sh++});
     if(ab>LOW_N||sh>=LOW_S)out[id]={ab:ab,sh:sh}});
@@ -1033,7 +1037,7 @@ function waCols(){var h=["#","Rider ID","الاسم","الجوال","المدي�
   h.push("السبب");w.push(100-w.reduce(function(a,b){return a+b},0));return {h:h,w:w}}
 function waPdf(){var ds=waDays();if(!ds.length)return;var day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0],R=waRows(day);if(!R.length)return;OV_BUSY="wa";render();var sy=window.scrollY;window.scrollTo(0,0);
   loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=waDoc(day,R);var el=w.firstChild;ovWords(el);
-    return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:waName()+" - "+day+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
+    return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:waName()+" - "+(WA.lp&&!waAbs()?waFrom(day)+" إلى ":"")+day+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
 function rDel(id){if(!isAdmin)return;var nd=days().filter(function(d){return data.days[d][id]}).length;
@@ -1787,6 +1791,7 @@ root.addEventListener("change",function(e){
   if(t.id==="aMon"){ui0.am=t.value;render()}
   if(t.id==="ovMon"){ui0.ovm=t.value;render()}
   if(t.id==="waDay"){ui0.wad=t.value;render()}
+  if(t.id==="waFrom"){ui0.waf=t.value;render()}
   if(t.id==="waQ"){WA.q=t.checked?1:0;waSave()}
   if(t.id==="waW"){WA.w=t.checked?1:0;waSave()}
   if(t.id==="waH"){WA.h=t.checked?1:0;waSave()}
