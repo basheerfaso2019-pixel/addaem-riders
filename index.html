@@ -525,7 +525,7 @@ function qSegTxt(){var a=ui0.qss||[];return a.length?" - فئة "+a.join(" + "):
 function qCityTxt(){var a=ui0.qcs||[];return a.length?a.join(" + "):""}
 function qTitle(){return "تصنيف جودة التوصيل"+qSegTxt()+qKatTxt()+(qCityTxt()?" - "+qCityTxt():"")}
 function qCat(id){return normCat(data.couriers[id]&&data.couriers[id].cat)||"—"}
-var QK={c:"qcs",s:"qss",k:"qks",rc:"rcs",rk:"rks",rs:"rss"};
+var QK={c:"qcs",s:"qss",k:"qks",rc:"rcs",rk:"rks",rs:"rss",dk:"dks"};
 /* multi-select dropdown: summary shows the choice, the list stays open while ticking */
 function qMsel(k,label,items,sel){var txt=!sel.length?"الكل":items.filter(function(x){return sel.indexOf(x[0])>=0}).map(function(x){return x[1].replace(/ \(\d+\)$/,"")}).join("، ");
   return '<details class="fcard msel" data-k="'+k+'"'+(ui0.qopen===k?" open":"")+'><summary><span>'+esc(label)+'</span><b>'+esc(txt)+'</b></summary><div class="mselp">'+
@@ -1044,6 +1044,34 @@ function rDel(id){if(!isAdmin)return;var nd=days().filter(function(d){return dat
    .then(function(){return sb.storage.from("rider-photos").remove([id+".jpg"]).catch(function(){})})
    .then(function(){delete data.couriers[id];Object.keys(data.days).forEach(function(d){delete data.days[d][id]});delete CARD.sel[id];if(CARD.ph&&typeof CARD.ph==="object")delete CARD.ph[id];if(CARD.photos)delete CARD.photos[id];CARD.msg="تم حذف المندوب "+nm+" ("+id+") من النظام.";render()},
      function(e){CARD.msg="تعذر حذف المندوب: "+(e&&e.message||e);render()})}
+/* ---------- distance: category selection + PDF ---------- */
+var DS=null;
+function dsFilter(rows){var kc={};rows.forEach(function(a){var k=rpCat(a.id);kc[k]=(kc[k]||0)+1});var kats=Object.keys(kc).sort(function(a,b){return shCatOrder(a)-shCatOrder(b)});
+  ui0.dks=(ui0.dks||[]).filter(function(k){return kats.indexOf(k)>=0});var out=rows.filter(function(a){return !ui0.dks.length||ui0.dks.indexOf(rpCat(a.id))>=0});
+  DS={f:F(),rows:out,kats:kats.map(function(k){return [k,rpCatName(k)+" ("+kc[k]+")"]})};return out}
+function dsSelTxt(){var k=(ui0.dks||[]).map(rpCatName).join(" + "),c=F().city||"";return (k?" - "+k:"")+(c?" - "+c:"")}
+function dsBar(){if(!DS)return "";
+  return '<div class="filters rpbar">'+qMsel("dk","فئة المندوب",DS.kats,ui0.dks||[])+
+    '<div class="row" style="gap:8px;align-self:flex-end"><button class="btn pri" id="dsPdf"'+(DS.rows.length&&!OV_BUSY?"":" disabled")+'>'+(OV_BUSY==="ds"?"جارٍ التجهيز…":"⬇ تحميل PDF")+'</button><span class="hint">'+DS.rows.length+' مندوب</span></div></div>'}
+function dsDoc(Q){var th='background:#20386b;color:#fff;font-weight:700;padding:6px 3px;border:1px solid #20386b;font-size:10px;line-height:1.35',td='padding:5px 3px;border:1px solid #d9deeb;font-size:10.5px;text-align:center;overflow:hidden';
+  var H=["#","Rider ID","الاسم","الجوال","الفئة","المدينة","المسافة (كم)","المدفوعة (كم)","أيام العمل","متوسط يومي (كم)","الطلبات","كم لكل طلب"],W=[4,8,22,10,5,9,8,8,6,7,6,7];
+  var tot=Q.rows.reduce(function(s,a){s.km+=a.km;s.pk+=a.pk;s.cp+=a.cp;s.d+=a.days;return s},{km:0,pk:0,cp:0,d:0});
+  var rows=Q.rows.map(function(a,i){var v=[i+1,a.id,cname(a.id),rpPh(a.id),rpCat(a.id)==="—"?"":rpCat(a.id),a.city,fmt(a.km,1),fmt(a.pk,1),fmt(a.days,0),fmt(a.km/a.days,1),fmt(a.cp,0),a.cp?fmt(a.km/a.cp,2):"—"];
+    return '<tr style="page-break-inside:avoid;background:'+(i%2?"#f3f5fa":"#fff")+'">'+v.map(function(x,j){return '<td style="'+td+(j===2?';text-align:right':'')+(j===6?';font-weight:700':'')+(j===3?';direction:ltr':'')+'">'+esc(x===""?"—":x)+'</td>'}).join("")+'</tr>'}).join("");
+  var foot='<tr style="background:#e6ecf5;font-weight:700"><td style="'+td+'" colspan="6">الإجمالي</td><td style="'+td+'">'+fmt(tot.km,1)+'</td><td style="'+td+'">'+fmt(tot.pk,1)+'</td><td style="'+td+'">'+fmt(tot.d,0)+'</td><td style="'+td+'">'+(tot.d?fmt(tot.km/tot.d,1):"—")+'</td><td style="'+td+'">'+fmt(tot.cp,0)+'</td><td style="'+td+'">'+(tot.cp?fmt(tot.km/tot.cp,2):"—")+'</td></tr>';
+  var box=function(l,v){return '<div style="border:1px solid #d9deeb;border-radius:8px;padding:6px 14px;font-size:11px;color:#5b6386;text-align:center"><div>'+l+'</div><div style="font-size:16px;font-weight:700;color:#20386b">'+v+'</div></div>'};
+  return '<div class="noi18n" dir="rtl" style="box-sizing:border-box;width:100%;padding:14px 10px;background:#fff;color:#141a33;font-family:\'IBM Plex Sans Arabic\',Tahoma,sans-serif;direction:rtl">'+
+    '<div style="height:4px;background:linear-gradient(90deg,#e6ecf5,#2f4e86 70%,#20386b);margin-bottom:10px"></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #f28a1a;padding-bottom:10px;margin-bottom:12px"><div><div style="font-size:19px;font-weight:700;color:#20386b">'+esc("المسافة المقطوعة"+dsSelTxt())+'</div><div style="font-size:12.5px;color:#5b6386;margin-top:2px">'+esc(data.company||"")+'</div></div>'+
+    '<div style="text-align:center;font-size:12px;color:#5b6386"><div style="font-size:14px;font-weight:700;color:#20386b" dir="ltr">'+esc(Q.f.from)+' → '+esc(Q.f.to)+'</div><div>الفترة</div></div><img src="logo.png" style="height:42px"></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'+box("عدد المناديب",Q.rows.length)+box("إجمالي المسافة (كم)",fmt(tot.km,1))+box("المدفوعة (كم)",fmt(tot.pk,1))+box("الطلبات",fmt(tot.cp,0))+box("كم لكل طلب",tot.cp?fmt(tot.km/tot.cp,2):"—")+'</div>'+
+    '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+W.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+H.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+foot+'</tbody></table>'+
+    '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
+function dsPdf(){if(!DS||!DS.rows.length)return;var Q={f:DS.f,rows:DS.rows.slice()},nm="المسافة المقطوعة"+dsSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf";OV_BUSY="ds";render();
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=dsDoc(Q);var el=w.firstChild;ovWords(el);
+    return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
+  .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
+  .then(function(){OV_BUSY="";render()})}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
@@ -1079,9 +1107,9 @@ function vQuality(){
 }
 function vDistance(){
   var f=F(),list=recs(f),g={};list.forEach(function(o){(g[o.id]||(g[o.id]=[])).push(o)});
-  var rows=Object.keys(g).map(function(id){var km=0,cp=0,pk=0;g[id].forEach(function(o){km+=+o.x[DI]||0;pk+=+o.x[DP]||0;cp+=+o.x[CP]||0});return{id:id,km:km,pk:pk,cp:cp,days:g[id].length}}).filter(function(a){return a.km>0}).sort(function(a,b){return b.km-a.km});
+  var rows=Object.keys(g).map(function(id){var km=0,cp=0,pk=0;g[id].forEach(function(o){km+=+o.x[DI]||0;pk+=+o.x[DP]||0;cp+=+o.x[CP]||0});var x0=g[id][g[id].length-1].x;return{id:id,km:km,pk:pk,cp:cp,days:g[id].length,city:x0&&x0[CI]||""}}).filter(function(a){return a.km>0}).sort(function(a,b){return b.km-a.km});rows=dsFilter(rows);
   var tk=0,body=rows.map(function(a){tk+=a.km;return '<tr class="click" data-open="'+esc(a.id)+'"><td class="num">'+esc(a.id)+'</td><td class="s">'+esc(cname(a.id))+'</td><td>'+N(a.km,1)+'</td><td>'+N(a.pk,1)+'</td><td>'+N(a.days,0)+'</td><td>'+N(a.km/a.days,1)+'</td><td>'+(a.cp?N(a.km/a.cp,2):"—")+'</td></tr>'}).join("");
-  return sampleNote()+filters()+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم</th><th>المسافة (كم)<br>Total KM</th><th>المدفوعة (كم)<br>Payable KM</th><th>أيام العمل</th><th>متوسط يومي (كم)</th><th>كم لكل طلب</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="7">لم تُرفع بيانات المسافة لهذه الفترة.</td></tr>')+'</tbody>'+(rows.length>1?'<tfoot><tr><td colspan="2">الإجمالي</td><td>'+N(tk,1)+'</td><td colspan="4"></td></tr></tfoot>':"")+'</table></div>';
+  return sampleNote()+filters()+dsBar()+'<div class="tbl"><table><thead><tr><th>Rider Id</th><th>الاسم</th><th>المسافة (كم)<br>Total KM</th><th>المدفوعة (كم)<br>Payable KM</th><th>أيام العمل</th><th>متوسط يومي (كم)</th><th>كم لكل طلب</th></tr></thead><tbody>'+(body||'<tr><td class="empty" colspan="7">لم تُرفع بيانات المسافة لهذه الفترة.</td></tr>')+'</tbody>'+(rows.length>1?'<tfoot><tr><td colspan="2">الإجمالي</td><td>'+N(tk,1)+'</td><td colspan="4"></td></tr></tfoot>':"")+'</table></div>';
 }
 
 /* admin: roles */
@@ -1627,6 +1655,7 @@ root.addEventListener("click",function(e){
   if(t.id==="qXlsx"){qExcel();return}
   if(t.id==="qPdf"){qPdf();return}
   if(t.id==="rpPdf"){rpPdf();return}
+  if(t.id==="dsPdf"){dsPdf();return}
   if(t.dataset.qclr){ui0[QK[t.dataset.qclr]]=[];render();return}
   if(t.dataset.qdone){ui0.qopen=null;render();return}
   if(t.dataset.waweb){var w=window.open(t.dataset.waweb,WA_TAB);if(w)w.focus();return}
