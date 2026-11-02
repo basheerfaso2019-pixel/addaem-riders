@@ -193,6 +193,8 @@ code{background:var(--sunk);border-radius:5px;padding:1px 6px;font-size:13px}
 
 .btn.rdel{color:var(--bad);border-color:var(--bad);padding:4px 12px}
 
+.btn.redt{padding:4px 12px}
+
 .wadl{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;white-space:nowrap}
 
 .rrbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:4px 0 10px}
@@ -602,7 +604,7 @@ function vCards(){cardIqLoad();cardPhotosLoad();cardCfgLoad();
   var first=sel[0]||list[0];if(first&&ph[first]&&CARD.photos[first]===undefined)cardPhoto(first).then(render);
   var cats=[["","الكل"],["أ","فئة أ"],["ب","فئة ب"],["خ","فئة خ"],["ر","مناديب الرياض"],["—","بدون فئة"]];
   var rows=list.slice(0,400).map(function(id){var c=data.couriers[id],on=!!CARD.sel[id];return '<tr'+(on?' class="csel"':'')+'><td><input type="checkbox" data-csel="'+esc(id)+'"'+(on?" checked":"")+'></td><td class="num">'+esc(id)+'</td><td class="s">'+esc(c.n)+'</td><td>'+esc(cardCatOf(id)==="ر"?"الرياض":cardCatOf(id))+'</td><td class="num">'+esc(cardIq(id)||"—")+'</td><td class="num">'+esc(cardPh(id)||"—")+'</td>'+
-    '<td style="white-space:nowrap"><label class="btn cphoto'+(ph[id]?"":" pri")+'">'+(ph[id]?"✓ صورة":"+ صورة")+'<input type="file" accept="image/*" data-cphoto="'+esc(id)+'" hidden></label>'+(ph[id]?' <button class="btn cphoto" data-cedit="'+esc(id)+'">ضبط</button>':'')+'</td>'+(isAdmin?'<td><button class="btn rdel" data-rdel="'+esc(id)+'">حذف</button></td>':'')+'</tr>'}).join("");
+    '<td style="white-space:nowrap"><label class="btn cphoto'+(ph[id]?"":" pri")+'">'+(ph[id]?"✓ صورة":"+ صورة")+'<input type="file" accept="image/*" data-cphoto="'+esc(id)+'" hidden></label>'+(ph[id]?' <button class="btn cphoto" data-cedit="'+esc(id)+'">ضبط</button>':'')+'</td>'+(isAdmin?'<td style="white-space:nowrap"><button class="btn redt" data-redt="'+esc(id)+'">تعديل</button> <button class="btn rdel" data-rdel="'+esc(id)+'">حذف</button></td>':'')+'</tr>'}).join("");
   var noPhoto=sel.filter(function(id){return !ph[id]}).length,noIq=sel.filter(function(id){return !cardIq(id)}).length;
   var g=CARD.cfg&&CARD.cfg!=="loading"?CARD.cfg:CARD_DEF;
   return '<style>'+CARD_CSS+'</style><div class="cardsgrid"><section class="panel"><h2>معاينة البطاقة</h2><p class="hint">'+(first?esc(cname(first)):"اختر مندوباً")+'</p><div class="cprev">'+(first?cardFront(first,CARD.photos[first]||""):"")+cardBack()+'</div>'+
@@ -716,7 +718,7 @@ document.addEventListener("click",function(e){var t=e.target;if(!t.closest)retur
   if(t.id==="aCancel"||t.id==="addDlg"){var o=document.getElementById("addDlg");if(o)o.remove();return}
   if(t.id==="aSave")addSave()});
 document.addEventListener("change",function(e){if(e.target.id==="aCat"){var t=document.getElementById("aVehT");if(t)t.innerHTML="المركبة: <b>"+(e.target.value==="أ"?"دراجة نارية":"سيارة")+"</b> (فئة أ = دراجة نارية، غيرها = سيارة)"}});
-document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("addDlg");if(o)o.remove()}else if(e.key==="Enter"&&e.target.closest&&e.target.closest("#addDlg")&&e.target.tagName==="INPUT")addSave()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("addDlg");if(o)o.remove()}else if(e.key==="Enter"&&e.target.closest&&e.target.closest("#addDlg")&&e.target.tagName==="INPUT"){var es=document.getElementById("eSave");if(es)rEditSave(es.dataset.id);else addSave()}});
 function kmHide(id){return normCat(data.couriers[id]&&data.couriers[id].cat)==="أ"}
 /* ---------- wallet PDF ---------- */
 var W_BUSY=false;
@@ -1061,6 +1063,31 @@ function rDel(id){if(!isAdmin)return;var nd=days().filter(function(d){return dat
    .then(function(){return sb.storage.from("rider-photos").remove([id+".jpg"]).catch(function(){})})
    .then(function(){delete data.couriers[id];Object.keys(data.days).forEach(function(d){delete data.days[d][id]});delete CARD.sel[id];if(CARD.ph&&typeof CARD.ph==="object")delete CARD.ph[id];if(CARD.photos)delete CARD.photos[id];CARD.msg="تم حذف المندوب "+nm+" ("+id+") من النظام.";render()},
      function(e){CARD.msg="تعذر حذف المندوب: "+(e&&e.message||e);render()})}
+function rEdit(id){if(!isAdmin)return;var c=data.couriers[id]||{},o=document.getElementById("addDlg");if(o)o.remove();o=document.createElement("div");o.id="addDlg";o.className="addov";o.setAttribute("dir","rtl");
+  var ph=String(c.ph||"").replace(/\D/g,"");if(/^9665\d{8}$/.test(ph))ph="0"+ph.slice(3);
+  var opt=function(v,l,cur){return '<option value="'+esc(v)+'"'+(v===cur?" selected":"")+'>'+l+'</option>'},rg=c.rg||"",ct=c.cat||"",vh=c.v||(ct==="أ"?"bike":"car");
+  o.innerHTML='<div class="addbox" role="dialog" aria-modal="true"><h2 style="margin:0 0 4px">تعديل بيانات المندوب</h2><p class="hint" style="margin:0 0 12px">Rider ID: <b dir="ltr">'+esc(id)+'</b></p>'+
+    addField("eName","الاسم","الاسم الكامل",'value="'+esc(c.n||"")+'"')+
+    addField("eIq","رقم الإقامة (كلمة دخول المندوب)","10 أرقام",'inputmode="numeric" value="'+esc(cardIq(id))+'"')+
+    addField("ePh","الجوال","05xxxxxxxx",'inputmode="tel" value="'+esc(ph)+'"')+
+    '<label class="addf"><span>المنطقة</span><select id="eReg">'+opt("","الأحساء",rg)+opt("الرياض","الرياض",rg)+opt("الدمام","الدمام",rg)+opt("أبقيق","أبقيق",rg)+(rg&&["الرياض","الدمام","أبقيق"].indexOf(rg)<0?opt(rg,esc(rg),rg):"")+'</select></label>'+
+    '<label class="addf"><span>الفئة</span><select id="eCat">'+opt("أ","فئة أ (تارقت)",ct)+opt("ب","فئة ب",ct)+opt("خ","فئة خ",ct)+opt("","بدون فئة",ct)+'</select></label>'+
+    '<label class="addf"><span>المركبة</span><select id="eVeh">'+opt("bike","دراجة نارية",vh)+opt("car","سيارة",vh)+'</select></label>'+
+    '<p id="aMsg" class="hint" style="min-height:1.4em;margin:8px 0"></p><div class="row" style="gap:8px;justify-content:flex-start"><button class="btn pri" id="eSave" data-id="'+esc(id)+'">حفظ التعديل</button><button class="btn" id="aCancel">إلغاء</button></div></div>';
+  document.body.appendChild(o);if(typeof trTree==="function")try{trTree(o)}catch(e){}document.getElementById("eName").focus()}
+function rEditSave(id){var g=function(i){return document.getElementById(i).value.trim()},c=data.couriers[id]||{},n=g("eName").replace(/\s+/g," "),iq=g("eIq").replace(/\D/g,""),ph=g("ePh").replace(/\D/g,""),cat=g("eCat"),reg=g("eReg"),veh=g("eVeh");
+  if(!n)return addMsg("اكتب اسم المندوب.");
+  if(iq&&iq.length!==10)return addMsg("رقم الإقامة لازم يكون 10 أرقام.");
+  if(!iq&&cardIq(id))return addMsg("لا يمكن ترك رقم الإقامة فارغاً، اكتب الرقم الصحيح.");
+  if(ph){if(/^05\d{8}$/.test(ph))ph="966"+ph.slice(1);else if(/^5\d{8}$/.test(ph))ph="966"+ph;if(!/^9665\d{8}$/.test(ph))return addMsg("رقم الجوال غير صحيح، اكتبه بصيغة 05xxxxxxxx.")}
+  var b=document.getElementById("eSave");b.disabled=true;addMsg("جارٍ الحفظ…",true);
+  var p=iq&&iq!==cardIq(id)?sb.rpc("set_riders",{p_rows:[{id:id,name:n,iqama:iq}]}).then(function(r){if(r.error)throw r.error}):Promise.resolve();
+  p.then(function(){return sb.from("riders").update({name:n,phone:ph||null,category:cat||null,region:reg||null,vehicle:veh||null,updated_at:new Date().toISOString()}).eq("id",id).then(function(u){if(u.error)throw u.error})})
+   .then(function(){c=data.couriers[id]||(data.couriers[id]={});c.n=n;if(ph)c.ph=ph;else delete c.ph;c.v=veh;if(reg)c.rg=reg;else delete c.rg;if(cat)c.cat=cat;else delete c.cat;
+     if(iq&&SHIQ&&typeof SHIQ==="object")SHIQ[id]=iq;if(typeof SHX==="object")for(var k in SHX)delete SHX[k];
+     var o=document.getElementById("addDlg");if(o)o.remove();CARD.msg="تم حفظ تعديل بيانات المندوب "+n+" ("+id+")";render()},
+     function(e){b.disabled=false;addMsg("تعذّر الحفظ: "+((e&&e.message)||e))})}
+document.addEventListener("click",function(e){var t=e.target;if(t&&t.id==="eSave")rEditSave(t.dataset.id)});
 /* ---------- distance: category selection + PDF ---------- */
 var DS=null;
 function dsFilter(rows){var kc={};rows.forEach(function(a){var k=rpCat(a.id);kc[k]=(kc[k]||0)+1});var kats=Object.keys(kc).sort(function(a,b){return shCatOrder(a)-shCatOrder(b)});
@@ -1805,6 +1832,7 @@ root.addEventListener("click",function(e){
   if(t.id==="wPdf"){wPdf();return}
   if(t.dataset.cedit){cardPhotoEdit(t.dataset.cedit);return}
   if(t.dataset.rdel!=null){rDel(t.dataset.rdel);return}
+  if(t.dataset.redt!=null){rEdit(t.dataset.redt);return}
   if(t.dataset.call!=null){if(t.dataset.call==="1")cardList().forEach(function(id){CARD.sel[id]=true});else CARD.sel={};render();return}
   if(t.id==="cPrint"){cardPrint();return}
   if(t.id==="qXlsx"){qExcel();return}
