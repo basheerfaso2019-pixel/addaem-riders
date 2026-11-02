@@ -1410,7 +1410,7 @@ function stmtBlockedHtml(id,m){return '<section class="panel stmt"><h2>ملخص 
 var SH_MON="",SHX={},SHIQ=null,SH_MSG="";
 var JSZIP_URL="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
 function loadZip(){return window.JSZip?Promise.resolve(window.JSZip):new Promise(function(ok,no){var s=document.createElement("script");s.src=JSZIP_URL;s.onload=function(){ok(window.JSZip)};s.onerror=function(){no(new Error("lib"))};document.head.appendChild(s)})}
-function shMonths(){var m={};days().forEach(function(d){m[d.slice(0,7)]=1});return Object.keys(m).sort().reverse()}
+function shMonths(){var m={};days().forEach(function(d){m[d.slice(0,7)]=1});var k=Object.keys(m);if(k.length)m[new Date(Date.now()+3*36e5).toISOString().slice(0,7)]=1;return Object.keys(m).sort().reverse()}
 function shCatOrder(c){return c==="ب"?0:c==="خ"?1:c==="أ"?2:3}
 function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)&&SH_OUT.indexOf(data.couriers[id].rg)<0&&!stGone(id,SHMON)}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
   var px=x.sp==null?1e9:x.sp,py=y.sp==null?1e9:y.sp;if(px!==py)return px-py;var cx=shCatOrder(normCat(x.cat)),cy=shCatOrder(normCat(y.cat));return cx!==cy?cx-cy:(+a)-(+b)})}
