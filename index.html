@@ -1066,7 +1066,8 @@ function rDel(id){if(!isAdmin)return;var nd=days().filter(function(d){return dat
 function rEdit(id){if(!isAdmin)return;var c=data.couriers[id]||{},o=document.getElementById("addDlg");if(o)o.remove();o=document.createElement("div");o.id="addDlg";o.className="addov";o.setAttribute("dir","rtl");
   var ph=String(c.ph||"").replace(/\D/g,"");if(/^9665\d{8}$/.test(ph))ph="0"+ph.slice(3);
   var opt=function(v,l,cur){return '<option value="'+esc(v)+'"'+(v===cur?" selected":"")+'>'+l+'</option>'},rg=c.rg||"",ct=c.cat||"",vh=c.v||(ct==="أ"?"bike":"car");
-  o.innerHTML='<div class="addbox" role="dialog" aria-modal="true"><h2 style="margin:0 0 4px">تعديل بيانات المندوب</h2><p class="hint" style="margin:0 0 12px">Rider ID: <b dir="ltr">'+esc(id)+'</b></p>'+
+  o.innerHTML='<div class="addbox" role="dialog" aria-modal="true"><h2 style="margin:0 0 4px">تعديل بيانات المندوب</h2><p class="hint" style="margin:0 0 12px">غيّر الـ Rider ID فقط إذا HungerStation أعطت المندوب رقماً جديداً؛ تنتقل كل بياناته (الأداء، الجودة، المحفظة، الملاحظات، الإقامة، الصورة) للرقم الجديد.</p>'+
+    addField("eId","Rider ID","أرقام فقط",'inputmode="numeric" dir="ltr" value="'+esc(id)+'"')+
     addField("eName","الاسم","الاسم الكامل",'value="'+esc(c.n||"")+'"')+
     addField("eIq","رقم الإقامة (كلمة دخول المندوب)","10 أرقام",'inputmode="numeric" value="'+esc(cardIq(id))+'"')+
     addField("ePh","الجوال","05xxxxxxxx",'inputmode="tel" value="'+esc(ph)+'"')+
@@ -1076,17 +1077,40 @@ function rEdit(id){if(!isAdmin)return;var c=data.couriers[id]||{},o=document.get
     '<p id="aMsg" class="hint" style="min-height:1.4em;margin:8px 0"></p><div class="row" style="gap:8px;justify-content:flex-start"><button class="btn pri" id="eSave" data-id="'+esc(id)+'">حفظ التعديل</button><button class="btn" id="aCancel">إلغاء</button></div></div>';
   document.body.appendChild(o);if(typeof trTree==="function")try{trTree(o)}catch(e){}document.getElementById("eName").focus()}
 function rEditSave(id){var g=function(i){return document.getElementById(i).value.trim()},c=data.couriers[id]||{},n=g("eName").replace(/\s+/g," "),iq=g("eIq").replace(/\D/g,""),ph=g("ePh").replace(/\D/g,""),cat=g("eCat"),reg=g("eReg"),veh=g("eVeh");
+  var nid=g("eId").replace(/\D/g,"");if(!nid)return addMsg("اكتب Rider ID (أرقام فقط).");
+  if(nid!==id){var ex=data.couriers[nid];if(ex&&ex.n)return addMsg("الرقم "+nid+" مسجّل مسبقاً باسم: "+ex.n);}
   if(!n)return addMsg("اكتب اسم المندوب.");
   if(iq&&iq.length!==10)return addMsg("رقم الإقامة لازم يكون 10 أرقام.");
   if(!iq&&cardIq(id))return addMsg("لا يمكن ترك رقم الإقامة فارغاً، اكتب الرقم الصحيح.");
   if(ph){if(/^05\d{8}$/.test(ph))ph="966"+ph.slice(1);else if(/^5\d{8}$/.test(ph))ph="966"+ph;if(!/^9665\d{8}$/.test(ph))return addMsg("رقم الجوال غير صحيح، اكتبه بصيغة 05xxxxxxxx.")}
+  if(nid!==id&&!confirm("تغيير Rider ID من "+id+" إلى "+nid+"؟\n\nستنتقل كل بيانات المندوب للرقم الجديد، ويصير دخوله لبوابة المناديب بالرقم الجديد."))return addMsg("");
   var b=document.getElementById("eSave");b.disabled=true;addMsg("جارٍ الحفظ…",true);
+  var p0=nid!==id?rMoveId(id,nid,iq||cardIq(id),n):Promise.resolve();
+  return p0.then(function(){if(nid!==id){if(SHIQ&&typeof SHIQ==="object"&&SHIQ[id]){SHIQ[nid]=SHIQ[id];delete SHIQ[id]}if(CARD.q)CARD.q=nid;id=nid}rEditSave2(id,n,iq,ph,cat,reg,veh)},function(e){b.disabled=false;addMsg("تعذّر تغيير الرقم: "+((e&&e.message)||e))})}
+function rEditSave2(id,n,iq,ph,cat,reg,veh){var c,b=document.getElementById("eSave");
   var p=iq&&iq!==cardIq(id)?sb.rpc("set_riders",{p_rows:[{id:id,name:n,iqama:iq}]}).then(function(r){if(r.error)throw r.error}):Promise.resolve();
   p.then(function(){return sb.from("riders").update({name:n,phone:ph||null,category:cat||null,region:reg||null,vehicle:veh||null,updated_at:new Date().toISOString()}).eq("id",id).then(function(u){if(u.error)throw u.error})})
    .then(function(){c=data.couriers[id]||(data.couriers[id]={});c.n=n;if(ph)c.ph=ph;else delete c.ph;c.v=veh;if(reg)c.rg=reg;else delete c.rg;if(cat)c.cat=cat;else delete c.cat;
      if(iq&&SHIQ&&typeof SHIQ==="object")SHIQ[id]=iq;if(typeof SHX==="object")for(var k in SHX)delete SHX[k];
      var o=document.getElementById("addDlg");if(o)o.remove();CARD.msg="تم حفظ تعديل بيانات المندوب "+n+" ("+id+")";render()},
-     function(e){b.disabled=false;addMsg("تعذّر الحفظ: "+((e&&e.message)||e))})}
+     function(e){if(b)b.disabled=false;addMsg("تعذّر الحفظ: "+((e&&e.message)||e))})}
+/* move every row of rider old to rider nid (HS gave a new ID). On a key clash the new ID's own row wins and the old one is dropped. */
+function rMoveId(old,nid,iq,n){var chk=function(r){if(r&&r.error)throw r.error;return r};
+  var mv=function(t,key){return sb.from(t).update({rider_id:nid}).eq("rider_id",old).then(function(r){if(!r.error)return;
+      if(!key||!/duplicate|23505|unique/i.test((r.error.code||"")+" "+(r.error.message||"")))throw r.error;
+      return sb.from(t).select(key).eq("rider_id",old).then(chk).then(function(r2){var q=Promise.resolve();(r2.data||[]).forEach(function(x){q=q.then(function(){
+        return sb.from(t).update({rider_id:nid}).eq("rider_id",old).eq(key,x[key]).then(function(u){if(u.error)return sb.from(t).delete().eq("rider_id",old).eq(key,x[key]).then(chk)})})});return q})})};
+  return sb.from("riders").select("*").eq("id",old).then(chk).then(function(r){var row=Object.assign({},(r.data||[])[0]||{});row.id=nid;row.updated_at=new Date().toISOString();
+      return sb.from("riders").upsert(row).then(chk)})
+    .then(function(){return iq?sb.rpc("set_riders",{p_rows:[{id:nid,name:n,iqama:iq}]}).then(chk):null})
+    .then(function(){return mv("daily","day")}).then(function(){return mv("quality","month")}).then(function(){return mv("sheet_extra","month")})
+    .then(function(){return mv("wallet","rider_id")}).then(function(){return mv("fuel_map")}).then(function(){return mv("tga_codes")})
+    .then(function(){return iq?sb.from("rider_private").delete().eq("rider_id",old).then(chk):mv("rider_private","rider_id")})
+    .then(function(){try{var st=sb.storage.from("rider-photos");return Promise.all([st.move(old+".jpg",nid+".jpg"),st.move("orig/"+old+".jpg","orig/"+nid+".jpg")]).catch(function(){})}catch(e){}})
+    .then(function(){return sb.from("riders").delete().eq("id",old).then(chk)})
+    .then(function(){var co=data.couriers[old]||{},cn=data.couriers[nid]||{};data.couriers[nid]=Object.assign({},cn,co);delete data.couriers[old];
+      Object.keys(data.days).forEach(function(d){var D=data.days[d];if(D[old]){if(!D[nid])D[nid]=D[old];delete D[old]}});
+      if(CARD.sel[old]){CARD.sel[nid]=1;delete CARD.sel[old]}if(CARD.ph&&typeof CARD.ph==="object"&&CARD.ph[old]){CARD.ph[nid]=CARD.ph[old];delete CARD.ph[old]}if(CARD.photos){CARD.photos[nid]=CARD.photos[old];delete CARD.photos[old]}})}
 document.addEventListener("click",function(e){var t=e.target;if(t&&t.id==="eSave")rEditSave(t.dataset.id)});
 /* ---------- distance: category selection + PDF ---------- */
 var DS=null;
