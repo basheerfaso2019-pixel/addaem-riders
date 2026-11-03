@@ -1563,7 +1563,11 @@ function vCourier(){
     var ph=data.couriers[id]&&data.couriers[id].ph,wa=ph?"https://wa.me/"+ph+"?text="+encodeURIComponent(stmtText(id,st)):"";
     return head+'<section class="panel stmt">'+stmtHead(id,st.mon)+stmtTable(id,st)+
       (ph?'<p class="hint noprint">يُرسل إلى الرقم المسجل: <span class="num" dir="ltr">+'+esc(ph)+'</span></p>':'')+'</section>';}
-  if(cs==="wallet"){var w2=data.couriers[id]&&data.couriers[id].w;
+  if(cs==="wallet"){var w2=data.couriers[id]&&data.couriers[id].w,wsn=((data.couriers[id]||{}).wsn||[]).slice().reverse();
+    if(wsn.length){var wm=ui0.rgm||"",wsel=(data.couriers[id].wh||{})[wm]||w2;
+      return sampleNote()+head+'<section class="panel"><h2>المحفظة</h2>'+(wsel?'<div class="hero"><span class="hero-num">'+money(wsel.b)+'</span><span>بتاريخ <span class="num">'+esc(wsel.d)+'</span></span></div>':'')+
+        '<h3 style="margin:14px 0 6px">سجل أرصدة المحفظة</h3><p class="hint" style="margin:0 0 8px">كل رصيد رُفع لك محفوظ بتاريخه كما هو في ملف هنقرستيشن، قبل التصفية وبعدها.</p>'+
+        '<div class="tbl" style="box-shadow:none"><table><thead><tr><th>التاريخ</th><th>الشهر</th><th>الرصيد</th></tr></thead><tbody>'+wsn.map(function(x){return '<tr'+(wsel&&x.d===wsel.d?' class="csel"':'')+'><td class="num">'+esc(x.d)+'</td><td>'+monTxt(String(x.d).slice(0,7))+'</td><td class="num" dir="ltr" style="'+(x.b<0?'color:var(--bad);':'')+'font-weight:700">'+money(x.b)+'</td></tr>'}).join("")+'</tbody></table></div></section>'}
     return sampleNote()+head+'<section class="panel"><h2>المحفظة</h2>'+(w2?'<div class="hero"><span class="hero-num">'+money(w2.b)+'</span></div><p class="hint">آخر تحديث <span class="num">'+esc(w2.d)+'</span>.</p><div class="kpis">'+kpi("رصيد المحفظة",money(w2.b),"")+(w2.c!=null?kpi("النقد المحصّل",money(w2.c),""):"")+'</div>':'<p class="hint">لم تُرفع بيانات المحفظة بعد.</p>')+'</section>';}
   if(cs==="quality"){var qq=(data.couriers[id]&&data.couriers[id].q)||{},qms=Object.keys(qq).sort().reverse(),qm=ui0.qm&&qq[ui0.qm]?ui0.qm:qms[0],q=qm&&qq[qm];
     if(!q)return sampleNote()+head+'<section class="panel"><h2>جودة التوصيل</h2><p class="hint">لم تُرفع بيانات جودة التوصيل لك بعد.</p></section>';
@@ -1760,6 +1764,7 @@ function portalToData(res){
   (res.days||[]).forEach(function(r){var x=rowToRec(r);x.rk=r.rnk;x.cn=r.cnt;x.av=r.avg_completed!=null?+r.avg_completed:null;(d.days[r.day]||(d.days[r.day]={}))[me]=x});
   (res.quality||[]).forEach(function(q){(c.q||(c.q={}))[q.month]=qToObj(q)});
   if(res.wallet)c.w={b:num(res.wallet.balance),c:null,d:res.wallet.as_of};
+  if(res.wallet_snaps&&res.wallet_snaps.length)c.wsn=res.wallet_snaps.map(function(h){return {d:h.as_of,b:num(h.balance)}});
   if(res.wallet_hist&&res.wallet_hist.length){c.wh={};res.wallet_hist.forEach(function(h){c.wh[h.month]={b:num(h.balance),c:null,d:h.as_of}})}
   data=d;
 }
