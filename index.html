@@ -1005,9 +1005,10 @@ function waRows(day){if(waAbs())return waStRows(day);var out=[],o=data.days[day]
     if(!WA.h);else if(ac==null)why.push("لم يعمل هذا اليوم");else if(ac<WA_HRS)why.push("ساعات العمل "+fmt(ac,2));
     var lp=LP[id];if(lp){if(lp.ab>LOW_N)why.push("أداء منخفض لعدم العمل "+lp.ab+" أيام");if(lp.sh>LOW_S)why.push("أداء منخفض لعمله أقل من "+LOW_H+" ساعات في "+lp.sh+" أيام")};
     if(WA.lo&&x&&(+x[AC]>0||+x[CP]>0)&&(cp||0)<=(+WA.lov||0))why.push("طلبات قليلة");
+    var sn=waNote(id,day);if(sn&&why.some(function(w){return /^طلبات قليلة|^ساعات العمل|^لم يعمل/.test(w)}))why.push("ملاحظة الشيت - "+sn);
     var tg=WA.tg?waTgOf(id,day):[];if(tg.length)why.push("عليه أكواد الهيئة");
     if(why.length)out.push({id:id,tg:tg,lp:lp,cp:cp,city:x&&x[CI]||"",q:q,w:w,ac:ac,pl:pl,why:why})});
-  return out.sort(function(a,b){return b.why.length-a.why.length||(WA.lo?(a.cp||0)-(b.cp||0):0)||(a.w==null?0:a.w)-(b.w==null?0:b.w)})}
+  return out.sort(function(a,b){return waWn(b)-waWn(a)||(WA.lo?(a.cp||0)-(b.cp||0):0)||(a.w==null?0:a.w)-(b.w==null?0:b.w)})}
 function vWatch(){return rrPanel()+vWatch0()}
 function vWatch0(){var h=waPanel(1);if(h&&WA.lp&&!waAbs())h=h.replace(/<select id="waDay"[\s\S]*?<\/select>/,function(m){return '<label class="wadl">من تاريخ '+waFromSel()+'</label><label class="wadl">إلى تاريخ '+m+'</label>'});return h||'<section class="panel"><p class="hint">لا توجد بيانات أداء يومية بعد.</p></section>'}
 function waPanel(full){var ds=waDays();if(!ds.length)return "";var day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0],R=waRows(day);if(waAbs())return waStPanel(full,ds,day,R);
@@ -1281,6 +1282,8 @@ function rrPdf(){var id=rrId();if(!id)return;var r=rrRange(),R=rrCalc(id,r.f,r.t
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
 function waTgOf(id,day){var m=day.slice(0,7);return ecMonth(id,days().filter(function(d){return d.slice(0,7)===m&&d<=day}).sort())}
+function waWn(r){return r.why.filter(function(w){return !/^ملاحظة الشيت/.test(w)}).length}
+function waNote(id,day){var m=day.slice(0,7);if(!SHX[m]&&typeof shLoad==="function")shLoad(m);var o=SHX[m]&&SHX[m]!=="loading"?SHX[m]:null;return o&&o[id]&&o[id].n?String(o[id].n):""}
 function vSoon(){var m=MENU.filter(function(x){return x[0]===view})[0];
   return '<div class="panel soonbox"><b>'+esc(m[1])+'</b><p class="hint" style="margin:0">هذا القسم من تقرير '+esc(m[2])+' في هنقرستيشن. أرسل لي شكل الملف أو الأعمدة وأضيفه هنا.</p></div>'}
 function noData(cols){return '<tr><td class="empty" colspan="'+cols+'">لا توجد بيانات في هذه الفترة.</td></tr>'}
