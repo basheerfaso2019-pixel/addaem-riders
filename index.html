@@ -998,7 +998,7 @@ function waStDoc(day,R){var th='background:#20386b;color:#fff;font-weight:700;pa
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+W.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+H.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function waRows(day){if(waAbs())return waStRows(day);var out=[],o=data.days[day]||{},LP=WA.lp?waLow(day):{};
-  Object.keys(data.couriers||{}).forEach(function(id){if(WA.ks.length&&WA.ks.indexOf(catOf(id))<0)return;var c=data.couriers[id];if(waOff(c,day))return;
+  Object.keys(data.couriers||{}).forEach(function(id){if(WA.ks.length&&WA.ks.indexOf(catOf(id))<0)return;var c=data.couriers[id];if(waOff(c,day)){var sk=waStOf(c,day);if(sk==="en"||!(WA.h||WA.lo))return;var wy=[waStTxt(sk)+(c.st.u?" حتى "+c.st.u:"")],sn0=waNote(id,day);if(sn0)wy.push("ملاحظة الشيت - "+sn0);var x0=o[id];out.push({id:id,tg:[],lp:null,cp:x0&&x0[CP]!=null?+x0[CP]:null,city:x0&&x0[CI]||"",q:waQ(c,day),w:c.w&&c.w.b!=null?+c.w.b:null,ac:x0&&x0[AC]!=null?+x0[AC]:null,pl:x0&&x0[PL]!=null?+x0[PL]:null,why:wy,off:1});return}
     var x=o[id],ac=x&&x[AC]!=null?+x[AC]:null,pl=x&&x[PL]!=null?+x[PL]:null,cp=x&&x[CP]!=null?+x[CP]:null,q=waQ(c,day),w=c.w&&c.w.b!=null?+c.w.b:null,why=[];
     if(WA.q&&q&&WA.g.indexOf(q.s)>=0)why.push("جودة التوصيل "+q.s);
     if(WA.w&&w!=null&&w<=WA_WAL)why.push("المحفظة "+fmt(w,2));
