@@ -1536,7 +1536,7 @@ function vCourier(){
     return sampleNote()+head+rgPanel(id,mine,ld)+'<p class="hint" style="text-align:center;margin:-4px 0 8px">البطاقات التالية لشهر <b>'+monTxt(mon)+'</b>، غيّر الشهر من القائمة أعلاه.</p><div class="tiles">'+
       tile("day",isCur?"عدد طلبات اليوم":"طلبات آخر يوم في الشهر",lv?N(lv[CP],0):"0",dd?dl(dd)+'<br>اختر أي يوم سابق':"لا توجد بيانات")+
       tile("all","إجمالي طلبات الشهر",N(t,0),monTxt(mon)+(md?' حتى <span class="num">'+md+'</span>':'')+'<br>اختر أي شهر')+
-      tile("wallet","المحفظة",w?money(w.b):"—",w?'بتاريخ <span class="num">'+esc(w.d)+'</span>':"لا يوجد رصيد محفوظ لهذا الشهر")+
+      tile("wallet","المحفظة",w?money(w.b):"—",w?(isCur?'':'رصيد نهاية الشهر<br>')+'من ملف <span class="num">'+esc(w.d)+'</span>':"لا يوجد رصيد محفوظ لهذا الشهر")+
       tile("quality","جودة التوصيل",qm?'<span style="font-size:24px">'+segPill(qm.s)+'</span>':"—",qm?"تصنيف "+monLabel(mon):"لم تُرفع لهذا الشهر")+
       tile("declined","الطلبات المرفوضة",N(sumDE(inm,id),0),monTxt(mon)+(md?' حتى <span class="num">'+md+'</span>':''))+(kmHide(id)?"":tile("distance","المسافة المستحقة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',monTxt(mon)))+""+'</div>'+
 '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
