@@ -1080,6 +1080,7 @@ function rEdit(id){if(!isAdmin)return;var c=data.couriers[id]||{},o=document.get
     '<label class="addf"><span>المنطقة</span><select id="eReg">'+opt("","الأحساء",rg)+opt("الرياض","الرياض",rg)+opt("الدمام","الدمام",rg)+opt("أبقيق","أبقيق",rg)+(rg&&["الرياض","الدمام","أبقيق"].indexOf(rg)<0?opt(rg,esc(rg),rg):"")+'</select></label>'+
     '<label class="addf"><span>الفئة</span><select id="eCat">'+opt("أ","فئة أ (تارقت)",ct)+opt("ب","فئة ب",ct)+opt("خ","فئة خ",ct)+opt("","بدون فئة",ct)+'</select></label>'+
     '<label class="addf"><span>المركبة</span><select id="eVeh">'+opt("bike","دراجة نارية",vh)+opt("car","سيارة",vh)+'</select></label>'+
+    '<label class="addf"><span>دخول المندوب للبوابة</span><select id="eNl">'+opt("","مسموح",(data.couriers[id]||{}).nl?"1":"")+opt("1","موقوف (لا يستطيع الدخول)",(data.couriers[id]||{}).nl?"1":"")+'</select></label>'+
     '<p id="aMsg" class="hint" style="min-height:1.4em;margin:8px 0"></p><div class="row" style="gap:8px;justify-content:flex-start"><button class="btn pri" id="eSave" data-id="'+esc(id)+'">حفظ التعديل</button><button class="btn" id="aCancel">إلغاء</button></div></div>';
   document.body.appendChild(o);if(typeof trTree==="function")try{trTree(o)}catch(e){}document.getElementById("eName").focus()}
 function rEditSave(id){var g=function(i){return document.getElementById(i).value.trim()},c=data.couriers[id]||{},n=g("eName").replace(/\s+/g," "),iq=g("eIq").replace(/\D/g,""),ph=g("ePh").replace(/\D/g,""),cat=g("eCat"),reg=g("eReg"),veh=g("eVeh");
@@ -1095,8 +1096,8 @@ function rEditSave(id){var g=function(i){return document.getElementById(i).value
   return p0.then(function(){if(nid!==id){if(SHIQ&&typeof SHIQ==="object"&&SHIQ[id]){SHIQ[nid]=SHIQ[id];delete SHIQ[id]}if(CARD.q)CARD.q=nid;id=nid}rEditSave2(id,n,iq,ph,cat,reg,veh)},function(e){b.disabled=false;addMsg("تعذّر تغيير الرقم: "+((e&&e.message)||e))})}
 function rEditSave2(id,n,iq,ph,cat,reg,veh){var c,b=document.getElementById("eSave");
   var p=iq&&iq!==cardIq(id)?sb.rpc("set_riders",{p_rows:[{id:id,name:n,iqama:iq}]}).then(function(r){if(r.error)throw r.error}):Promise.resolve();
-  p.then(function(){return sb.from("riders").update({name:n,phone:ph||null,category:cat||null,region:reg||null,vehicle:veh||null,updated_at:new Date().toISOString()}).eq("id",id).then(function(u){if(u.error)throw u.error})})
-   .then(function(){c=data.couriers[id]||(data.couriers[id]={});c.n=n;if(ph)c.ph=ph;else delete c.ph;c.v=veh;if(reg)c.rg=reg;else delete c.rg;if(cat)c.cat=cat;else delete c.cat;
+  p.then(function(){return sb.from("riders").update({name:n,phone:ph||null,category:cat||null,region:reg||null,vehicle:veh||null,no_login:!!(document.getElementById("eNl")||{}).value,updated_at:new Date().toISOString()}).eq("id",id).then(function(u){if(u.error)throw u.error})})
+   .then(function(){c=data.couriers[id]||(data.couriers[id]={});if((document.getElementById("eNl")||{}).value)c.nl=1;else delete c.nl;c.n=n;if(ph)c.ph=ph;else delete c.ph;c.v=veh;if(reg)c.rg=reg;else delete c.rg;if(cat)c.cat=cat;else delete c.cat;
      if(iq&&SHIQ&&typeof SHIQ==="object")SHIQ[id]=iq;if(typeof SHX==="object")for(var k in SHX)delete SHX[k];
      var o=document.getElementById("addDlg");if(o)o.remove();CARD.msg="تم حفظ تعديل بيانات المندوب "+n+" ("+id+")";render()},
      function(e){if(b)b.disabled=false;addMsg("تعذّر الحفظ: "+((e&&e.message)||e))})}
@@ -1752,7 +1753,7 @@ function loadStaffData(){
   function C(id){return d.couriers[id]||(d.couriers[id]={})}
   var jobs=[
     sb.from("settings").select("key,value").then(function(r){(r.data||[]).forEach(function(s){if(s.key==="company")d.company=s.value;if(s.key==="last_upload")LASTUP=s.value})}),
-    all("riders","id,name,vehicle,tga,phone,category,sheet_pos,region,st,st_from,st_until,st_note","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.st)c.st={t:r.st,f:r.st_from,u:r.st_until,n:r.st_note||""};if(r.sheet_pos!=null)c.sp=r.sheet_pos;if(r.region)c.rg=r.region;if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.category)c.cat=r.category;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
+    all("riders","id,name,vehicle,tga,phone,category,sheet_pos,region,st,st_from,st_until,st_note,no_login","id").then(function(rs){rs.forEach(function(r){var c=C(r.id);if(r.no_login)c.nl=1;if(r.st)c.st={t:r.st,f:r.st_from,u:r.st_until,n:r.st_note||""};if(r.sheet_pos!=null)c.sp=r.sheet_pos;if(r.region)c.rg=r.region;if(r.name)c.n=r.name;if(r.phone)c.ph=r.phone;if(r.category)c.cat=r.category;if(r.vehicle)c.v=r.vehicle;if(r.tga)c.tga=r.tga})}),
     all("daily","*",["day","rider_id"]).then(function(rs){rs.forEach(function(r){if(r.city==null&&r.completed==null&&r.actual_hours==null&&r.planned_hours==null&&r.shifts==null&&!(+r.distance_km||+r.payable_km||+r.completed_dist))return;(d.days[r.day]||(d.days[r.day]={}))[r.rider_id]=rowToRec(r)})}),
     sb.rpc("riders_with_login").then(function(r){(r.data||[]).forEach(function(id){C(typeof id==="string"?id:id.riders_with_login).h=true})})];
   if(canSee("quality"))jobs.push(all("quality","*",["month","rider_id"]).then(function(rs){rs.forEach(function(q){var c=C(q.rider_id);(c.q||(c.q={}))[q.month]=qToObj(q)})}));
@@ -1841,7 +1842,7 @@ function work(promise,okMsg){
   return promise.then(function(){return loadStaffData()}).then(function(){ui.busy=false;ui.msg=okMsg;ui.msgOk=true;render()})
   .catch(function(e){ui.busy=false;ui.msgOk=false;ui.msg="تعذّر الحفظ: "+((e&&e.message)||e);render()});
 }
-function riderErr(e){return e==="ended"?"تم إنهاء عقدك مع الشركة، لذلك لا يمكنك الدخول. للاستفسار تواصل مع الإدارة.":e==="locked"?"محاولات كثيرة خاطئة. حاول بعد 15 دقيقة.":"رقم الإقامة أو الـ ID غير صحيح."}
+function riderErr(e){return e==="blocked"?"تم إيقاف الدخول لحسابك. للاستفسار تواصل مع الإدارة.":e==="ended"?"تم إنهاء عقدك مع الشركة، لذلك لا يمكنك الدخول. للاستفسار تواصل مع الإدارة.":e==="locked"?"محاولات كثيرة خاطئة. حاول بعد 15 دقيقة.":"رقم الإقامة أو الـ ID غير صحيح."}
 
 /* ---------- events ---------- */
 root.addEventListener("click",function(e){
