@@ -475,8 +475,32 @@ function ovDoc(k,m,t){var L=t[k],off=k==="top"?0:k==="mid"?t.top.length:t.top.le
 /* html2canvas drops spaces between Arabic words, so each word gets its own box */
 function ovWords(el){var tw=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[],n;while(n=tw.nextNode())if(/\S\s+\S/.test(n.nodeValue)&&/[؀-ۿ]/.test(n.nodeValue))ns.push(n);
   ns.forEach(function(n){var f=document.createDocumentFragment();n.nodeValue.trim().split(/\s+/).forEach(function(w){var s=document.createElement("span");s.style.cssText="display:inline-block;margin:0 .15em";s.textContent=w;f.appendChild(s)});n.parentNode.replaceChild(f,n)})}
+/* size PDF table columns from their content, so no column is cramped, overflows or takes the leftover space */
+function pdfFit(el,land){var host=document.createElement("div");host.style.cssText="position:fixed;left:-20000px;top:0;visibility:hidden;width:"+(land?285:198)+"mm";host.appendChild(el);document.body.appendChild(host);
+  try{[].slice.call(el.querySelectorAll("table")).forEach(function(t){
+    var trs=[].slice.call(t.rows),all=[].slice.call(t.querySelectorAll("th,td")),n=0;
+    trs.forEach(function(r){var c=0;[].slice.call(r.cells).forEach(function(x){c+=x.colSpan||1});n=Math.max(n,c)});if(!n)return;
+    all.forEach(function(x){x.style.minWidth="0";x.style.maxWidth="none";x.style.overflow="visible";x.style.wordBreak="normal";x.style.overflowWrap="normal";x.style.verticalAlign="middle"});
+    var cg=t.querySelector("colgroup"),ps=getComputedStyle(t.parentNode),avail=t.parentNode.clientWidth-(parseFloat(ps.paddingLeft)||0)-(parseFloat(ps.paddingRight)||0);
+    var cw=function(x){var r=document.createRange();r.selectNodeContents(x);return r.getBoundingClientRect().width},
+      pad=function(x){var s=getComputedStyle(x);return (parseFloat(s.paddingLeft)||0)+(parseFloat(s.paddingRight)||0)+(parseFloat(s.borderLeftWidth)||0)+(parseFloat(s.borderRightWidth)||0)+6},
+      each=function(f){trs.forEach(function(r){var c=0;[].slice.call(r.cells).forEach(function(x){var s=x.colSpan||1;if(s===1)f(x,c,r.parentNode.tagName==="THEAD");c+=s})})};
+    if(cg)cg.parentNode.removeChild(cg);t.style.tableLayout="auto";t.style.width="auto";
+    var mx=[],mn=[],hd=[],z=function(a,i,v){a[i]=Math.max(a[i]||0,v)};
+    all.forEach(function(x){x.style.whiteSpace="nowrap"});
+    each(function(x,c,h){var v=cw(x)+pad(x);if(h)hd[c]=Math.max(hd[c]||0,v);else z(mx,c,v)});
+    all.forEach(function(x){x.style.whiteSpace="normal"});t.style.width="1px";
+    each(function(x,c,h){z(mn,c,cw(x)+pad(x))});
+    var W=[],M=[];for(var i=0;i<n;i++){M[i]=mn[i]||20;W[i]=Math.max(M[i],mx[i]||0,Math.min(hd[i]||0,Math.max(M[i],(hd[i]||0)/2)))}
+    var sw=W.reduce(function(a,b){return a+b},0),sm=M.reduce(function(a,b){return a+b},0),F;
+    if(sw<=avail)F=W.map(function(w){return w*avail/sw});
+    else if(sm<avail)F=W.map(function(w,i){return M[i]+(w-M[i])*(avail-sm)/(sw-sm)});
+    else F=M.map(function(m){return m*avail/sm});
+    var g=document.createElement("colgroup");F.forEach(function(w){var c=document.createElement("col");c.style.width=(w/avail*100).toFixed(3)+"%";g.appendChild(c)});t.insertBefore(g,t.firstChild);
+    t.style.tableLayout="fixed";t.style.width="100%";all.forEach(function(x){x.style.overflowWrap="anywhere"})})}
+  finally{host.removeChild(el);document.body.removeChild(host)}}
 function ovPdf(k){var m=ovMon(),t=ovTiers(m);if(!t[k].length)return;OV_BUSY=k;render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=ovDoc(k,m,t);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=ovDoc(k,m,t);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:OV_T[k]+" - "+m+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -563,7 +587,7 @@ function qDoc(Q){var th='background:#0f4c4a;color:#fff;font-weight:700;padding:6
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+[4,8,19,5,8,6,7,8,7,7,6,6,5,4].map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+Q_HEAD.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#6b7f7e"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function qPdf(){if(!QROWS||!QROWS.rows.length)return;var Q=QROWS;OV_BUSY="q";render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=qDoc(Q);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=qDoc(Q);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:qTitle()+" - "+Q.m+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -751,7 +775,7 @@ function wDoc(L,m){var tot=0,th='background:#0f4c4a;color:#fff;font-weight:700;p
     '<tfoot><tr><td colspan="6" style="'+td+';font-weight:700;background:#eef1f7">الإجمالي</td><td style="'+td+';font-weight:700;background:#eef1f7">'+fmt(tot,2)+'</td><td colspan="2" style="'+td+';background:#eef1f7"></td></tr></tfoot></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:flex-end;font-size:10.5px;color:#6b7f7e"><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function wPdf(){var L=wList(),m=wMin();if(!L.length)return;W_BUSY=true;render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=wDoc(L,m);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=wDoc(L,m);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:"مناديب "+(wOwe()?"عليهم ":"لهم ")+m+" فأكثر"+(wFiltTxt()?" - "+wFiltTxt().replace(/[\\/:*?"<>|]/g," "):"")+" - "+new Date().toISOString().slice(0,10)+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){W_BUSY=false;render()})}
@@ -914,7 +938,7 @@ function rpDoc(Q){var th='background:#0f4c4a;color:#fff;font-weight:700;padding:
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+[3,5,15,8,4,6,4,5,5,5,5,5,5,6,6,5,8].map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+RP_HEAD.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#6b7f7e"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function rpPdf(){if(!RP||!RP.rows.length)return;var Q={f:RP.f,rows:RP.rows.slice()};OV_BUSY="rp";render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=rpDoc(Q);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=rpDoc(Q);var el=w.firstChild;ovWords(el);pdfFit(el,1);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:"أداء المناديب"+rpSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -1057,7 +1081,7 @@ function waCols(){var h=["#","Rider ID","الاسم","الجوال"],w=[4,9,21,1
   if(WA.tg){h.push("أكواد الهيئة");w.push(10)}
   h.push("السبب");w.push(100-w.reduce(function(a,b){return a+b},0));return {h:h,w:w}}
 function waPdf(){var ds=waDays();if(!ds.length)return;var day=ui0.wad&&ds.indexOf(ui0.wad)>=0?ui0.wad:ds[0],R=waRows(day);if(!R.length)return;OV_BUSY="wa";render();var sy=window.scrollY;window.scrollTo(0,0);
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=waDoc(day,R);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=waDoc(day,R);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:waName()+" - "+(WA.lp&&!waAbs()?waFrom(day)+" إلى ":"")+day+".pdf",image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
@@ -1145,7 +1169,7 @@ function dsDoc(Q){var th='background:#20386b;color:#fff;font-weight:700;padding:
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+W.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+H.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+foot+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function dsPdf(){if(!DS||!DS.rows.length)return;var Q={f:DS.f,rows:DS.rows.slice()},nm="المسافة المقطوعة"+dsSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf";OV_BUSY="ds";render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=dsDoc(Q);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=dsDoc(Q);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -1174,7 +1198,7 @@ function dyDoc(Q){var th='background:#20386b;color:#fff;font-weight:700;padding:
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+W.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+H.map(function(h){return '<th style="'+th+'">'+esc(h)+'</th>'}).join("")+'</tr></thead><tbody>'+rows+foot+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function dyPdf(){if(!DY.keys||!DY.keys.length)return;var Q={f:DY.f,keys:DY.keys.slice(),g:DY.g,list:DY.list},nm="الأداء اليومي"+dySelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf";OV_BUSY="dy";render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=dyDoc(Q);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=dyDoc(Q);var el=w.firstChild;ovWords(el);pdfFit(el,1);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -1201,7 +1225,7 @@ function tpDoc(Q){var th='background:#20386b;color:#fff;font-weight:700;padding:
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+W.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+H.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function tpPdf(){if(!TP.rows||!TP.rows.length)return;var Q={f:TP.f,rows:TP.rows.slice()},nm="أفضل المناديب"+tpSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf";OV_BUSY="tp";render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=tpDoc(Q);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=tpDoc(Q);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -1228,7 +1252,7 @@ function abDoc(Q){var th='background:#20386b;color:#fff;font-weight:700;padding:
     '<table style="width:100%;border-collapse:collapse;table-layout:fixed"><colgroup>'+W.map(function(w){return '<col style="width:'+w+'%">'}).join("")+'</colgroup><thead><tr>'+H.map(function(h){return '<th style="'+th+'">'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<div style="margin-top:14px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function abPdf(){if(!AB.rows||!AB.rows.length)return;var Q={f:AB.f,rows:AB.rows.slice(),n:AB.n},nm="غياب المناديب"+abSelTxt()+" "+Q.f.from+" إلى "+Q.f.to+".pdf";OV_BUSY="ab";render();
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=abDoc(Q);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=abDoc(Q);var el=w.firstChild;ovWords(el);pdfFit(el,1);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render()})}
@@ -1280,7 +1304,7 @@ function rrDoc(R){var s=R.s,c=R.c,id=R.id,q=waQ(c,R.t),w=c.w&&c.w.b!=null?+c.w.b
     '<tr style="background:#e6ecf5;font-weight:700"><td style="'+td+'" colspan="3">الإجمالي</td><td style="'+td+'">'+fmt(s.pl,1)+'</td><td style="'+td+'">'+fmt(s.ac,1)+'</td><td style="'+td+'">'+fmt(s.cp,0)+'</td><td style="'+td+'">'+fmt(s.ns,0)+'</td><td style="'+td+'">'+fmt(s.de,0)+'</td></tr></tbody></table>'+
     '<div style="margin-top:12px;display:flex;justify-content:space-between;font-size:10.5px;color:#5b6386"><span>تاريخ التصدير '+new Date().toISOString().slice(0,10)+'</span><span>تصميم المهندس / فاضل العميسي</span></div></div>'}
 function rrPdf(){var id=rrId();if(!id)return;var r=rrRange(),R=rrCalc(id,r.f,r.t),nm="تقرير المندوب "+cname(id)+" "+id+" - "+r.f+" إلى "+r.t+".pdf";OV_BUSY="rr";render();var sy=window.scrollY;window.scrollTo(0,0);
-  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=rrDoc(R);var el=w.firstChild;ovWords(el);
+  loadH2P().then(function(h2p){var w=document.createElement("div");w.innerHTML=rrDoc(R);var el=w.firstChild;ovWords(el);pdfFit(el,0);
     return (document.fonts&&document.fonts.ready||Promise.resolve()).then(function(){return h2p().set({margin:[8,6,10,6],filename:nm,image:{type:"jpeg",quality:0.95},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:"tr"}}).from(el).save()})})
   .catch(function(){alert("تعذر تحميل مكتبة PDF، تأكد من الاتصال بالإنترنت وحاول مرة أخرى.")})
   .then(function(){OV_BUSY="";render();window.scrollTo(0,sy)})}
