@@ -1842,6 +1842,12 @@ function dayPurge(rows){var ds=upDays(rows);if(!ds.length)return null;var q=sb.f
   /* no performance data and no distance (null or 0) = empty row */
   return q.then(function(r){if(r.error)throw r.error;var by={};(r.data||[]).forEach(function(x){if(!(+x.distance_km||+x.payable_km||+x.completed_dist))(by[x.day]||(by[x.day]=[])).push(x.rider_id)});
     return Object.keys(by).reduce(function(p,d){return p.then(function(){return sb.from("daily").delete().eq("day",d).in("rider_id",by[d]).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})}
+function suspLift(rows){var by={};rows.forEach(function(r){var c=+(r.completed!=null?r.completed:r.completed_dist)||0;if(c>0&&r.rider_id&&r.day){(by[r.rider_id]=by[r.rider_id]||[]).push(String(r.day).slice(0,10))}});var ids=Object.keys(by);if(!ids.length)return null;
+  return sb.from("riders").select("id,st_from,st_until").eq("st","susp").in("id",ids).then(function(q){if(q.error||!q.data)return null;
+    return q.data.reduce(function(p,rd){var ds=by[rd.id].filter(function(d){return(!rd.st_from||d>=rd.st_from)&&(!rd.st_until||d<=rd.st_until)}).sort();if(!ds.length)return p;var d=ds[0];
+      var pv=new Date(d+"T12:00:00Z");pv.setUTCDate(pv.getUTCDate()-1);pv=pv.toISOString().slice(0,10);
+      var up=(!rd.st_from||pv<rd.st_from)?{st:null,st_from:null,st_until:null,st_note:null}:{st_until:pv};
+      return p.then(function(){return sb.from("riders").update(up).eq("id",rd.id)}).then(function(){return sb.from("sheet_extra").update({note:null}).eq("rider_id",rd.id).eq("month",d.slice(0,7)).not("note","is",null)})},Promise.resolve())})}
 function upsertAll(table,rows,conflict){return batches(rows,500).reduce(function(p,b){return p.then(function(){return sb.from(table).upsert(b,{onConflict:conflict}).then(function(r){if(r.error)throw r.error})})},Promise.resolve())}
 function round2(v){return v==null?null:Math.round(v*100)/100}
 /* write parsed files to the database */
@@ -1869,6 +1875,7 @@ function applyUpload(list){
     .then(function(){return upsertAll("daily",daily.perf,"day,rider_id")})
     .then(function(){return upsertAll("daily",daily.dist,"day,rider_id")})
     .then(function(){return dayPurge(daily.perf.concat(daily.dist))})
+    .then(function(){return suspLift(daily.perf.concat(daily.dist))})
     .then(function(){return upsertAll("quality",qual,"month,rider_id")})
     .then(function(){return upsertAll("wallet",Object.keys(wal).map(function(k){return wal[k]}),"rider_id")})
     .then(function(){return fuelApply(list)})
