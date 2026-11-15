@@ -744,7 +744,9 @@ document.addEventListener("click",function(e){var t=e.target;if(!t.closest)retur
   if(t.id==="aSave")addSave()});
 document.addEventListener("change",function(e){if(e.target.id==="aCat"){var t=document.getElementById("aVehT");if(t)t.innerHTML="المركبة: <b>"+(e.target.value==="أ"?"دراجة نارية":"سيارة")+"</b> (فئة أ = دراجة نارية، غيرها = سيارة)"}});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){var o=document.getElementById("addDlg");if(o)o.remove()}else if(e.key==="Enter"&&e.target.closest&&e.target.closest("#addDlg")&&e.target.tagName==="INPUT"){var es=document.getElementById("eSave");if(es)rEditSave(es.dataset.id);else addSave()}});
-function kmHide(id){return normCat(data.couriers[id]&&data.couriers[id].cat)==="أ"}
+function kmHide(id){var c=normCat(data.couriers[id]&&data.couriers[id].cat);return c==="أ"||c==="ج"}
+/* category ج (Riyadh): portal shows only orders and delivery quality */
+function cjOnly(id){return normCat(data.couriers[id]&&data.couriers[id].cat)==="ج"}
 /* ---------- wallet PDF ---------- */
 var W_BUSY=false;
 /* amount typed with Arabic or English digits; balances are mostly negative (money the rider owes), so "owes" is the default direction */
@@ -954,7 +956,7 @@ function deWeak(id,mon){var md=days().filter(function(d){return d.slice(0,7)===m
 function deLeave(id){var s=data.couriers[id]&&data.couriers[id].st,t=stToday();return s&&s.t==="leave"&&(!s.f||s.f<=t)&&(!s.u||s.u>=t)?s:null}
 function deNotice(id){var lv=deLeave(id);if(lv&&/حادث|اصاب|إصاب|مرض/.test(lv.n||"")){deShow('<div class="denh">🤲 الحمدلله على السلامة</div><p class="denw">يا <b>'+esc(cname(id))+'</b>، الحمدلله على السلامة يا ذيبان، تقوم بالسلامة 🤍</p><p class="dene" dir="ltr">Hi <b>'+esc(cname(id))+'</b>, thank God you are safe. Get well soon, wolf 🤍</p>',"den-high");return}
   if(lv){deShow('<div class="denh">🌴 إجازة سعيدة</div><p class="denw">إجازة سعيدة يا <b>'+esc(cname(id))+'</b>، مشتاقين لك 🤍</p><p class="dene" dir="ltr">Happy vacation, <b>'+esc(cname(id))+'</b>! We miss you 🤍</p>'+(lv.u?'<p class="hint" style="margin:4px 0">إجازتك حتى <span class="num">'+esc(lv.u)+'</span></p>':''),"den-high");return}
-  var mon=curMonth(),ds=days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]&&deX(data.days[d][id][DE])>0}),lvl=deWeak(id,mon),weak=!!lvl;if(!ds.length&&!weak)return;
+  var mon=curMonth(),ds=cjOnly(id)?[]:days().filter(function(d){return d.slice(0,7)===mon&&data.days[d][id]&&deX(data.days[d][id][DE])>0}),lvl=deWeak(id,mon),weak=!!lvl;if(!ds.length&&!weak)return;
   var tot=0,li=ds.map(function(d){var v=+data.days[d][id][DE]||0,x=deX(v);tot+=x;return '<li>'+dl(d)+': رفضت <b class="num">'+v+'</b> طلب، الزائد <b class="num">'+x+'</b></li>'}).join("");
   deShow((weak?'<div class="denh">'+DEN_M[lvl][0]+'</div><p class="denw">يا <b>'+esc(cname(id))+'</b>، '+DEN_M[lvl][1]+'</p><p class="dene" dir="ltr">Hi <b>'+esc(cname(id))+'</b>, '+DEN_M[lvl][2]+'</p>':'')+
     (ds.length?(weak?'<hr>':'')+'<div class="denh">⚠️ تنبيه الطلبات المرفوضة</div><p>'+(weak?'':'يا <b>'+esc(cname(id))+'</b>، ')+'لقد رفضت <b class="num">'+tot+'</b> طلب زيادة عن المسموح (طلبين في اليوم) خلال '+monTxt(mon)+':</p><p class="dene" dir="ltr">'+(weak?'You':'Hi <b>'+esc(cname(id))+'</b>, you')+' rejected <b>'+tot+'</b> orders above the allowed limit (2 per day) this month:</p><ul>'+li+'</ul>':''),ds.length?"":" den-"+lvl)}
@@ -1106,7 +1108,7 @@ function rEdit(id){if(!isAdmin)return;var c=data.couriers[id]||{},o=document.get
     addField("eIq","رقم الإقامة (كلمة دخول المندوب)","10 أرقام",'inputmode="numeric" value="'+esc(cardIq(id))+'"')+
     addField("ePh","الجوال","05xxxxxxxx",'inputmode="tel" value="'+esc(ph)+'"')+
     '<label class="addf"><span>المنطقة</span><select id="eReg">'+opt("","الأحساء",rg)+opt("الرياض","الرياض",rg)+opt("الدمام","الدمام",rg)+opt("أبقيق","أبقيق",rg)+(rg&&["الرياض","الدمام","أبقيق"].indexOf(rg)<0?opt(rg,esc(rg),rg):"")+'</select></label>'+
-    '<label class="addf"><span>الفئة</span><select id="eCat">'+opt("أ","فئة أ (تارقت)",ct)+opt("ب","فئة ب",ct)+opt("خ","فئة خ",ct)+opt("","بدون فئة",ct)+'</select></label>'+
+    '<label class="addf"><span>الفئة</span><select id="eCat">'+opt("أ","فئة أ (تارقت)",ct)+opt("ب","فئة ب",ct)+opt("خ","فئة خ",ct)+opt("ج","فئة ج (الرياض)",ct)+opt("","بدون فئة",ct)+'</select></label>'+
     '<label class="addf"><span>المركبة</span><select id="eVeh">'+opt("bike","دراجة نارية",vh)+opt("car","سيارة",vh)+'</select></label>'+
     '<label class="addf"><span>دخول المندوب للبوابة</span><select id="eNl">'+opt("","مسموح",(data.couriers[id]||{}).nl?"1":"")+opt("1","موقوف (لا يستطيع الدخول)",(data.couriers[id]||{}).nl?"1":"")+'</select></label>'+
     '<label class="addf"><span>الرمز السري للدخول</span><select id="ePin">'+((data.couriers[id]||{}).pin?opt("","مُعيَّن (يبقى كما هو)","")+opt("1","مسح الرمز (يختار رمزاً جديداً عند الدخول)",""):opt("","لم يختر رمزاً بعد",""))+'</select></label>'+
@@ -1564,6 +1566,7 @@ function vCourier(){
   var id=me,ds=days(),mine=ds.filter(function(d){return data.days[d][id]}),ld=lastDay(),cs=ui0.cs;
   var head='<section class="panel"><div class="who"><div><div style="color:var(--muted);font-size:13px">مرحباً</div><b>'+esc(cname(id))+'</b> <span class="num" style="color:var(--muted)">#'+esc(id)+'</span></div><div class="row">'+""+(cs!=="home"?'<button class="btn" data-cs="home">الرجوع للقائمة</button>':"")+'<button class="btn" id="logout">تسجيل خروج</button></div></div></section>';
   if(cs==="distance"&&kmHide(id))cs="home";
+  if(cjOnly(id)&&["home","day","all","quality"].indexOf(cs)<0)cs="home";
   if(cs==="home"){
     var ms0={};mine.forEach(function(d){ms0[d.slice(0,7)]=1});if(ld)ms0[ld.slice(0,7)]=1;var ml0=Object.keys(ms0).sort().reverse(),mon=ui0.rgm&&ms0[ui0.rgm]?ui0.rgm:(ml0[0]||curMonth());
     var inm=mine.filter(function(d){return d.slice(0,7)===mon}),md=inm.length?inm[inm.length-1]:null,isCur=ld&&ld.slice(0,7)===mon,dd=isCur?ld:md,lv=dd&&cRec(dd);
@@ -1573,9 +1576,9 @@ function vCourier(){
     return sampleNote()+head+rgPanel(id,mine,ld)+'<p class="hint" style="text-align:center;margin:-4px 0 8px">البطاقات التالية لشهر <b>'+monTxt(mon)+'</b>، غيّر الشهر من القائمة أعلاه.</p><div class="tiles">'+
       tile("day",isCur?"عدد طلبات اليوم":"طلبات آخر يوم في الشهر",lv?N(lv[CP],0):"0",dd?dl(dd)+'<br>اختر أي يوم سابق':"لا توجد بيانات")+
       tile("all","إجمالي طلبات الشهر",N(t,0),monTxt(mon)+(md?' حتى <span class="num">'+md+'</span>':'')+'<br>اختر أي شهر')+
-      tile("wallet","المحفظة",w?money(w.b):"—",w?(isCur?'':'رصيد نهاية الشهر<br>')+'من ملف <span class="num">'+esc(w.d)+'</span>':"لا يوجد رصيد محفوظ لهذا الشهر")+
+      (cjOnly(id)?"":tile("wallet","المحفظة",w?money(w.b):"—",w?(isCur?'':'رصيد نهاية الشهر<br>')+'من ملف <span class="num">'+esc(w.d)+'</span>':"لا يوجد رصيد محفوظ لهذا الشهر"))+
       tile("quality","جودة التوصيل",qm?'<span style="font-size:24px">'+segPill(qm.s)+'</span>':"—",qm?"تصنيف "+monLabel(mon):"لم تُرفع لهذا الشهر")+
-      tile("declined","الطلبات المرفوضة",N(sumDE(inm,id),0),monTxt(mon)+(md?' حتى <span class="num">'+md+'</span>':''))+(kmHide(id)?"":tile("distance","المسافة المستحقة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',monTxt(mon)))+""+'</div>'+
+      (cjOnly(id)?"":tile("declined","الطلبات المرفوضة",N(sumDE(inm,id),0),monTxt(mon)+(md?' حتى <span class="num">'+md+'</span>':'')))+(kmHide(id)?"":tile("distance","المسافة المستحقة",'<span class="num">'+fmt(km,1)+'</span> <span style="font-size:15px">كم</span>',monTxt(mon)))+""+'</div>'+
 '<p class="hint" style="text-align:center">طلبات اليوم الحالي تظهر في هنقرستيشن في اليوم التالي، لذلك آخر يوم متاح هو أمس.</p>';
   }
   var res="";
@@ -1587,15 +1590,15 @@ function vCourier(){
     else{var rk=v.rk,arr={length:v.cn};
       res+='<div class="hero"><span class="hero-num num">'+fmt(v[CP],0)+'</span><span>طلب مكتمل في '+dl(d)+'</span></div>'+
       '<div class="kpis" style="margin-top:12px">'+(rk?kpi("ترتيبك في اليوم",'<span class="num">'+rk+'</span> <span style="font-size:14px;color:var(--muted)">من <span class="num">'+arr.length+'</span></span>',v.av!=null?'متوسط المناديب <span class="num">'+fmt(v.av,1)+'</span> طلب':""):"")+
-      (v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DP]!=null?kpi("المسافة المستحقة",N(v[DP],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">'+fmt(v[DE],0)+'</span>'):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):"")+'</div>';}
-    var hist=mine.slice(-14).reverse().map(function(x){var y=data.days[x][id];return '<tr class="click" data-cday="'+x+'"><td>'+dl(x)+'</td><td>'+N(y[CP],0)+'</td><td>'+P(y[AR])+'</td><td>'+N(y[AC])+'</td></tr>'}).join("");
-    return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th><th>القبول</th><th>الساعات</th></tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
+      (cjOnly(id)?"":(v[NT]!=null||v[AC]!=null?kpi("نسبة القبول",P(v[AR]),'<span class="num">'+fmt(v[AD],0)+'</span> مقبول من <span class="num">'+fmt(v[NT],0)+'</span>')+kpi("ساعات العمل",N(v[AC]),'من <span class="num">'+fmt(v[PL])+'</span> مخططة'):"")+(v[DP]!=null?kpi("المسافة المستحقة",N(v[DP],1)+' <span style="font-size:14px">كم</span>',""):"")+(v[DE]!=null?kpi("الطلبات المرفوضة",N(deX(v[DE]),0),'المسموح <span class="num">2</span> يومياً، رفضت <span class="num">'+fmt(v[DE],0)+'</span>'):"")+(+v[NS]?kpi("عدم حضور",N(v[NS],0),""):""))+'</div>';}
+    var hist=mine.slice(-14).reverse().map(function(x){var y=data.days[x][id];return '<tr class="click" data-cday="'+x+'"><td>'+dl(x)+'</td><td>'+N(y[CP],0)+'</td>'+(cjOnly(id)?'':'<td>'+P(y[AR])+'</td><td>'+N(y[AC])+'</td>')+'</tr>'}).join("");
+    return sampleNote()+head+'<section class="panel"><h2>عدد طلبات يوم محدد</h2>'+res+'</section>'+(hist?'<section class="panel"><h2>آخر أيامي</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>اليوم</th><th>المكتملة</th>'+(cjOnly(id)?'':'<th>القبول</th><th>الساعات</th>')+'</tr></thead><tbody>'+hist+'</tbody></table></div></section>':"");
   }
   if(cs==="all"){var amo={};mine.forEach(function(d){var m=d.slice(0,7);amo[m]=(amo[m]||0)+(+data.days[d][id][CP]||0)});var aml=Object.keys(amo).sort().reverse(),am=ui0.am&&amo[ui0.am]!=null?ui0.am:(aml[0]||curMonth());
     var amd=mine.filter(function(d){return d.slice(0,7)===am}),a=agg(amd.map(function(d){return{d:d,id:id,x:data.days[d][id]}}));
     var mrows=aml.map(function(m){return '<tr class="click" data-am="'+m+'"'+(m===am?' style="background:var(--menu-sel)"':'')+'><td>'+monTxt(m)+'</td><td>'+N(amo[m],0)+'</td></tr>'}).join("");
     return sampleNote()+head+'<section class="panel"><div class="stmthead"><h2>إجمالي الطلبات · '+monTxt(am)+'</h2><div class="stmttools"><select id="aMon" aria-label="الشهر">'+aml.map(function(m){return '<option value="'+m+'"'+(m===am?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select></div></div><div class="hero"><span class="hero-num num">'+fmt(a.cp,0)+'</span><span>طلب مكتمل في '+monTxt(am)+'</span></div><p class="hint">'+(amd.length?'من <span class="num">'+amd[0]+'</span> إلى <span class="num">'+amd[amd.length-1]+'</span>':'لا توجد أيام مسجلة لك في هذا الشهر.')+'</p>'+
-      '<div class="kpis">'+kpi("أيام العمل",N(a.days,0),"")+kpi("متوسط يومي",N(a.days?a.cp/a.days:0,1),"طلب مكتمل")+kpi("نسبة القبول",P(a.ar),"")+kpi("ساعات العمل",N(a.ac,1),"")+kpi("عدم الحضور",N(a.ns,0),"")+kpi("الطلبات المرفوضة",N(sumDE(amd,id),0),"Declined Deliveries")+'</div></section>'+(aml.length?'<section class="panel"><h2>إجمالي كل شهر</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>الشهر</th><th>الطلبات المكتملة</th></tr></thead><tbody>'+mrows+'</tbody></table></div></section>':"");}
+      '<div class="kpis">'+kpi("أيام العمل",N(a.days,0),"")+kpi("متوسط يومي",N(a.days?a.cp/a.days:0,1),"طلب مكتمل")+(cjOnly(id)?"":kpi("نسبة القبول",P(a.ar),"")+kpi("ساعات العمل",N(a.ac,1),"")+kpi("عدم الحضور",N(a.ns,0),"")+kpi("الطلبات المرفوضة",N(sumDE(amd,id),0),"Declined Deliveries"))+'</div></section>'+(aml.length?'<section class="panel"><h2>إجمالي كل شهر</h2><div class="tbl" style="box-shadow:none"><table><thead><tr><th>الشهر</th><th>الطلبات المكتملة</th></tr></thead><tbody>'+mrows+'</tbody></table></div></section>':"");}
   if(cs==="declined"){var dd2=mine.filter(function(d){return data.days[d][id][DE]!=null}),tot=sumDE(mine,id);
     var rowsD=dd2.slice().reverse().map(function(d){var y=data.days[d][id];return '<tr class="click" data-cday="'+d+'" data-cs="day"><td>'+dl(d)+'</td><td>'+N(y[DE],0)+'</td><td>'+N(deX(y[DE]),0)+'</td><td>'+N(y[NT],0)+'</td><td>'+N(y[CP],0)+'</td></tr>'}).join("");
     return head+'<section class="panel"><h2>الطلبات المرفوضة</h2><div class="hero"><span class="hero-num num">'+fmt(tot,0)+'</span><span>طلب مرفوض حتى <span class="num">'+(ld||"—")+'</span></span></div>'+
