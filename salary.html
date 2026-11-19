@@ -61,7 +61,10 @@ tr.fixed td{background:#fff6d6}tr.bad td{background:#fde4e1}
 .shG tr.t td{padding:13px 8px}
 .shG tr.t td.l{color:#4f81bd;text-decoration:underline;font-style:normal}
 .shG tr.t td.v{color:#f00;font-weight:700;text-decoration:underline;font-size:18px}
-.shG tr.r td{border-width:2px}
+.shR{margin-top:10px;border:3px solid;border-radius:10px;padding:14px 10px;text-align:center}
+.shRl{font-size:26px;font-weight:700}
+.shRv{font-size:34px;font-weight:700;margin:4px 0}
+.shRs{font-size:15px;color:#333}
 </style>
 </head>
 <body>
@@ -110,14 +113,14 @@ tr.fixed td{background:#fff6d6}tr.bad td{background:#fde4e1}
     <div class="tblw"><table class="sum"><thead><tr><th>مستحقات الشركة مع المديونية على المندوب</th><th style="width:160px">المبلغ</th><th style="width:40px"></th></tr></thead><tbody id="items"></tbody>
       <tfoot><tr><td>اجمالي الخصومات</td><td class="big" id="tDed" style="text-align:center"></td><td></td></tr>
       <tr><td>الراتب</td><td class="big" id="tSal" style="text-align:center"></td><td></td></tr>
-      <tr><td>المتبقي عليك ++ المتبقي لك --</td><td class="big" id="tRem" style="text-align:center;color:var(--bad)"></td><td></td></tr></tfoot></table></div>
+      <tr><td id="tRemL" style="font-size:16px"></td><td class="big" id="tRem" style="text-align:center"></td><td></td></tr></tfoot></table></div>
     <div class="row" style="margin-top:10px"><button class="ghost" id="addItem">+ بند آخر</button></div>
     <div id="chk" class="chk" hidden></div>
     <div class="row"><button class="acc" id="png">⬇ تحميل صورة</button><button class="acc" id="pdf">⬇ تحميل PDF</button><span id="xst" class="st"></span></div>
   </section>
 </div>
 
-<script src="salary-core.js?v=20261119d"></script>
+<script src="salary-core.js?v=20261119e"></script>
 <script>
 (function(){
 "use strict";
@@ -181,7 +184,7 @@ function drawItems(){$("#items").innerHTML=S.items.map(function(it,i){var fixed=
   return '<tr><td class="lab"><input data-i="'+i+'" data-f="label" value="'+esc(it.label)+'"'+(fixed?' readonly':'')+'></td><td class="n"><input data-i="'+i+'" data-f="v" value="'+esc(it.v)+'"></td><td>'+(fixed?'':'<button class="del" data-i="'+i+'">✕</button>')+'</td></tr>'}).join("");sync()}
 function sync(){if(!S)return;S.name=$("#sName").value.trim();S.month=$("#sMonth").value.trim();S.orders=$("#sOrders").value.trim()===""?"":C.num($("#sOrders").value);S.level=$("#sLevel").value.trim();
   S.dist=$("#sDist").value.trim()===""?"":C.num($("#sDist").value);S.salary=C.num($("#sSalary").value);
-  var T=C.totals(S);$("#sTitle").value=C.title(S);$("#tDed").textContent=fmt(T.ded);$("#tSal").textContent=fmt(T.salary);$("#tRem").textContent=fmt(T.rem);
+  var T=C.totals(S);$("#sTitle").value=C.title(S);$("#tDed").textContent=fmt(T.ded);$("#tSal").textContent=fmt(T.salary);var D=remDir(T.rem);$("#tRem").textContent=fmt(Math.abs(T.rem))+" ريال";$("#tRem").style.color=D.c;$("#tRemL").textContent=D.t;$("#tRemL").style.color=D.c;
   var k=$("#chk");if(S.endBal==null){k.hidden=true}else{k.hidden=false;var ok=Math.abs(T.rem-S.endBal)<0.02;k.className="chk "+(ok?"ok":"bad");
     k.textContent=ok?"✓ المتبقي ("+fmt(T.rem)+") يطابق رصيد آخر سطر في الكشف":"⚠ المتبقي ("+fmt(T.rem)+") لا يطابق رصيد آخر سطر في الكشف ("+fmt(S.endBal)+")، الفرق "+fmt(T.rem-S.endBal)+". راجع السطور أو البنود."}}
 $("#items").addEventListener("input",function(e){var i=e.target.dataset.i;if(i==null)return;var it=S.items[+i];if(e.target.dataset.f==="v")it.v=C.num(e.target.value);else it.label=e.target.value;sync()});
@@ -203,7 +206,12 @@ function sheetHtml(){var T=C.totals(S);
    '<table class="shG">'+S.items.map(function(it){return '<tr><td class="l">'+ws(it.label)+'</td><td class="v">'+money(it.v)+'</td></tr>'}).join("")+
    '<tr class="t"><td class="l">'+ws("اجمالي الخصومات")+'</td><td class="v">'+money(T.ded)+'</td></tr>'+
    '<tr class="t"><td class="l">'+ws("الراتب")+'</td><td class="v">'+money(T.salary)+'</td></tr>'+
-   '<tr class="t r"><td class="l">'+ws("المتبقي عليك ++ المتبقي لك --")+'</td><td class="v">'+money(T.rem)+'</td></tr></table></div>'}
+   '</table><div class="shR" style="border-color:'+remDir(T.rem).c+';background:'+remDir(T.rem).bg+'"><div class="shRl" style="color:'+remDir(T.rem).c+'">'+ws(remDir(T.rem).t)+'</div><div class="shRv" style="color:'+remDir(T.rem).c+'">'+money(Math.abs(T.rem))+' '+ws("ريال")+'</div><div class="shRs">'+ws(remDir(T.rem).s)+'</div></div></div>'}
+/* who owes whom: positive = the rider owes the company (مدين), negative = the company owes the rider (دائن) */
+function remDir(v){v=Math.round((+v||0)*100)/100;
+  if(v>0)return {t:"المتبقي عليك",s:"مبلغ مستحق على المندوب للشركة",c:"#c0141b",bg:"#fdecec"};
+  if(v<0)return {t:"المتبقي لك",s:"مبلغ مستحق للمندوب على الشركة",c:"#11803f",bg:"#e8f6ee"};
+  return {t:"لا يوجد متبقي",s:"الحساب مُسدّد بالكامل",c:"#1f497d",bg:"#eef3fa"}}
 function fname(){return ("تفاصيل راتب - "+(S.name||"مندوب")+(S.month?" - "+S.month:"")).replace(/[\\\/:*?"<>|]/g," ")}
 function exportAs(kind,btn){if(!S)return;sync();btn.disabled=true;$("#xst").textContent="جارٍ التجهيز…";
   var box=document.createElement("div");box.id="shBox";box.innerHTML=sheetHtml();document.body.appendChild(box);var el=box.firstChild;
