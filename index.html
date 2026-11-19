@@ -355,7 +355,7 @@ function side(){
   if(!isAdmin&&!staff)return "";
   var co='<div class="co"><b>'+esc(data.company||"شركة التشغيل")+'</b><span>'+esc(roleName())+'</span></div>';
   var items=MENU.filter(function(m){return canSee(m[0])});
-  var extra=isAdmin?'<hr><a class="navlink" href="#rider" target="_blank" rel="noopener">شاشة المندوب<small>Rider link</small></a><button data-tab="sheet" aria-current="'+(view==="sheet")+'">شيت الأداء اليومي<small>Daily Sheet</small></button><button data-tab="cards" aria-current="'+(view==="cards")+'">بطاقات المناديب<small>Rider ID Cards</small></button><button data-tab="hire" aria-current="'+(view==="hire")+'">طلب توظيف مندوب<small>Job Application</small></button><button data-tab="watch" aria-current="'+(view==="watch")+'">متابعة المناديب<small>Rider Watch List</small></button><button data-tab="perm" aria-current="'+(view==="perm")+'">الصلاحيات<small>Roles</small></button><button data-tab="data" aria-current="'+(view==="data")+'">رفع البيانات<small>Upload</small></button><button id="staffOut">تسجيل خروج<small>Sign out</small></button>':'<hr><button id="staffOut">تسجيل خروج<small>Sign out</small></button>';
+  var extra=isAdmin?'<hr><a class="navlink" href="#rider" target="_blank" rel="noopener">شاشة المندوب<small>Rider link</small></a><button data-tab="sheet" aria-current="'+(view==="sheet")+'">شيت الأداء اليومي<small>Daily Sheet</small></button><button data-tab="cards" aria-current="'+(view==="cards")+'">بطاقات المناديب<small>Rider ID Cards</small></button><button data-tab="hire" aria-current="'+(view==="hire")+'">طلب توظيف مندوب<small>Job Application</small></button><button data-tab="salary" aria-current="'+(view==="salary")+'">تفاصيل الراتب<small>Salary Details</small></button><button data-tab="watch" aria-current="'+(view==="watch")+'">متابعة المناديب<small>Rider Watch List</small></button><button data-tab="perm" aria-current="'+(view==="perm")+'">الصلاحيات<small>Roles</small></button><button data-tab="data" aria-current="'+(view==="data")+'">رفع البيانات<small>Upload</small></button><button id="staffOut">تسجيل خروج<small>Sign out</small></button>':'<hr><button id="staffOut">تسجيل خروج<small>Sign out</small></button>';
   var mb=function(m){return '<button data-tab="'+m[0]+'" aria-current="'+(view===m[0])+'"'+(m[3]?' class="soon"':"")+'>'+m[1]+'<small>'+m[2]+'</small></button>'},soon=items.filter(function(m){return m[3]}).map(mb).join(""),out='<button id="staffOut">';
   if(soon)extra=extra.replace(out,'<hr>'+soon+out);
   return '<nav class="side">'+co+items.filter(function(m){return !m[3]}).map(mb).join("")+extra+'</nav>';
@@ -997,6 +997,15 @@ function hirePos(){var s=document.getElementById("hireSlot"),f=HIRE.fr;
   var b=s.getBoundingClientRect();f.style.display="block";f.style.top=(b.top+window.scrollY)+"px";f.style.left=(b.left+window.scrollX)+"px";f.style.width=b.width+"px";f.style.height=b.height+"px"}
 setInterval(hirePos,200);window.addEventListener("resize",hirePos);
 function vHire(){hireLoad();setTimeout(hirePos,0);return '<div id="hireSlot" class="hires"><p class="hint" style="padding:16px">جارٍ فتح النموذج…</p></div>'}
+/* ---------- salary details from a statement picture (admin only, own page in an iframe so re-renders keep its state) ---------- */
+var SAL={fr:null};
+function salPos(){var s=document.getElementById("salSlot"),f=SAL.fr;
+  if(!isAdmin){if(f){f.remove();SAL.fr=null}return}
+  if(!s){if(f)f.style.display="none";return}
+  if(!f){f=SAL.fr=document.createElement("iframe");f.src="salary.html";f.title="تفاصيل الراتب";f.className="hiref";document.body.appendChild(f)}
+  var b=s.getBoundingClientRect();f.style.display="block";f.style.top=(b.top+window.scrollY)+"px";f.style.left=(b.left+window.scrollX)+"px";f.style.width=b.width+"px";f.style.height=b.height+"px"}
+setInterval(salPos,200);window.addEventListener("resize",salPos);
+function vSalary(){setTimeout(salPos,0);return '<div id="salSlot" class="hires"><p class="hint" style="padding:16px">جارٍ فتح الصفحة…</p></div>'}
 /* ---------- daily watch list: category أ ---------- */
 var WA_DEF={sm:["w"],ks:["أ"],q:1,w:1,h:1,lp:0,tg:0,lo:0,lov:15,bt:0,bg:[],g:["E","F"],wv:300,hv:8},WA=(function(){var o={};try{o=JSON.parse(localStorage.getItem("hs_wa")||"{}")||{}}catch(e){}var r={};for(var k in WA_DEF)r[k]=o[k]!=null?o[k]:WA_DEF[k];if(o.ks==null&&o.k)r.ks=o.k==="*"?[]:[o.k];return JSON.parse(JSON.stringify(r))})(),WA_WAL=-Math.abs(+WA.wv||300),WA_HRS=+WA.hv||8;
 function waSave(){WA_WAL=-Math.abs(+WA.wv||0);WA_HRS=+WA.hv||0;try{localStorage.setItem("hs_wa",JSON.stringify(WA))}catch(e){}setTimeout(render,0)}
@@ -1686,8 +1695,8 @@ applyLang();i18nWatch();showSplash(3200);
 function render(){
   if(booting){root.innerHTML='<div class="login" style="padding:60px 16px;text-align:center"><p class="hint">جارٍ التحميل…</p></div>';return}
   if(!me&&!isAdmin&&!staff)view="courier";
-  var V={overall:vOverall,daily:vDaily,riders:vRiders,top:vTop,absence:vAbsence,wallet:vWallet,quality:vQuality,distance:vDistance,courier:vCourier,data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet,cards:isAdmin&&vCards,hire:isAdmin&&vHire,watch:isAdmin&&vWatch,susp:vSusp}[view];
-  if(view!=="courier"&&view!=="data"&&view!=="perm"&&view!=="sheet"&&view!=="cards"&&view!=="hire"&&view!=="watch"&&!canSee(view))V=staff?function(){return '<div class="panel"><p class="hint" style="margin:0">لم يحدد لك المدير أي قسم بعد.</p></div>'}:vCourier;else if(!V)V=(view==="data"||view==="perm"||view==="sheet"||view==="cards"||view==="hire"||view==="watch")?vCourier:vSoon;
+  var V={overall:vOverall,daily:vDaily,riders:vRiders,top:vTop,absence:vAbsence,wallet:vWallet,quality:vQuality,distance:vDistance,courier:vCourier,data:isAdmin&&vData,perm:isAdmin&&vPerm,sheet:isAdmin&&vSheet,cards:isAdmin&&vCards,hire:isAdmin&&vHire,salary:isAdmin&&vSalary,watch:isAdmin&&vWatch,susp:vSusp}[view];
+  if(view!=="courier"&&view!=="data"&&view!=="perm"&&view!=="sheet"&&view!=="cards"&&view!=="hire"&&view!=="salary"&&view!=="watch"&&!canSee(view))V=staff?function(){return '<div class="panel"><p class="hint" style="margin:0">لم يحدد لك المدير أي قسم بعد.</p></div>'}:vCourier;else if(!V)V=(view==="data"||view==="perm"||view==="sheet"||view==="cards"||view==="hire"||view==="salary"||view==="watch")?vCourier:vSoon;
   var html='<div class="shell'+(isAdmin||staff?"":" solo")+'">'+side()+'<div style="min-width:0">'+bar()+'<main class="content">'+V()+'</main></div></div>';
   var a=document.activeElement,f=a&&a.id,pos=null;try{pos=a.selectionStart}catch(e){}
   var sd0=root.querySelector(".side"),sdT=sd0?sd0.scrollTop:0,sdL=sd0?sd0.scrollLeft:0;
