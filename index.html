@@ -715,6 +715,10 @@ document.addEventListener("input",function(e){if(e.target.id!=="cQ")return;CARD.
 /* ---------- add rider ---------- */
 /* regions kept off شيت الأداء (fadhel: Riyadh 2026-10-11, Dammam 2026-10-28); الأحساء = no region, أبقيق stays on the sheet */
 var SH_OUT=["الرياض","الدمام"];
+/* sheet city filter (fadhel 2026-11-19): all = every region; الأحساء = region empty */
+var SH_CITY="all",SH_CITIES=[["all","الكل"],["الأحساء","الأحساء"],["الرياض","الرياض"],["الدمام","الدمام"],["أبقيق","أبقيق"]];
+function shCityOk(id){var rg=data.couriers[id].rg||"";if(SH_CITY==="all")return true;return SH_CITY==="الأحساء"?!rg:rg===SH_CITY}
+function shCityTxt(){return SH_CITY==="all"?"":" - "+SH_CITY}
 var ADDB='<button class="btn" data-addr="1">+ إضافة مندوب</button>';
 function addField(id,label,ph,extra){return '<label class="addf"><span>'+label+'</span><input id="'+id+'" placeholder="'+ph+'" '+(extra||"")+'></label>'}
 function addOpen(){var o=document.getElementById("addDlg");if(o)o.remove();o=document.createElement("div");o.id="addDlg";o.className="addov";o.setAttribute("dir","rtl");
@@ -1456,7 +1460,7 @@ var JSZIP_URL="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
 function loadZip(){return window.JSZip?Promise.resolve(window.JSZip):new Promise(function(ok,no){var s=document.createElement("script");s.src=JSZIP_URL;s.onload=function(){ok(window.JSZip)};s.onerror=function(){no(new Error("lib"))};document.head.appendChild(s)})}
 function shMonths(){var m={};days().forEach(function(d){m[d.slice(0,7)]=1});var k=Object.keys(m);if(k.length)m[new Date(Date.now()+3*36e5).toISOString().slice(0,7)]=1;return Object.keys(m).sort().reverse()}
 function shCatOrder(c){return c==="ب"?0:c==="خ"?1:c==="أ"?2:3}
-function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)&&SH_OUT.indexOf(data.couriers[id].rg)<0&&!stGone(id,SHMON)&&!(SHX[SHMON]&&SHX[SHMON]!=="loading"&&SHX[SHMON][id]&&SHX[SHMON][id].h)}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
+function shRiders(){return Object.keys(data.couriers).filter(function(id){return normCat(data.couriers[id].cat)&&shCityOk(id)&&!stGone(id,SHMON)&&!(SHX[SHMON]&&SHX[SHMON]!=="loading"&&SHX[SHMON][id]&&SHX[SHMON][id].h)}).sort(function(a,b){var x=data.couriers[a],y=data.couriers[b];
   var px=x.sp==null?1e9:x.sp,py=y.sp==null?1e9:y.sp;if(px!==py)return px-py;var cx=shCatOrder(normCat(x.cat)),cy=shCatOrder(normCat(y.cat));return cx!==cy?cx-cy:(+a)-(+b)})}
 function shLoad(mon){
   if(!SHIQ){SHIQ="loading";all("rider_private","rider_id,iqama","rider_id").then(function(rs){SHIQ={};rs.forEach(function(r){SHIQ[r.rider_id]=r.iqama});render()},function(){SHIQ={};render()})}
@@ -1491,8 +1495,8 @@ function vSheet(){
   for(var j=0;j<31;j++)dt+='<td class="num">'+(j<S.nd?S.rows.reduce(function(a,r){return a+r.dd[j]},0):"")+'</td>';
   var foot='<tr class="shtot"><td colspan="6">الإجمالي</td><td></td><td class="num">'+S.rows.filter(function(r){return r.tga.length}).length+'</td><td class="num">'+fmt(tot("h"))+'</td><td class="num">'+tot("de")+'</td><td></td><td class="num">'+fmt(tot("w"))+'</td>'+dt+'<td class="num">'+tot("tot")+'</td><td class="num">'+fmt(tot("f"))+'</td><td></td></tr>';
   var busy=SHIQ==="loading"||SHX[mon]==="loading";
-  return '<section class="panel"><div class="shhead"><div><h2 style="margin:0">شيت الأداء شهر '+monTxt(mon)+'</h2><p class="hint" style="margin:4px 0 0">يُبنى تلقائياً من البيانات المرفوعة حتى <span class="num">'+(S.last||"—")+'</span>. البنزين والملاحظة تكتبها هنا وتُحفظ تلقائياً.</p></div>'+
-    '<div class="stmttools"><select id="shMon" aria-label="الشهر">'+ms.map(function(m){return '<option value="'+m+'"'+(m===mon?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select>'+(isAdmin?ADDB:'')+'<button class="btn pri" id="shXlsx"'+(busy?" disabled":"")+'>تصدير Excel</button></div></div>'+
+  return '<section class="panel"><div class="shhead"><div><h2 style="margin:0">شيت الأداء شهر '+monTxt(mon)+esc(shCityTxt())+'</h2><p class="hint" style="margin:4px 0 0">يُبنى تلقائياً من البيانات المرفوعة حتى <span class="num">'+(S.last||"—")+'</span>. البنزين والملاحظة تكتبها هنا وتُحفظ تلقائياً.</p></div>'+
+    '<div class="stmttools"><select id="shMon" aria-label="الشهر">'+ms.map(function(m){return '<option value="'+m+'"'+(m===mon?" selected":"")+'>'+monTxt(m)+'</option>'}).join("")+'</select><select id="shCity" aria-label="المدينة">'+SH_CITIES.map(function(c){return '<option value="'+c[0]+'"'+(c[0]===SH_CITY?" selected":"")+'>'+c[1]+'</option>'}).join("")+'</select>'+(isAdmin?ADDB:'')+'<button class="btn pri" id="shXlsx"'+(busy?" disabled":"")+'>تصدير Excel</button></div></div>'+
     '<p class="hint" id="shMsg" style="min-height:1.5em;margin:6px 0">'+esc(SH_MSG)+'</p>'+
     '<div class="tbl shtbl" style="box-shadow:none"><table><thead><tr>'+SH_COLS.map(function(h,i){return '<th'+(i===1?' class="shcat"':'')+'>'+h+'</th>'}).join("")+dh+'<th>إجمالي الطلبات</th><th>البنزين</th><th>ملاحظة</th></tr></thead><tbody>'+
     (body||'<tr><td class="empty" colspan="46">لا يوجد مناديب في الكشف. ارفع ملف المناديب مع عمود الفئة.</td></tr>')+'</tbody><tfoot>'+foot+'</tfoot></table></div></section>'+fuelPanel(mon);
@@ -1502,12 +1506,12 @@ function colL(n){var s="";while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+
 function xc(ref,s,v){if(v==null||v==="")return '<c r="'+ref+'" s="'+s+'" t="n" />';if(typeof v==="number")return '<c r="'+ref+'" s="'+s+'" t="n"><v>'+v+'</v></c>';return '<c r="'+ref+'" s="'+s+'" t="inlineStr"><is><t>'+xe(v)+'</t></is></c>'}
 function xf(ref,s,f){return '<c r="'+ref+'" s="'+s+'"><f>'+f+'</f><v /></c>'}
 function shExport(){
-  var mon=SH_MON||shMonths()[0],S=shCalc(mon),title="شيت الأداء شهر "+monTxt(mon),sname="شيت "+monTxt(mon);
+  var mon=SH_MON||shMonths()[0],S=shCalc(mon),title="شيت الأداء شهر "+monTxt(mon)+shCityTxt(),sname="شيت "+monTxt(mon);
   var b=document.getElementById("shXlsx");if(b){b.disabled=true;b.textContent="جارٍ التجهيز…"}
   var done=function(){var b=document.getElementById("shXlsx");if(b){b.disabled=false;b.textContent="تصدير Excel"}};
   Promise.all([loadZip(),fetch("sheet-template.xlsx",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("template");return r.arrayBuffer()})]).then(function(a){return a[0].loadAsync(a[1])}).then(function(zip){return zip.file("xl/styles.xml").async("string").then(function(st){zip.file("xl/styles.xml",tgaStyles(st));return zip})}).then(function(zip){
     return Promise.all([zip.file("xl/worksheets/sheet1.xml").async("string"),zip.file("xl/workbook.xml").async("string")]).then(function(x){
-      var catS={"ب":11,"خ":21,"أ":27},rows="",n=S.rows.length,tr=n+3;
+      var catS={"ب":11,"خ":21,"أ":27,"ج":11},rows="",n=S.rows.length,tr=n+3;
       S.rows.forEach(function(r,i){var R=i+3,c=[];
         c.push(xc("A"+R,10,r.no),xc("B"+R,catS[r.cat]||11,r.cat),xc("C"+R,12,r.name),xc("D"+R,13,/^\d+$/.test(r.iq)?+r.iq:r.iq),xc("E"+R,14,/^\d+$/.test(r.ph)?+r.ph:r.ph),xc("F"+R,10,/^\d+$/.test(r.id)?+r.id:r.id),xc("G"+R,15,r.bt),
           xc("H"+R,r.tga.length?TGA_XF:15,r.tga.length?(r.tga.length===1&&/^\d+$/.test(r.tga[0])?+r.tga[0]:r.tga.join("، ")):0),xc("I"+R,15,r.h),xc("J"+R,15,r.de),xc("K"+R,15,r.q||null),xc("L"+R,15,r.w));
@@ -1980,7 +1984,7 @@ root.addEventListener("click",function(e){
 root.addEventListener("input",function(e){var t=e.target;if(t.dataset.aname!=null){ui.acc[+t.dataset.aname].n=t.value;var b=document.getElementById("saveStaff");if(b)b.disabled=false}});
 root.addEventListener("change",function(e){
   var t=e.target,f=F();
-  if(t.id==="shMon"){SH_MON=t.value;render();return}
+  if(t.id==="shMon"){SH_MON=t.value;render();return}if(t.id==="shCity"){SH_CITY=t.value;render();return}
   if(t.dataset.shf!=null||t.dataset.shn!=null){shSave(t);return}
   if(t.id==="fFrom"){f.from=t.value>YEST?YEST:t.value;if(f.to<f.from)f.to=f.from;render()}
   if(t.id==="fTo"){f.to=t.value>YEST?YEST:t.value;if(f.from>f.to)f.from=f.to;render()}
