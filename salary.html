@@ -44,10 +44,9 @@ td.n input{direction:ltr;text-align:center}
 .big{font-size:17px}
 .chk{padding:8px 12px;border-radius:10px;margin:10px 0;font-weight:600}
 .chk.ok{background:#e7f5ec;color:var(--ok)}.chk.bad{background:#fdecea;color:var(--bad)}
-.key{font-size:13px;color:var(--muted)}
-.key input{width:240px}
+tr.fixed td{background:#fff6d6}tr.bad td{background:#fde4e1}
 .hint{font-size:12px;color:var(--muted)}
-@media (max-width:640px){.wrap{padding:10px}.key input{width:100%}}
+@media (max-width:640px){.wrap{padding:10px}}
 </style>
 </head>
 <body>
@@ -65,7 +64,7 @@ td.n input{direction:ltr;text-align:center}
       <button id="read" class="acc" disabled>قراءة الصورة</button>
       <span id="st" class="st"></span>
     </div>
-    <div class="key" id="keyBox" style="margin-top:10px"></div>
+    <p class="hint" style="margin:10px 0 0">القراءة مجانية وتتم داخل جهازك، بدون مفتاح ولا اشتراك. أول مرة تُحمَّل أداة القراءة (عدة ميغابايت) ثم تُحفظ في المتصفح. بعد القراءة راجع الأرقام: الأرقام المصحّحة تلقائياً تظهر بالأصفر، وما لم يتطابق بالأحمر.</p>
   </section>
 
   <section class="card">
@@ -113,52 +112,46 @@ function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"
 function fmt(v){return (Math.round((+v||0)*100)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
 function st(t,c){var e=$("#st");e.textContent=t||"";e.className="st"+(c?" "+c:"")}
 
-/* ---- API key (same key as the job application form, saved in this browser only) ---- */
-function getKey(){try{return localStorage.getItem("dm-api-key")||""}catch(e){return ""}}
-function keyUI(){var k=getKey(),b=$("#keyBox");
-  b.innerHTML=k?'مفتاح القراءة الذكية محفوظ في هذا المتصفح ✓ <button class="ghost" id="kDel" style="padding:2px 10px">حذف المفتاح</button>'
-   :'لقراءة الصورة يلزم مفتاح Claude API (نفس مفتاح «طلب توظيف مندوب»، يُحفظ في هذا المتصفح فقط): <input id="kIn" type="password" placeholder="sk-ant-…" dir="ltr"> <button class="ghost" id="kSave" style="padding:4px 12px">حفظ</button><div class="hint">بدون مفتاح يمكنك إدخال سطور الكشف يدوياً في الخطوة 2.</div>';
-  var d=$("#kDel");if(d)d.onclick=function(){try{localStorage.removeItem("dm-api-key")}catch(e){}MODEL=null;keyUI()};
-  var s=$("#kSave");if(s)s.onclick=function(){var v=$("#kIn").value.trim();if(!v)return;MODEL=null;st("جارٍ اختبار المفتاح…");
-    apiModel(v).then(function(){try{localStorage.setItem("dm-api-key",v)}catch(e){}st("تم حفظ المفتاح","ok");keyUI()},function(e){st(errTxt(e),"err")})}}
-var MODEL=null;
-function apiModel(key){if(MODEL)return Promise.resolve(MODEL);
-  return fetch("https://api.anthropic.com/v1/models?limit=50",{headers:{"x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"}}).then(function(r){
-    if(!r.ok)throw {code:r.status===401?"bad_key":"api_"+r.status};return r.json()}).then(function(d){var ids=(d.data||[]).map(function(m){return m.id});
-    MODEL=ids.find(function(i){return /sonnet/i.test(i)})||ids.find(function(i){return /opus/i.test(i)})||ids[0];if(!MODEL)throw {code:"no_model"};return MODEL})}
-function errTxt(e){var c=e&&e.code||"";return c==="bad_key"?"المفتاح غير صحيح":c==="rate_limited"?"تم تجاوز حد الطلبات، حاول بعد دقيقة":c==="invalid_json"?"تعذّر فهم رد القراءة، حاول مرة أخرى":"تعذّرت القراءة ("+(c||e&&e.message||"خطأ")+")"}
+/* ---- free reading on this device (Tesseract.js, Arabic + English); first use downloads the reading files (a few MB), then the browser keeps them ---- */
+var TESS_URL="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js",tessP=null,WK=null,SRC=null;
+function loadTess(){if(!tessP)tessP=new Promise(function(ok,no){if(window.Tesseract)return ok(window.Tesseract);var s=document.createElement("script");s.src=TESS_URL;s.onload=function(){ok(window.Tesseract)};s.onerror=function(){tessP=null;no({code:"ocr_load"})};document.head.appendChild(s)});return tessP}
+function workers(){if(WK)return WK;WK=loadTess().then(function(T){
+  function mk(lang,par){return T.createWorker(lang,1).then(function(w){return par?w.setParameters(par).then(function(){return w}):w})}
+  return Promise.all([mk("eng"),mk("eng",{tessedit_char_whitelist:"0123456789.,-",tessedit_pageseg_mode:"7"}),mk("eng",{tessedit_char_whitelist:"0123456789-",tessedit_pageseg_mode:"7"}),mk("ara",{tessedit_pageseg_mode:"6"})]).then(function(a){return {page:a[0],num:a[1],date:a[2],ara:a[3]}})});
+  WK.catch(function(){WK=null});return WK}
+function errTxt(e){var c=e&&e.code||"";return c==="ocr_load"?"تعذّر تحميل أداة القراءة، تأكد من الاتصال بالإنترنت وحاول مرة أخرى":c==="no_rows"?"لم أجد سطور الكشف في الصورة. تأكد أن الصورة لجدول كشف الحساب كاملاً وواضحة":"تعذّرت القراءة ("+(c||e&&e.message||"خطأ")+")"}
 
 /* ---- image ---- */
 function setImg(file){if(!file||!/^image\//.test(file.type))return;
   var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){
-    var m=2000,w=im.width,h=im.height,k=Math.min(1,m/Math.max(w,h)),cv=document.createElement("canvas");cv.width=Math.round(w*k);cv.height=Math.round(h*k);
-    var x=cv.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);x.drawImage(im,0,0,cv.width,cv.height);
-    IMG=cv.toDataURL("image/jpeg",0.92);var p=$("#prev");p.src=IMG;p.style.display="block";$("#read").disabled=false;st("الصورة جاهزة، اضغط «قراءة الصورة»")};im.src=fr.result};fr.readAsDataURL(file)}
+    /* base image for reading: 1630 px wide, grey; extra copies at 1.5x and 2x for the numbers */
+    var BW=1630,k=BW/im.width,BH=Math.round(im.height*k);SRC={W:BW,H:BH,c:{}};
+    [1,1.5,2].forEach(function(sc){var cv=document.createElement("canvas");cv.width=Math.round(BW*sc);cv.height=Math.round(BH*sc);var x=cv.getContext("2d");
+      x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);x.imageSmoothingQuality="high";x.filter="grayscale(1)";x.drawImage(im,0,0,cv.width,cv.height);SRC.c[sc]=cv});
+    IMG=fr.result;var p=$("#prev");p.src=IMG;p.style.display="block";$("#read").disabled=false;st("الصورة جاهزة، اضغط «قراءة الصورة»")};im.src=fr.result};fr.readAsDataURL(file)}
 var drop=$("#drop");
 $("#file").onchange=function(e){setImg(e.target.files[0])};
 drop.ondragover=function(e){e.preventDefault();drop.classList.add("on")};drop.ondragleave=function(){drop.classList.remove("on")};
 drop.ondrop=function(e){e.preventDefault();drop.classList.remove("on");setImg(e.dataTransfer.files[0])};
 document.addEventListener("paste",function(e){var it=(e.clipboardData||{}).items||[];for(var i=0;i<it.length;i++)if(it[i].type.indexOf("image")===0){setImg(it[i].getAsFile());e.preventDefault();return}});
 
-$("#read").onclick=function(){var key=getKey();if(!IMG)return;if(!key){st("احفظ مفتاح القراءة أولاً، أو أدخل السطور يدوياً","err");return}
-  var b=this;b.disabled=true;st("جارٍ قراءة الكشف… (قد يستغرق حتى دقيقة)");
-  apiModel(key).then(function(model){
-    return fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true","content-type":"application/json"},
-      body:JSON.stringify({model:model,max_tokens:6000,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:IMG.split(",")[1]}},{type:"text",text:C.PROMPT+"\n\nأرجع JSON فقط بدون أي نص آخر."}]}]})})}).then(function(r){
-    if(!r.ok)throw {code:r.status===401?"bad_key":r.status===429?"rate_limited":"api_"+r.status};return r.json()}).then(function(d){
-    var t=(d.content||[]).filter(function(c){return c.type==="text"}).map(function(c){return c.text}).join(""),m=t.match(/\{[\s\S]*\}/);if(!m)throw {code:"invalid_json"};
-    var j;try{j=JSON.parse(m[0])}catch(e){throw {code:"invalid_json"}}
-    $("#mName").value=(j.name||"").trim();$("#mIq").value=(j.iqama||"").trim();
-    var rows=(j.rows||[]).map(function(r){return {date:r.date||"",desc:r.desc||"",debit:C.num(r.debit),credit:C.num(r.credit),balance:r.balance==null?"":C.num(r.balance)}});
-    setRows(rows);
-    var sd=rows.reduce(function(a,r){return a+r.debit},0),sc=rows.reduce(function(a,r){return a+r.credit},0),msg="تمت قراءة "+rows.length+" سطر";
-    if(j.total_debit&&Math.abs(sd-C.num(j.total_debit))>0.05)msg+=" — تنبيه: مجموع المدين ("+fmt(sd)+") لا يطابق إجمالي الكشف ("+fmt(C.num(j.total_debit))+")، راجع السطور";
-    else if(j.total_credit&&Math.abs(sc-C.num(j.total_credit))>0.05)msg+=" — تنبيه: مجموع الدائن لا يطابق إجمالي الكشف، راجع السطور";
-    st(msg,/تنبيه/.test(msg)?"err":"ok");calc()}).catch(function(e){st(errTxt(e),"err")}).then(function(){b.disabled=false})};
+$("#read").onclick=function(){if(!SRC)return;var b=this;b.disabled=true;st("تجهيز أداة القراءة… (أول مرة قد تأخذ دقيقة لتحميلها)");
+  workers().then(function(W){
+    return C.ocrStatement({W:SRC.W,H:SRC.H,progress:function(m){st(m)},rec:function(kind,r,sc){var cv=SRC.c[sc]||SRC.c[1],f=cv.width/SRC.W;
+      var rr={left:Math.round(r.left*f),top:Math.round(r.top*f),width:Math.max(4,Math.round(r.width*f)),height:Math.max(4,Math.round(r.height*f))};
+      return W[kind].recognize(cv,kind==="page"&&r.left===0&&r.top===0&&r.width>=SRC.W?{}:{rectangle:rr}).then(function(x){return x.data})}})}).then(function(res){
+    $("#mName").value=res.name||"";$("#mIq").value="";
+    setRows(res.rows);
+    var nf=res.rows.filter(function(r){return r.flag==="fixed"}).length,nb=res.rows.filter(function(r){return r.flag==="bad"}).length,T=res.totals,msg="تمت قراءة "+res.rows.length+" سطر";
+    if(nf)msg+="، وصُحّح "+nf+" رقم تلقائياً من تسلسل الرصيد (باللون الأصفر)";
+    if(nb)msg+=". ⚠ "+nb+" سطر لم يتطابق (باللون الأحمر)، راجع أرقامه مع الصورة";
+    else if(T&&!(T.debit&&T.credit&&T.balance))msg+=". ⚠ المجاميع لا تطابق سطر «إجمالي الحساب» في الصورة، راجع السطور";
+    else if(T)msg+=". ✓ المجاميع تطابق «إجمالي الحساب» في الصورة";
+    st(msg,nb||(T&&!(T.debit&&T.credit&&T.balance))?"err":"ok");calc()}).catch(function(e){st(errTxt(e),"err")}).then(function(){b.disabled=false})};
 
 /* ---- statement rows ---- */
 function rowHtml(r){r=r||{};var v=function(x){return x===0||x===""||x==null?"":String(x)};
-  return '<tr><td><input data-f="date" value="'+esc(r.date)+'" dir="ltr"></td><td><input data-f="desc" value="'+esc(r.desc)+'"></td><td class="n"><input data-f="debit" value="'+esc(v(r.debit))+'"></td><td class="n"><input data-f="credit" value="'+esc(v(r.credit))+'"></td><td class="n"><input data-f="balance" value="'+esc(r.balance==null?"":r.balance)+'"></td><td><button class="del" title="حذف السطر">✕</button></td></tr>'}
+  return '<tr'+(r.flag?' class="'+r.flag+'"':'')+'><td><input data-f="date" value="'+esc(r.date)+'" dir="ltr"></td><td><input data-f="desc" value="'+esc(r.desc)+'"></td><td class="n"><input data-f="debit" value="'+esc(v(r.debit))+'"></td><td class="n"><input data-f="credit" value="'+esc(v(r.credit))+'"></td><td class="n"><input data-f="balance" value="'+esc(r.balance==null?"":r.balance)+'"></td><td><button class="del" title="حذف السطر">✕</button></td></tr>'}
 function setRows(rows){$("#rows tbody").innerHTML=(rows.length?rows:[{}]).map(rowHtml).join("")}
 function getRows(){return [].map.call(document.querySelectorAll("#rows tbody tr"),function(tr){var o={};tr.querySelectorAll("input").forEach(function(i){o[i.dataset.f]=i.value});return o})}
 $("#rows").addEventListener("click",function(e){if(e.target.classList.contains("del")){e.target.closest("tr").remove();if(!document.querySelector("#rows tbody tr"))setRows([])}});
@@ -188,7 +181,6 @@ $("#xl").onclick=function(){if(!S)return;var b=this;b.disabled=true;$("#xst").te
     var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=("تفاصيل راتب - "+(S.name||"مندوب")+(S.month?" - "+S.month:"")).replace(/[\\\/:*?"<>|]/g," ")+".xlsx";
     document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);$("#xst").textContent=""}).catch(function(e){$("#xst").textContent="تعذّر إنشاء الملف ("+(e&&e.message||e)+")"}).then(function(){b.disabled=false})};
 
-keyUI();
 })();
 </script>
 </body>
