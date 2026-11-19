@@ -124,7 +124,7 @@ button.lng{background:#fff;color:var(--brand);padding:5px 16px}button.lng[aria-p
   </section>
 </div>
 
-<script src="salary-core.js?v=20261119f"></script>
+<script src="salary-core.js?v=20261119g"></script>
 <script>
 (function(){
 "use strict";
@@ -143,12 +143,30 @@ function workers(){if(WK)return WK;WK=loadTess().then(function(T){
 function errTxt(e){var c=e&&e.code||"";return c==="ocr_load"?"تعذّر تحميل أداة القراءة، تأكد من الاتصال بالإنترنت وحاول مرة أخرى":c==="no_rows"?"لم أجد سطور الكشف في الصورة. تأكد أن الصورة لجدول كشف الحساب كاملاً وواضحة":"تعذّرت القراءة ("+(c||e&&e.message||"خطأ")+")"}
 
 /* ---- image ---- */
+var IMEL=null;
+/* reading copy of a part of the picture: the part is scaled to 1630 px wide, grey, a little more contrast; extra copies at 1.5x and 2x for the numbers */
+function makeSrc(im,r){var BW=1630,k=BW/r.w,BH=Math.round(r.h*k),o={W:BW,H:BH,c:{},r:r};
+  [1,1.5,2].forEach(function(sc){var cv=document.createElement("canvas");cv.width=Math.round(BW*sc);cv.height=Math.round(BH*sc);var x=cv.getContext("2d");
+    x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);x.imageSmoothingQuality="high";x.filter=FILT;x.drawImage(im,r.x,r.y,r.w,r.h,0,0,cv.width,cv.height);o.c[sc]=cv});
+  return o}
+var FILT="grayscale(1) contrast(1.25)";
+function fz(w,t){w=String(w||"").toLowerCase().replace(/[^a-z]/g,"");return w===t||(w.length>=4&&(t.indexOf(w)===0||w.indexOf(t.slice(0,4))===0||w.indexOf(t.slice(-4))>=0))}
+/* find the statement table (English column titles + ACCOUNT TOTAL) and return it as a part of the original picture */
+function locate(W){var src=SRC;
+  function tryAt(sc){return W.page.recognize(src.c[sc]).then(function(x){var d=x.data,ws=[],f=src.c[sc].width/src.W;
+    (d.lines||[]).forEach(function(l){(l.words||[]).forEach(function(w){ws.push({t:w.text,x0:w.bbox.x0/f,x1:w.bbox.x1/f,y0:w.bbox.y0/f,y1:w.bbox.y1/f})})});
+    var get=function(t){return ws.filter(function(w){return fz(w.t,t)})};
+    var bal=get("balance"),dat=get("date"),tot=ws.filter(function(w){return /total/i.test(w.t)});
+    for(var i=0;i<bal.length;i++)for(var j=0;j<dat.length;j++){var a=bal[i],b=dat[j];if(Math.abs(a.y0-b.y0)<20&&b.x0>a.x1){
+      var span=b.x1-a.x0,t=tot.filter(function(w){return w.y0>a.y1}).sort(function(p,q){return p.y0-q.y0})[0],
+        x0=Math.max(0,a.x0-span*.11),x1=Math.min(src.W,b.x1+span*.05),y0=Math.max(0,a.y0-span*.16),y1=Math.min(src.H,t?t.y1+span*.04:src.H);
+      var k=src.r.w/src.W;return {x:src.r.x+x0*k,y:src.r.y+y0*k,w:(x1-x0)*k,h:(y1-y0)*k}}}
+    return null})}
+  return tryAt(1).then(function(r){return r||tryAt(2)})}
+
 function setImg(file){if(!file||!/^image\//.test(file.type))return;
   var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){
-    /* base image for reading: 1630 px wide, grey; extra copies at 1.5x and 2x for the numbers */
-    var BW=1630,k=BW/im.width,BH=Math.round(im.height*k);SRC={W:BW,H:BH,c:{}};
-    [1,1.5,2].forEach(function(sc){var cv=document.createElement("canvas");cv.width=Math.round(BW*sc);cv.height=Math.round(BH*sc);var x=cv.getContext("2d");
-      x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);x.imageSmoothingQuality="high";x.filter="grayscale(1)";x.drawImage(im,0,0,cv.width,cv.height);SRC.c[sc]=cv});
+    IMEL=im;SRC=makeSrc(im,{x:0,y:0,w:im.width,h:im.height});
     IMG=fr.result;var p=$("#prev");p.src=IMG;p.style.display="block";$("#read").disabled=false;st("الصورة جاهزة، اضغط «قراءة الصورة»")};im.src=fr.result};fr.readAsDataURL(file)}
 var drop=$("#drop");
 $("#file").onchange=function(e){setImg(e.target.files[0])};
@@ -157,16 +175,18 @@ drop.ondrop=function(e){e.preventDefault();drop.classList.remove("on");setImg(e.
 document.addEventListener("paste",function(e){var it=(e.clipboardData||{}).items||[];for(var i=0;i<it.length;i++)if(it[i].type.indexOf("image")===0){setImg(it[i].getAsFile());e.preventDefault();return}});
 
 $("#read").onclick=function(){if(!SRC)return;var b=this;b.disabled=true;st("تجهيز أداة القراءة… (أول مرة قد تأخذ دقيقة لتحميلها)");
-  workers().then(function(W){
+  SRC=makeSrc(IMEL,{x:0,y:0,w:IMEL.width,h:IMEL.height});var WW;workers().then(function(W){WW=W;st("تحديد جدول الكشف في الصورة…");return locate(W)}).then(function(r){
+    if(r&&(r.w<IMEL.width*.92||r.h<IMEL.height*.92))SRC=makeSrc(IMEL,r);
+    var W=WW;
     return C.ocrStatement({W:SRC.W,H:SRC.H,progress:function(m){st(m)},rec:function(kind,r,sc){var cv=SRC.c[sc]||SRC.c[1],f=cv.width/SRC.W;
       var rr={left:Math.round(r.left*f),top:Math.round(r.top*f),width:Math.max(4,Math.round(r.width*f)),height:Math.max(4,Math.round(r.height*f))};
-      return W[kind].recognize(cv,kind==="page"&&r.left===0&&r.top===0&&r.width>=SRC.W?{}:{rectangle:rr}).then(function(x){return x.data})}})}).then(function(res){
+      return W[kind].recognize(cv,kind==="page"&&r.left===0&&r.top===0&&r.width>=SRC.W?{}:{rectangle:rr}).then(function(x){var d=x.data;if(kind==="page"&&r.left===0&&r.top===0&&r.width>=SRC.W)d.f=f;return d})}})}).then(function(res){
     $("#mName").value=res.name||"";$("#mIq").value="";
     setRows(res.rows);
     var nf=res.rows.filter(function(r){return r.flag==="fixed"}).length,nb=res.rows.filter(function(r){return r.flag==="bad"}).length,T=res.totals,msg="تمت قراءة "+res.rows.length+" سطر";
     if(nf)msg+="، وصُحّح "+nf+" رقم تلقائياً من تسلسل الرصيد (باللون الأصفر)";
     if(nb)msg+=". ⚠ "+nb+" سطر لم يتطابق (باللون الأحمر)، راجع أرقامه مع الصورة";
-    else if(T&&!(T.debit&&T.credit&&T.balance))msg+=". ⚠ المجاميع لا تطابق سطر «إجمالي الحساب» في الصورة، راجع السطور";
+    else if(T&&!(T.debit&&T.credit&&T.balance))msg+=". ⚠ لم تتطابق المجاميع مع سطر «إجمالي الحساب» في الصورة (قد يكون سطر الإجمالي غير واضح)، طابق الأرقام مع الصورة قبل التحميل";
     else if(T)msg+=". ✓ المجاميع تطابق «إجمالي الحساب» في الصورة";
     st(msg,nb||(T&&!(T.debit&&T.credit&&T.balance))?"err":"ok");calc()}).catch(function(e){st(errTxt(e),"err")}).then(function(){b.disabled=false})};
 

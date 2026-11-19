@@ -125,7 +125,7 @@ var PROMPT="هذه صورة كشف حساب مندوب من نظام محاسب�
    api: {W,H (base image size), rec(kind, rect, scale) -> Promise<{text, lines:[{bbox,words:[{text,bbox}]}]}>, progress(msg)}
    kinds: "page" (eng, whole image, words with boxes), "num" (digits . , - one line), "date" (digits and -), "ara" (Arabic block).
    rect is in base-image pixels; scale = extra upscaling for that pass. */
-var CONF={"6":"85","8":"603","5":"6","3":"8","0":"8","1":"7","7":"1","9":"8"};
+var CONF={"0":"86","1":"74","2":"7","3":"85","4":"1","5":"63","6":"850","7":"12","8":"6390","9":"84"};
 function cents(t){var s=latin(t).replace(/[−–—]/g,"-"),neg=/-\s*\d/.test(s)||/^\s*-/.test(s),d=s.replace(/\D/g,"");if(!d)return null;var v=parseInt(d,10);return neg?-v:v}
 /* candidate values (in cents) with a cost: readings from several passes, plus one confusable-digit swap */
 function cands(reads,signed){
@@ -143,11 +143,18 @@ function fuzzy(w,t){w=w.toLowerCase().replace(/[^a-z]/g,"");return w===t||(t.len
 function ocrStatement(api){
   var W=api.W,H=api.H,P=api.progress||function(){};
   P("قراءة شكل الكشف…");
-  return api.rec("page",{left:0,top:0,width:W,height:H},1).then(function(pg){
-    var words=[];(pg.lines||[]).forEach(function(l){(l.words||[]).forEach(function(w){words.push({t:w.text,x0:w.bbox.x0,x1:w.bbox.x1,y0:w.bbox.y0,y1:w.bbox.y1,cy:(w.bbox.y0+w.bbox.y1)/2})})});
-    var hdr={},keys=["balance","credit","debit","doc","description","entry","date"];
-    words.forEach(function(w){keys.forEach(function(k){if(!hdr[k]&&fuzzy(w.t,k))hdr[k]=w})});
-    var hy=null;["debit","credit","balance","date","entry"].forEach(function(k){if(hdr[k]&&hy==null)hy=hdr[k].y1});
+  var keys=["balance","credit","debit","doc","description","entry","date"];
+  function pass(sc){return api.rec("page",{left:0,top:0,width:W,height:H},sc).then(function(pg){var ws=[],f=pg.f||1;
+    (pg.lines||[]).forEach(function(l){(l.words||[]).forEach(function(w){var b=w.bbox;ws.push({t:w.text,x0:b.x0/f,x1:b.x1/f,y0:b.y0/f,y1:b.y1/f,cy:(b.y0+b.y1)/2/f})})});
+    var n={};ws.forEach(function(w){keys.forEach(function(k){if(fuzzy(w.t,k))n[k]=1})});ws.n=Object.keys(n).length;return ws})}
+  /* small or blurry pictures: read the page again at double size if the column titles were not found */
+  return pass(1).then(function(a){return a.n>=4?a:pass(2).then(function(b){return b.n>a.n?b:a},function(){return a})}).then(function(words){
+    var hdr={};
+    /* the header line is the line where the most column titles are found */
+    var hits=[];words.forEach(function(w){keys.forEach(function(k){if(fuzzy(w.t,k))hits.push({k:k,w:w})})});
+    var bestY=null,bestN=0;hits.forEach(function(h){var ks={};hits.forEach(function(g){if(Math.abs(g.w.cy-h.w.cy)<H*.02)ks[g.k]=1});var n=Object.keys(ks).length;if(n>bestN||(n===bestN&&bestY!=null&&h.w.cy<bestY)){bestN=n;bestY=h.w.cy}});
+    hits.forEach(function(h){if(bestY!=null&&Math.abs(h.w.cy-bestY)<H*.02&&!hdr[h.k])hdr[h.k]=h.w});
+    var hy=null;["debit","credit","balance","date","entry","doc","description"].forEach(function(k){if(hdr[k]&&hy==null)hy=hdr[k].y1});
     /* keep header words that sit on the header line */
     if(hy!=null)keys.forEach(function(k){if(hdr[k]&&Math.abs(hdr[k].y1-hy)>H*0.03)delete hdr[k]});
     var R={balance:.115,credit:.253,debit:.374,doc:.475,description:.62,entry:.799,date:.913},X={};
@@ -192,10 +199,18 @@ function solve(rows,totals){
       Object.keys(Li.D.m).forEach(function(dk){var dv=+dk,dc=Li.D.m[dk];if(dv<0)return;
         Object.keys(Li.C.m).forEach(function(ck){var cv=+ck,cc=Li.C.m[ck];if(cv<0||(dv>0&&cv>0))return;
           var b=pv+dv-cv,bc=Li.B.m[String(b)];if(bc==null)return;var tc=pc+dc+cc+bc;
-          if(!cur[b]||tc<cur[b].c)cur[b]={c:tc,from:pk,d:dv,cr:cv,ok:true}})})});
+          if(!cur[b]||tc<cur[b].c)cur[b]={c:tc,from:pk,d:dv,cr:cv,ok:true}})});
+        /* balance unreadable: take it from the amounts */
+        Object.keys(Li.D.m).forEach(function(dk){var dv=+dk,dc=Li.D.m[dk];if(dv<0||dc>1)return;Object.keys(Li.C.m).forEach(function(ck){var cv=+ck,cc=Li.C.m[ck];if(cv<0||cc>1||(dv>0&&cv>0))return;
+          var b=pv+dv-cv,tc=pc+dc+cc+3.5;if(!cur[b]||tc<cur[b].c)cur[b]={c:tc,from:pk,d:dv,cr:cv,ok:true}})});
+        /* amount unreadable: take it from the change in balance */
+        Object.keys(Li.B.m).forEach(function(bk){var bv=+bk,bc=Li.B.m[bk];if(bc>1)return;var df=bv-pv;if(!df)return;var tc=pc+bc+3.5;
+          if(!cur[bv]||tc<cur[bv].c)cur[bv]={c:tc,from:pk,d:df>0?df:0,cr:df<0?-df:0,ok:true}})});
     if(!Object.keys(cur).length){/* nothing consistent: keep the raw readings and mark the row */
       var bp=Object.keys(prev).sort(function(a,b){return prev[a].c-prev[b].c})[0],d=Math.max(0,Li.D.best),c=Math.max(0,Li.C.best),b=Li.B.best;
       cur[b]={c:prev[bp].c+10,from:bp,d:d,cr:c,ok:false}}
+    /* keep the 60 best states */
+    var ks=Object.keys(cur).sort(function(a,b){return cur[a].c-cur[b].c});if(ks.length>60){var nc={};ks.slice(0,60).forEach(function(k){nc[k]=cur[k]});cur=nc}
     trail.push(cur);prev=cur}
   var fin=Object.keys(prev);
   if(totals){var TB=cands(totals.br,true);fin.forEach(function(k){if(TB.m[k]==null)prev[k].c+=3;else prev[k].c+=TB.m[k]})}
@@ -206,7 +221,11 @@ function solve(rows,totals){
     return {date:fixDate(o.date),desc:o.desc,debit:r.d/100,credit:r.c/100,balance:r.b/100,flag:!r.ok?"bad":fixed?"fixed":""}});
   var T=null;if(totals){var td=cands(totals.dr),tc=cands(totals.cr),tb=cands(totals.br,true);
     T={debit:td.m[sd]!=null,credit:tc.m[sc]!=null,balance:tb.m[res.length?res[res.length-1].b:0]!=null}}
-  /* the opening line has its amount in debit or credit only */
+  /* dates: dd-mm-yyyy from the digits; a year that differs from the other lines is a misread */
+  var yc={};out.forEach(function(r){var m=/^(\d{2})-(\d{2})-(\d{4})$/.exec(r.date);if(m)yc[m[3]]=(yc[m[3]]||0)+1});
+  var yr=Object.keys(yc).sort(function(a,b){return yc[b]-yc[a]})[0];
+  out.forEach(function(r){var d=latin(r.date).replace(/\D/g,"");if(d.length<4)return;var dd=d.slice(0,2),mm=d.slice(2,4),y=d.slice(4,8);
+    if(+dd<1||+dd>31||+mm<1||+mm>12)return;if(yr&&(y.length<4||(y!==yr&&(yc[y]||0)<2)))y=yr;if(y.length===4)r.date=dd+"-"+mm+"-"+y});
   return {rows:out,totals:T}}
 function fixDate(t){var d=latin(t).replace(/[^\d]/g,"");if(d.length===8)return d.slice(0,2)+"-"+d.slice(2,4)+"-"+d.slice(4);return latin(t).replace(/[^\d\-\/.:]/g,"").replace(/[.:\/]/g,"-")}
 
