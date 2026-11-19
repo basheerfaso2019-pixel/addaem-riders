@@ -1002,7 +1002,7 @@ var SAL={fr:null};
 function salPos(){var s=document.getElementById("salSlot"),f=SAL.fr;
   if(!isAdmin){if(f){f.remove();SAL.fr=null}return}
   if(!s){if(f)f.style.display="none";return}
-  if(!f){f=SAL.fr=document.createElement("iframe");f.src="salary.html?v=20261119e";f.title="تفاصيل الراتب";f.className="hiref";document.body.appendChild(f)}
+  if(!f){f=SAL.fr=document.createElement("iframe");f.src="salary.html?v=20261119f";f.title="تفاصيل الراتب";f.className="hiref";document.body.appendChild(f)}
   var b=s.getBoundingClientRect();f.style.display="block";f.style.top=(b.top+window.scrollY)+"px";f.style.left=(b.left+window.scrollX)+"px";f.style.width=b.width+"px";f.style.height=b.height+"px"}
 setInterval(salPos,200);window.addEventListener("resize",salPos);
 function vSalary(){setTimeout(salPos,0);return '<div id="salSlot" class="hires"><p class="hint" style="padding:16px">جارٍ فتح الصفحة…</p></div>'}
