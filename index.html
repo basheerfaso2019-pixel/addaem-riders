@@ -427,7 +427,7 @@ function vOverall(){
   var k='<div class="kpis">'+kpi("عدد المناديب",N(courierIds().length,0),'عمل منهم <span class="num">'+t.riders+'</span> في '+wd(ld))+
     kpi("الطلبات المكتملة",N(t.cp,0),delta==null?dl(ld):'<span class="'+(delta>=0?"up":"down")+'"><span class="num">'+(delta>=0?"+":"")+fmt(delta,1)+'%</span></span> عن اليوم السابق')+
     kpi("نسبة القبول",P(t.ar),dl(ld))+kpi("ساعات العمل الفعلية",N(t.ac,1),'من <span class="num">'+fmt(t.pl,0)+'</span> ساعة مخططة')+
-    kpi("عدم الحضور",N(t.ns,0),"في آخر يوم")+kpi("إجمالي المكتملة",N(ocmSum(),0),ocmLbl())+'</div>'+ocmPanel();
+    kpi("عدم الحضور",N(t.ns,0),"في آخر يوم")+kpi("إجمالي المكتملة",N(ocmSum(),0),ocmLbl())+'</div>'+swaPanel()+ocmPanel();
   var ser=ds.slice(-30).map(function(d){return{d:d,v:agg(rec(d)).cp}});
   var byCity={};rec(ld).forEach(function(o){var c=o.x[CI]||"—";(byCity[c]||(byCity[c]=[])).push(o)});
   var cityT=Object.keys(byCity).map(function(c){var a=agg(byCity[c]);return '<tr><td>'+esc(c)+'</td><td>'+N(a.riders,0)+'</td><td>'+N(a.cp,0)+'</td><td>'+P(a.ar)+'</td><td>'+N(a.ac,1)+'</td></tr>'}).join("");
@@ -881,6 +881,19 @@ function stState(s){var t=stToday();if(s.t==="ended")return {cls:"st-end",txt:"�
   if(s.u&&s.u<t)return {cls:"st-done",txt:(s.t==="leave"?"انتهت الإجازة":"انتهى الإيقاف")};
   if(s.f&&s.f>t)return {cls:"st-wait",txt:ST_T[s.t]+" تبدأ "+s.f};
   return {cls:s.t==="leave"?"st-leave":"st-susp",txt:ST_T[s.t]+(s.u?" — باقي "+stDays(t,s.u)+" يوم":"")}}
+/* riders with a status (leave/susp/ended) who worked inside that status period (swa_block) */
+function stWorked(){var out=[];Object.keys(data.couriers).forEach(function(id){var c=data.couriers[id],st=c.st;if(!st)return;var L=[],o=0,h=0;
+  Object.keys(data.days).forEach(function(d){if(st.f&&d<st.f)return;if(st.u&&d>st.u)return;var x=data.days[d][id];if(!x)return;var cp=+x[CP]||0,ah=+x[AC]||0;if(cp>0||ah>0){L.push(d);o+=cp;h+=ah}});
+  if(L.length){L.sort();out.push({id:id,st:st,ds:L,o:o,h:h,w:c.w?c.w.b:null,wd:c.w?c.w.d:null})}});
+  return out.sort(function(a,b){var r={ended:0,susp:1,leave:2};return(r[a.st.t]-r[b.st.t])||(b.ds[b.ds.length-1]>a.ds[a.ds.length-1]?1:-1)})}
+function stTypeTxt(st){if(st.t==="ended")return "ترك العمل";if(st.t==="susp")return "موقوف";return /عمرة/.test(st.n)?"إجازة عمرة":/حادث|إصابة|مرض/.test(st.n)?"إجازة مرضية":"إجازة"}
+function swaPanel(){if(!isAdmin)return "";var R=stWorked();if(!R.length)return "";
+  return '<section class="panel" style="border:2px solid var(--bad)"><h2 style="margin:0 0 6px;color:var(--bad)">⚠ تنبيه: مناديب اشتغلوا وهم '+'متوقفون أو تاركون للعمل أو في إجازة (<span class="num">'+R.length+'</span>)</h2>'+
+  '<p class="hint" style="margin:0 0 8px">أيام فيها طلبات أو ساعات عمل داخل فترة الحالة المسجلة في «المناديب الموقوفون». راجع الحالة أو المحفظة.</p><div class="tw"><table><thead><tr><th>م</th><th>المندوب</th><th>I.D</th><th>الحالة</th><th>من / إلى</th><th>أيام عمل</th><th>الطلبات</th><th>أول / آخر يوم عمل</th><th>المحفظة</th></tr></thead><tbody>'+
+  R.map(function(r,i){return '<tr><td class="num">'+(i+1)+'</td><td>'+esc(cname(r.id))+'</td><td class="num">'+esc(r.id)+'</td><td><b style="color:var(--bad)">'+esc(stTypeTxt(r.st))+'</b>'+(r.st.n&&r.st.n!==stTypeTxt(r.st)?'<br><small>'+esc(r.st.n)+'</small>':'')+'</td><td class="num">'+esc(r.st.f||"—")+'<br>'+esc(r.st.u||"بدون نهاية")+'</td><td class="num">'+r.ds.length+'</td><td class="num">'+fmt(r.o,0)+'</td><td class="num">'+esc(r.ds[0])+'<br>'+esc(r.ds[r.ds.length-1])+'</td><td>'+money(r.w)+(r.wd?'<br><small class="num">'+esc(r.wd)+'</small>':'')+'</td></tr>'}).join("")+
+  '</tbody></table></div></section>'}
+function swaUpMsg(dd){var a=stWorked().map(function(r){var ds=r.ds.filter(function(d){return dd[d]});return ds.length?cname(r.id)+" ("+r.id+") - "+stTypeTxt(r.st)+": "+ds.join("، "):null}).filter(Boolean);
+  var t="";if(a.length)t+=" ⚠ تنبيه: اشتغل وهو متوقف/تارك/في إجازة: "+a.join(" | ")+".";if(SWLIFT.length)t+=" ⚠ رجع للعمل وهو موقوف (رُفع الإيقاف تلقائياً): "+SWLIFT.join(" | ")+".";return t}
 function vSusp(){
   var t=stToday(),ids=Object.keys(data.couriers).filter(function(id){return data.couriers[id].n}).sort(function(a,b){return cname(a).localeCompare(cname(b),"ar")});
   var form=isAdmin?'<section class="panel"><h2 style="margin:0 0 10px">تسجيل حالة مندوب</h2><div class="tgaform">'+
@@ -900,7 +913,7 @@ function vSusp(){
     return '<tr><td class="num">'+(i+1)+'</td><td>'+esc(cname(id))+'</td><td class="num">'+esc(id)+'</td><td>'+(c?'<span class="catp cat-'+({"أ":"a","ب":"b","خ":"k"}[c]||"r")+'">'+esc(c)+'</span>':'')+'</td>'+
       '<td><span class="stchip '+x.cls+'">'+esc(x.txt)+'</span></td><td class="num">'+esc(s.f||"")+'</td><td class="num">'+esc(s.u||"")+'</td><td style="white-space:normal">'+esc(s.n)+'</td><td class="num">'+esc(stLastDay(id))+'</td>'+
       (isAdmin?'<td><button class="btn sm" data-stedit="'+esc(id)+'">تعديل</button> <button class="btn sm'+(x.cls==="st-done"?" pri":"")+'" data-stclear="'+esc(id)+'">'+(s.t==="ended"?"إعادة تفعيل":"رجع للعمل")+'</button></td>':'')+'</tr>'}).join("");
-  return form+'<section class="panel"><h2 style="margin:0 0 10px">المناديب في إجازة أو موقوفون أو منتهية عقودهم</h2>'+tiles+
+  return form+swaPanel()+'<section class="panel"><h2 style="margin:0 0 10px">المناديب في إجازة أو موقوفون أو منتهية عقودهم</h2>'+tiles+
     '<div class="tbl"><table data-catdone="1"><thead><tr><th>م</th><th>الاسم</th><th>Rider Id</th><th>الفئة</th><th>الحالة</th><th>من</th><th>إلى</th><th>السبب</th><th>آخر يوم عمل</th>'+(isAdmin?'<th></th>':'')+'</tr></thead><tbody>'+
     (body||'<tr><td class="empty" colspan="10">لا يوجد مندوب في إجازة أو موقوف حالياً.</td></tr>')+'</tbody></table></div></section>'}
 function stSet(m,ok){stUi.msg=m;stUi.ok=ok!==false;var e=document.getElementById("stMsg");if(e){e.textContent=m;e.style.color=stUi.ok?"inherit":"#c00"}}
@@ -1858,9 +1871,10 @@ function dayPurge(rows){var ds=upDays(rows);if(!ds.length)return null;var q=sb.f
   /* no performance data and no distance (null or 0) = empty row */
   return q.then(function(r){if(r.error)throw r.error;var by={};(r.data||[]).forEach(function(x){if(!(+x.distance_km||+x.payable_km||+x.completed_dist))(by[x.day]||(by[x.day]=[])).push(x.rider_id)});
     return Object.keys(by).reduce(function(p,d){return p.then(function(){return sb.from("daily").delete().eq("day",d).in("rider_id",by[d]).then(function(r){if(r.error)throw r.error})})},Promise.resolve())})}
+var SWLIFT=[];
 function suspLift(rows){var by={};rows.forEach(function(r){var c=+(r.completed!=null?r.completed:r.completed_dist)||0;if(c>0&&r.rider_id&&r.day){(by[r.rider_id]=by[r.rider_id]||[]).push(String(r.day).slice(0,10))}});var ids=Object.keys(by);if(!ids.length)return null;
   return sb.from("riders").select("id,st_from,st_until").eq("st","susp").in("id",ids).then(function(q){if(q.error||!q.data)return null;
-    return q.data.reduce(function(p,rd){var ds=by[rd.id].filter(function(d){return(!rd.st_from||d>=rd.st_from)&&(!rd.st_until||d<=rd.st_until)}).sort();if(!ds.length)return p;var d=ds[0];
+    return q.data.reduce(function(p,rd){var ds=by[rd.id].filter(function(d){return(!rd.st_from||d>=rd.st_from)&&(!rd.st_until||d<=rd.st_until)}).sort();if(!ds.length)return p;var d=ds[0];SWLIFT.push(cname(rd.id)+" ("+rd.id+") من "+d);
       var pv=new Date(d+"T12:00:00Z");pv.setUTCDate(pv.getUTCDate()-1);pv=pv.toISOString().slice(0,10);
       var up=(!rd.st_from||pv<rd.st_from)?{st:null,st_from:null,st_until:null,st_note:null}:{st_until:pv};
       return p.then(function(){return sb.from("riders").update(up).eq("id",rd.id)}).then(function(){return sb.from("sheet_extra").update({note:null}).eq("rider_id",rd.id).eq("month",d.slice(0,7)).not("note","is",null)})},Promise.resolve())})}
@@ -1899,7 +1913,7 @@ function applyUpload(list){
 }
 function work(promise,okMsg){
   ui.busy=true;ui.msg="جارٍ الحفظ…";ui.msgOk=true;render();
-  return promise.then(function(){return loadStaffData()}).then(function(){ui.busy=false;ui.msg=okMsg;ui.msgOk=true;render()})
+  return promise.then(function(){return loadStaffData()}).then(function(){ui.busy=false;ui.msg=typeof okMsg==="function"?okMsg():okMsg;ui.msgOk=true;render()})
   .catch(function(e){ui.busy=false;ui.msgOk=false;ui.msg="تعذّر الحفظ: "+((e&&e.message)||e);render()});
 }
 function riderLogin(cid,iq,pin,np){ui.busy=true;ui.msg="";
@@ -1986,7 +2000,7 @@ root.addEventListener("click",function(e){
     work(Promise.all([sb.from("daily").delete().gte("day","1900-01-01"),sb.from("quality").delete().neq("month",""),sb.from("wallet").delete().neq("rider_id","")]).then(function(rs){rs.forEach(function(r){if(r.error)throw r.error})}),"تم حذف بيانات الأداء. أسماء المناديب وأرقام الإقامة باقية.");return}
   if(t.id==="saveName"){var nm=document.getElementById("cname").value.trim();if(!nm)return;
     work(sb.from("settings").upsert({key:"company",value:nm}).then(function(r){if(r.error)throw r.error}),"تم حفظ الاسم.");return}
-  if(t.id==="applyUp"){var up=ui.upload;if(!up||!up.length)return;var multi=up.filter(function(u){return u.type==="perf"&&u.multiDay});up=up.filter(function(u){return !(u.type==="perf"&&u.multiDay)});ui.upload=null;if(!up.length){ui.msgOk=false;ui.msg="لم يُحفظ شيء: تقرير الأداء يغطي أكثر من يوم. صدّره من هنقرستيشن ليوم واحد فقط ثم ارفعه مع اختيار نفس التاريخ.";render();return}work(applyUpload(up),multi.length?"تم حفظ باقي الملفات. تقرير الأداء لم يُحفظ لأنه يغطي أكثر من يوم، صدّره ليوم واحد.":"تم حفظ البيانات.");return}
+  if(t.id==="applyUp"){var up=ui.upload;if(!up||!up.length)return;var multi=up.filter(function(u){return u.type==="perf"&&u.multiDay});up=up.filter(function(u){return !(u.type==="perf"&&u.multiDay)});ui.upload=null;if(!up.length){ui.msgOk=false;ui.msg="لم يُحفظ شيء: تقرير الأداء يغطي أكثر من يوم. صدّره من هنقرستيشن ليوم واحد فقط ثم ارفعه مع اختيار نفس التاريخ.";render();return}var swDays={};up.forEach(function(u){Object.keys(u.days||{}).forEach(function(d){swDays[d]=1})});SWLIFT=[];var m0=multi.length?"تم حفظ باقي الملفات. تقرير الأداء لم يُحفظ لأنه يغطي أكثر من يوم، صدّره ليوم واحد.":"تم حفظ البيانات.";work(applyUpload(up),function(){return m0+swaUpMsg(swDays)});return}
   if(t.id==="saveRoster"){var ro=ui.roster;ui.roster=null;
     work(sb.rpc("set_riders",{p_rows:Object.keys(ro).map(function(id){return{id:id,name:ro[id].n||"",iqama:ro[id].iq}})}).then(function(r){if(r.error)throw r.error}),"تم حفظ أرقام الإقامة.");return}
 });
