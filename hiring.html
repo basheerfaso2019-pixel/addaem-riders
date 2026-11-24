@@ -383,27 +383,31 @@ function loadTess(){if(!tessP)tessP=new Promise((res,rej)=>{if(window.Tesseract)
 let tessW=null;
 const TPRE=`const _f=self.fetch.bind(self);self.fetch=async(u,o)=>{u=String(u);for(const l of ['ara','eng']){if(u.indexOf(l+'.traineddata')>-1){const b=atob(self.__EMB[l]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Response(a)}}return _f(u,o)};
 const _cu=URL.createObjectURL(new Blob([self.__EMB.core],{type:'text/javascript'}));const _is=self.importScripts.bind(self);self.importScripts=(...u)=>_is(...u.map(x=>String(x).indexOf('tesseract-core')>-1?_cu:x));`;
-async function makeTessWorker(T){
+async function makeTessWorker(T,langs){langs=langs||['ara','eng'];
  const g=id=>{const e=document.getElementById(id);return e?e.textContent:null};
  if(g('emb-tw')){
   const src='self.__EMB='+JSON.stringify({ara:g('emb-ta').trim(),eng:g('emb-te').trim(),core:g('emb-tc')})+';\n'+TPRE+'\n'+g('emb-tw');
   const url=URL.createObjectURL(new Blob([src],{type:'text/javascript'}));
-  return T.createWorker(['ara','eng'],1,{workerPath:url,workerBlobURL:false,corePath:'https://local.invalid/tesseract-core-lstm.wasm.js',langPath:'https://local.invalid/lang',gzip:true,cacheMethod:'none'});
+  return T.createWorker(langs,1,{workerPath:url,workerBlobURL:false,corePath:'https://local.invalid/tesseract-core-lstm.wasm.js',langPath:'https://local.invalid/lang',gzip:true,cacheMethod:'none'});
  }
- return T.createWorker(['ara','eng']);
+ return T.createWorker(langs);
 }
 async function upscale(blob){try{const u=URL.createObjectURL(blob);const img=await new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=u});URL.revokeObjectURL(u);const sc=Math.min(3,Math.max(1,2600/Math.max(img.width,img.height)));if(sc<=1.05)return blob;const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);const x=c.getContext('2d');x.imageSmoothingQuality='high';x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);return await canvasBlob(c)}catch(e){return blob}}
 async function ocrText(blob){const T=await loadTess();if(!tessW)tessW=await makeTessWorker(T);const r=await tessW.recognize(await upscale(blob));return latinDigits(r.data.text||'')}
 const COUNTRIES={'اليمن':['YEMEN','يمن'],'مصر':['EGYPT','مصر'],'الهند':['INDIA','هند'],'باكستان':['PAKISTAN','باكستان'],'بنجلاديش':['BANGLADESH','بنجلاديش','بنغلاديش'],'السودان':['SUDAN','سودان'],'الفلبين':['PHILIPPINES','فلبين'],'نيبال':['NEPAL','نيبال'],'سوريا':['SYRIA','سوري'],'الأردن':['JORDAN','اردن','أردن'],'إثيوبيا':['ETHIOPIA','اثيوبيا','إثيوبيا'],'سريلانكا':['SRI LANKA','سريلانكا'],'إندونيسيا':['INDONESIA','اندونيسيا'],'أفغانستان':['AFGHANISTAN','افغانستان'],'نيجيريا':['NIGERIA','نيجيريا'],'كينيا':['KENYA','كينيا'],'أوغندا':['UGANDA','اوغندا'],'تشاد':['CHAD','تشاد'],'المغرب':['MOROCCO','مغرب'],'تونس':['TUNISIA','تونس'],'لبنان':['LEBANON','لبنان'],'فلسطين':['PALESTINE','فلسطين'],'السعودية':['SAUDI','سعودي']};
+function pickIqama(T){const C=[...String(T).replace(/(\d)[ \u200f\u200e](?=\d)/g,'$1').matchAll(/(?<!\d)([12]\d{9})(?!\d)/g)].map(m=>({v:m[1],i:m.index})).filter(c=>new Set(c.v).size>=4&&!/(\d)\1{4}/.test(c.v));
+ const li=String(T).search(/رقم الهوية|رقم الإقامة|رقم الاقامة|ID\s*N|IQAMA|ID No|Identity No/i);
+ C.sort((a,b)=>((b.v[0]==='2')-(a.v[0]==='2'))||(li>=0?Math.abs(a.i-li)-Math.abs(b.i-li):a.i-b.i));return C[0]?C[0].v:''}
+let digW=null;
+async function ocrDigits(blob){const T=await loadTess();if(!digW){digW=await makeTessWorker(T,['eng']);await digW.setParameters({tessedit_char_whitelist:'0123456789',tessedit_pageseg_mode:'11'})}const r=await digW.recognize(await upscale(blob));return latinDigits(r.data.text||'')}
+window.__hire={pickIqama:(t)=>pickIqama(t),ocrDigits:(b)=>ocrDigits(b),ocrText:(b)=>ocrText(b),parseText:(t,y)=>parseText(t,y)};
 function parseText(t,type){
  const o={};const T=t.replace(/[ \t]+/g,' ');
  const ib=T.replace(/[ \-]/g,'').toUpperCase().match(/SA\d{22}/);if(ib)o.iban=ib[0];
- if(type!=='iban'){const C=[...T.replace(/(\d)[ \u200f\u200e](?=\d)/g,'$1').matchAll(/(?<!\d)([12]\d{9})(?!\d)/g)].map(m=>({v:m[1],i:m.index})).filter(c=>new Set(c.v).size>=4&&!/(\d)\1{4}/.test(c.v));
-  const li=T.search(/رقم الهوية|رقم الإقامة|رقم الاقامة|ID\s*N|IQAMA|ID No|Identity No/i);
-  C.sort((a,b)=>((b.v[0]==='2')-(a.v[0]==='2'))||(li>=0?Math.abs(a.i-li)-Math.abs(b.i-li):a.i-b.i));if(C[0])o.iqama=C[0].v}
+ if(type!=='iban'){const q=pickIqama(T);if(q)o.iqama=q}
  const dates=[];for(const m of T.matchAll(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})|(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/g)){const y=+(m[1]||m[6]),mo=+(m[2]||m[5]),d=+(m[3]||m[4]);if(y>1900&&y<2100&&mo<=12&&d<=31)dates.push(`${y}/${pad(mo)}/${pad(d)}`)}
  dates.sort();
- if(type==='iqama'||type==='passport'){const dob=dates.find(d=>+d.slice(0,4)<2012);if(dob)o.dob=dob;const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex&&type==='iqama')o.iqama_exp=ex}
+ if(type==='iqama'||type==='passport'){const yNow=new Date().getFullYear();const dob=dates.find(d=>+d.slice(0,4)>=1940&&+d.slice(0,4)<=yNow-15);if(dob)o.dob=dob;const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex&&type==='iqama')o.iqama_exp=ex}
  if(type==='license'){const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex)o.license_exp=ex}
  const STOP=/KINGDOM|SAUDI|ARABIA|MINISTRY|INTERIOR|RESIDENT|IDENTITY|PERMIT|BANK|ACCOUNT|IBAN|PASSPORT|REPUBLIC|LICENSE|DRIVING|NUMBER|CURRENT|DETAILS|SWIFT|BRANCH|EMPLOYER|OCCUPATION|PROFESSION|NATIONALITY|RELIGION|MUSLIM|BIRTH|EXPIRY|ISSUE|DATE|PLACE|SPONSOR|ABSHER|COMPANY|\bEST\b|ESTABLISHMENT|LOGISTIC|SERVICES|TRADING|CONTRACTING|DRIVER|WORKER|DELIVERY|VERSION|COPY|DIGITAL|GENERAL|DIRECTORATE|PASSPORTS|BORDER|\bID\b/;
  const lines=t.split(/\n/).map(x=>x.trim()).filter(Boolean);
@@ -443,7 +447,7 @@ async function ocrExtract(id){
    const p=a.pages[i];a.status=`جارٍ قراءة الصفحة ${i+1} من ${a.pages.length}…`;buildDrops();
    const txt=await ocrText(p.blob);
    const type=id==='bundle'?classify(txt):(id.startsWith('other')?classify(txt):id);p.type=type;
-   const o=parseText(txt,type);const key=id==='bundle'?'b_'+type:id;
+   const o=parseText(txt,type);if(type==='iqama'&&!o.iqama){a.status='جارٍ قراءة رقم الإقامة…';buildDrops();try{const q=pickIqama(await ocrDigits(p.blob));if(q)o.iqama=q}catch(e){}}const key=id==='bundle'?'b_'+type:id;
    EXT[key]=EXT[key]||{};for(const k in o)if(!EXT[key][k]){EXT[key][k]=o[k];n++}
    if(!Object.keys(EXT[key]).length)delete EXT[key];
   }
