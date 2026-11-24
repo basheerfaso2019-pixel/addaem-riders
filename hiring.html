@@ -403,18 +403,27 @@ function parseText(t,type){
  dates.sort();
  if(type==='iqama'||type==='passport'){const dob=dates.find(d=>+d.slice(0,4)<2012);if(dob)o.dob=dob;const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex&&type==='iqama')o.iqama_exp=ex}
  if(type==='license'){const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex)o.license_exp=ex}
- const STOP=/KINGDOM|SAUDI|ARABIA|MINISTRY|INTERIOR|RESIDENT|IDENTITY|PERMIT|BANK|ACCOUNT|IBAN|PASSPORT|REPUBLIC|LICENSE|DRIVING|NAME|NUMBER|CURRENT|DETAILS|SWIFT|BRANCH/;
+ const STOP=/KINGDOM|SAUDI|ARABIA|MINISTRY|INTERIOR|RESIDENT|IDENTITY|PERMIT|BANK|ACCOUNT|IBAN|PASSPORT|REPUBLIC|LICENSE|DRIVING|NUMBER|CURRENT|DETAILS|SWIFT|BRANCH|EMPLOYER|OCCUPATION|PROFESSION|NATIONALITY|RELIGION|MUSLIM|BIRTH|EXPIRY|ISSUE|DATE|PLACE|SPONSOR|ABSHER|COMPANY|\bEST\b|ESTABLISHMENT|LOGISTIC|SERVICES|TRADING|CONTRACTING|DRIVER|WORKER|DELIVERY|VERSION|COPY|DIGITAL|GENERAL|DIRECTORATE|PASSPORTS|BORDER|\bID\b/;
  const lines=t.split(/\n/).map(x=>x.trim()).filter(Boolean);
- const en=lines.map(x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim()).filter(x=>x.split(' ').length>=3&&x===x.toUpperCase()&&x.length>=10&&!STOP.test(x));
- if(en[0]){if(type==='iban')o.acct_holder=en[0];else o.name_en=en[0]}
- const ARSTOP=/المملكة|العربية|السعودية|وزارة|الداخلية|هوية|مقيم|إقامة|اقامة|البنك|بنك|الحساب|حساب|رخصة|جواز|المهنة|الجنسية|تاريخ|رقم|العنوان|الديانة|صاحب العمل|النسخة|الإصدار|الانتهاء/;
+ const latinShare=x=>{const a=(x.match(/[A-Za-z]/g)||[]).length,b=(x.replace(/\s/g,'').length)||1;return a/b};
+ const enOk=x=>{const w=x.split(' ');return w.length>=2&&w.length<=7&&w.every(z=>z.length>=2)&&x.length>=8&&!STOP.test(x)};
+ const enClean=x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
+ let enName='';
+ for(let i=0;i<lines.length&&!enName;i++){const m=lines[i].match(/\bNAME\b\s*[:：.]?\s*(.*)$/i);if(m&&!/BANK|EMPLOYER|SPONSOR/i.test(lines[i])){let c=enClean(m[1]);if(!enOk(c)&&lines[i+1])c=enClean(lines[i+1]);if(enOk(c))enName=c}}
+ if(!enName){const c=lines.filter(x=>latinShare(x)>0.75).map(enClean).filter(x=>enOk(x)&&x.split(' ').length>=3);enName=c[0]||''}
+ if(enName){if(type==='iban')o.acct_holder=enName;else o.name_en=enName}
+ const ARSTOP=/المملكة|العربية|السعودية|وزارة|الداخلية|هوية|مقيم|إقامة|اقامة|البنك|بنك|الحساب|حساب|رخصة|جواز|المهنة|الجنسية|تاريخ|رقم|العنوان|الديانة|صاحب|النسخة|الإصدار|الاصدار|الانتهاء|مؤسسة|موسسة|شركة|للخدمات|الخدمات|اللوجستية|للمقاولات|للتجارة|سائق|عامل|مندوب|توصيل|الإسلام|الاسلام|مسلم|ميلادي|هجري|الكفيل|المنشأة|المنشاة|الجوازات|العامة|المديرية|أبشر|ابشر|الرقمية|مكان|الميلاد|الإقامة|الاقامة|المملكه|السعوديه/;
+ const arClean=x=>x.replace(/[^ء-ي ]/g,' ').replace(/\s+/g,' ').trim();
+ const arOk=x=>{const w=x.split(' ');return w.length>=2&&w.length<=7&&w.every(z=>z.length>=2)&&!ARSTOP.test(x)};
  let arName='';
- const lbl=lines.find(x=>/الاسم\s*[:：]/.test(x));if(lbl)arName=lbl.split(/[:：]/).pop();
- if(!arName){const c=lines.map(x=>x.replace(/[^؀-ۿ ]/g,' ').replace(/\s+/g,' ').trim()).filter(x=>{const w=x.split(' ');return w.length>=3&&w.length<=6&&w.every(z=>z.length>=2)&&!ARSTOP.test(x)});arName=c[0]||''}
- arName=arName.replace(/[^؀-ۿ ]/g,' ').split(/\s+/).filter(w=>w&&w!=='بن'&&w!=='بنت').join(' ');
+ for(let i=0;i<lines.length&&!arName;i++){const L=lines[i];if(/الاسم|الإسم/.test(L)&&!/صاحب|الكفيل|البنك|المنشأة|المنشاة/.test(L)){let c=arClean(L.split(/الاسم|الإسم/).slice(1).join(' ').replace(/[:：]/g,' '));if(!arOk(c)&&lines[i+1])c=arClean(lines[i+1]);if(arOk(c))arName=c}}
+ if(!arName){const want=enName?enName.split(' ').length:4;const c=lines.filter(x=>latinShare(x)<0.3).map(arClean).filter(x=>arOk(x)&&x.split(' ').length>=3);c.sort((a,b)=>Math.abs(a.split(' ').length-want)-Math.abs(b.split(' ').length-want));arName=c[0]||''}
+ arName=arName.split(/\s+/).filter(w=>w&&w!=='بن'&&w!=='بنت').join(' ');
  if(arName&&type!=='iban'){const w=arName.split(' ');o.first_ar=w[0]||'';o.father_ar=w[1]||'';if(w.length>=4){o.grand_ar=w.slice(2,-1).join(' ');o.family_ar=w[w.length-1]}else o.family_ar=w[2]||''}
  else if(arName&&type==='iban'&&!o.acct_holder)o.acct_holder=arName;
- if(type!=='iban'){const up=T.toUpperCase();for(const [ar,keys] of Object.entries(COUNTRIES)){if(keys.some(k=>up.includes(k.toUpperCase())||T.includes(k))){if(ar!=='السعودية'||type==='passport'){o.nationality=ar;break}}}}
+ if(type!=='iban'){const ni=lines.findIndex(x=>/الجنسية|NATIONALITY/i.test(x));if(ni>=0){for(const seg0 of [lines[ni],lines[ni+1]||'']){const su=seg0.replace(/الجنسية|NATIONALITY|مهندس|الهندسة|هندسي/ig,' ').toUpperCase();for(const [ar,keys] of Object.entries(COUNTRIES)){if(keys.some(k=>su.includes(k.toUpperCase()))){o.nationality=ar;break}}if(o.nationality)break}}}
+ if(type!=='iban'){const pi=lines.findIndex(x=>/المهنة/.test(x));if(pi>=0){let c=arClean(lines[pi].split('المهنة').slice(1).join(' '));if(!c&&lines[pi+1])c=arClean(lines[pi+1]);if(c&&c.split(' ').length<=4)o.profession=c}}
+ if(type!=='iban'&&!o.nationality){const up=T.replace(/مهندس|الهندسة|هندسي/g,' ').toUpperCase();for(const [ar,keys] of Object.entries(COUNTRIES)){if(keys.some(k=>up.includes(k.toUpperCase()))){if(ar!=='السعودية'||type==='passport'){o.nationality=ar;break}}}}
  if(!o.nationality&&o.iqama&&o.iqama[0]==='1'&&type!=='iban')o.nationality='السعودية';
  const mob=T.match(/(?<!\d)05\d{8}(?!\d)/);if(mob)o.mobile1=mob[0];
  const em=T.match(/[\w.+-]+@[\w-]+\.[\w.]+/);if(em)o.email=em[0];
