@@ -717,7 +717,7 @@ document.addEventListener("input",function(e){if(e.target.id!=="cQ")return;CARD.
 var SH_OUT=["الرياض","الدمام"];
 /* sheet city filter (fadhel 2026-11-19): all = every region; الأحساء = region empty */
 var SH_CITIES=[["الأحساء","الأحساء"],["الرياض","الرياض"],["الدمام","الدمام"],["أبقيق","أبقيق"]];
-function shCitySel(){return (ui0.scs||[]).filter(function(c){return SH_CITIES.some(function(x){return x[0]===c})})}
+function shCitySel(){if(ui0.scs==null)ui0.scs=["الأحساء","أبقيق"];return ui0.scs.filter(function(c){return SH_CITIES.some(function(x){return x[0]===c})})}
 function shCityOk(id){var rg=data.couriers[id].rg||"",S=shCitySel();if(!S.length)return true;return S.indexOf(rg||"الأحساء")>=0}
 function shCityTxt(){var S=shCitySel();return S.length?" - "+S.join(" و "):""}
 var ADDB='<button class="btn" data-addr="1">+ إضافة مندوب</button>';
