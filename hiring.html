@@ -398,7 +398,9 @@ const COUNTRIES={'اليمن':['YEMEN','يمن'],'مصر':['EGYPT','مصر'],'ا
 function parseText(t,type){
  const o={};const T=t.replace(/[ \t]+/g,' ');
  const ib=T.replace(/[ \-]/g,'').toUpperCase().match(/SA\d{22}/);if(ib)o.iban=ib[0];
- const iq=T.match(/(?<!\d)[12]\d{9}(?!\d)/);if(iq&&type!=='iban')o.iqama=iq[0];
+ if(type!=='iban'){const C=[...T.replace(/(\d)[ \u200f\u200e](?=\d)/g,'$1').matchAll(/(?<!\d)([12]\d{9})(?!\d)/g)].map(m=>({v:m[1],i:m.index})).filter(c=>new Set(c.v).size>=4&&!/(\d)\1{4}/.test(c.v));
+  const li=T.search(/رقم الهوية|رقم الإقامة|رقم الاقامة|ID\s*N|IQAMA|ID No|Identity No/i);
+  C.sort((a,b)=>((b.v[0]==='2')-(a.v[0]==='2'))||(li>=0?Math.abs(a.i-li)-Math.abs(b.i-li):a.i-b.i));if(C[0])o.iqama=C[0].v}
  const dates=[];for(const m of T.matchAll(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})|(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/g)){const y=+(m[1]||m[6]),mo=+(m[2]||m[5]),d=+(m[3]||m[4]);if(y>1900&&y<2100&&mo<=12&&d<=31)dates.push(`${y}/${pad(mo)}/${pad(d)}`)}
  dates.sort();
  if(type==='iqama'||type==='passport'){const dob=dates.find(d=>+d.slice(0,4)<2012);if(dob)o.dob=dob;const ex=dates.filter(d=>+d.slice(0,4)>=2020).pop();if(ex&&type==='iqama')o.iqama_exp=ex}
